@@ -1,0 +1,2 @@
+# easyspider-web
+Django website
