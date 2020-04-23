@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    {% block script %}{% endblock %}
+</head>
+<body>
+<div id="content">
+    {% block header %}<h1>EasySpider</h1>{% endblock %}
+    <hr>
+    {% if request.session.username %}
+        <p>欢迎，{{ request.session.username }}！</p>
+    {% else %}
+        <p>欢迎！</p>
+    {% endif %}
+    {% block navigation %}
+    {% if request.session.username %}
+        <nav>
+            <a href="{% url 'easyspider:index' %}">首页</a> |
+            <a href="{% url 'easyspider:template-list' %}">爬虫模板列表</a> |
+            <a href="{% url 'easyspider:task-list' %}">爬虫任务列表</a> |
+            <a href="{% url 'easyspider:logout' %}">注销</a>
+        </nav>
+    {% else %}
+        <nav>
+            <a href="{% url 'easyspider:login' %}">登录</a> |
+            <a href="{% url 'easyspider:register' %}">注册</a>
+        </nav>
+    {% endif %}
+    {% endblock %}
+    {% block content %}{% endblock %}
+    <hr>
+    <footer>
+        <small>Copyright</small>
+    </footer>
+</div>
+</body>
+</html>

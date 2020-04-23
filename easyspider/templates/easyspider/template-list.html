@@ -1,0 +1,17 @@
+{% extends "easyspider/base.html" %}
+
+{% block title %}爬虫模板列表{% endblock %}
+
+{% block header %}<h1>爬虫模板列表</h1>{% endblock %}
+
+{% block content %}
+    {% if template_list %}
+        <ul>
+        {% for template in template_list %}
+            <li><a href="{% url 'easyspider:template-detail' template.id %}">{{ template.name }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>暂无</p>
+    {% endif %}
+{% endblock %}

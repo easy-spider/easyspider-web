@@ -1,0 +1,22 @@
+{% extends 'easyspider/base.html' %}
+
+{% block title %}用户登录{% endblock %}
+
+{% block header %}<h1>用户登录</h1>{% endblock %}
+
+{% block navigation %}{% endblock %}
+
+{% block content %}
+{% if error_message %}<p style="color: red">{{ error_message }}</p>{% endif %}
+<form action="{% url 'easyspider:login' %}" method="post">
+    {% csrf_token %}
+    <label for="username-input">用户名</label>
+    <input id="username-input" type="text" name="username"
+           pattern="[0-9A-Za-z_]+" maxlength="32" required>
+    <br>
+    <label for="password-input">密码</label>
+    <input id="password-input" type="password" name="password" maxlength="32" required>
+    <br>
+    <input type="submit" value="登录">
+</form>
+{% endblock %}
