@@ -4,4 +4,5 @@
 # Python
 __pycache__/
 
+/EasySpiderWeb/settings.py
 /my.ini
