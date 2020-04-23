@@ -1,0 +1,54 @@
+#search-box {
+  width: 40%;
+}
+
+#logo,
+#hot-template-header {
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+.widget-user-desc {
+  color: #aaa;
+  font-size: small;
+}
+
+.widget-user-username {
+  font-weight: bold !important;
+}
+
+blockquote {
+  background-color: transparent !important;
+}
+
+#logo {
+  padding-bottom: 30px;
+}
+
+.hot-templates,
+#hot-template-header,
+.hot-template-footer {
+  padding: 0 25%;
+}
+
+.hot-templates .card {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.hot-templates .card-footer {
+  background-color: transparent !important;
+}
+
+.hot-templates .card:hover {
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.125), 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+  background-color: #ddd !important;
+}
+
+.hot-templates .card:hover .card-footer {
+  background-color: #ddd !important;
+}
+
+#hot-template-header {
+  margin-bottom: -20px;
+}

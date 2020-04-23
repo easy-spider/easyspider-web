@@ -1,0 +1,43 @@
+#template-desc h4 {
+  margin-bottom: 20px;
+}
+
+#arguments-vert-tabs-tabContent img,
+#data-field-vert-tabs-tabContent img {
+  width: 100%;
+}
+
+#template-logo {
+  width: 85%;
+}
+
+.card:not(#example-data-table) {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #f4f6f9 !important;
+}
+
+#template-tab .nav-link.active {
+  border-color: #ddd #ddd transparent #ddd !important;
+}
+
+#template-tab {
+  border-bottom-color: #ddd !important;
+}
+
+#template-tab .nav-link:hover {
+  border-bottom-color: transparent !important;
+}
+
+#data-field-vert-tabs-tab,
+#arguments-vert-tabs-tab {
+  border-right-color: #ddd !important;
+}
+
+#data-field-vert-tabs-tab .nav-link.active,
+#arguments-vert-tabs-tab .nav-link.active {
+  border-color: #ddd transparent #ddd #ddd !important;
+}

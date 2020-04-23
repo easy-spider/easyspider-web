@@ -1,0 +1,33 @@
+#createTaskBtn {
+    margin-top: 3px;
+    margin-bottom: -5px;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+#edit-menu {
+    margin-left: 60px;
+    margin-top: 0px;
+}
+
+.dropdown-menu .dropdown-item {
+    color: #555 !important;
+}
+
+.dropdown-toggle::after {
+    content: none !important;
+}
+
+.nav-username {
+    padding-left: 10px;
+}
+
+.edit-item .nav-link:hover .fa-ellipsis-h {
+    visibility: visible;
+}
+
+.card-comments {
+    background-color: transparent !important;
+}
