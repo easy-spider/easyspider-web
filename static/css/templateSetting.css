@@ -1,0 +1,23 @@
+#setting-img-wrapper img {
+  width: 100%;
+}
+
+#arguments-card {
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+#arguments-card input,
+#arguments-card textarea,
+#arguments-card select {
+  background-color: transparent !important;
+}
+
+#arguments-card h5 {
+  margin-bottom: 20px;
+  font-weight: bolder;
+}
+
+#arguments-card label {
+  font-weight: normal !important;
+}

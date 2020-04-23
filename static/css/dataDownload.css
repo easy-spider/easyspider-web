@@ -1,0 +1,20 @@
+.dataTables_paginate {
+  margin-top: 15px !important;
+}
+
+.dataTables_info {
+  margin-top: 8px !important;
+}
+
+#export-data-btn {
+  margin-left: 10px;
+}
+
+#export-modal .modal-body h6 {
+  color: #888;
+}
+
+#data-table button {
+  border: none !important;
+  background-color: transparent !important;
+}

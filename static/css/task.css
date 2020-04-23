@@ -1,0 +1,18 @@
+.task-dropdown {
+  padding: 0px !important;
+}
+
+#task-table tbody tr:hover .fa-pen,
+#task-table tbody tr:hover .fa-play-circle,
+#task-table tbody tr:hover .fa-pause-circle {
+  visibility: visible;
+}
+
+#task-card {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+#refresh-delete {
+  margin-bottom: -50px;
+}
