@@ -141,14 +141,16 @@ def get_node_by_id(request, node_id):
 
 def set_node_status(request, node_id, status):
     """设置节点状态"""
-    if get_client_ip(request) != '127.0.0.1':
+    if get_client_ip(request) == '127.0.0.1' or \
+            'username' in request.session and request.session['username'] == 'admin':
+        node = get_object_or_404(Node, pk=node_id)
+        if status not in [NodeStatus.ONLINE, NodeStatus.OFFLINE, NodeStatus.DISABLED]:
+            return HttpResponseBadRequest()
+        node.status = status
+        node.save()
+        return JsonResponse({'result': 'ok'})
+    else:
         return HttpResponseForbidden()
-    node = get_object_or_404(Node, pk=node_id)
-    if status not in [NodeStatus.ONLINE, NodeStatus.OFFLINE, NodeStatus.DISABLED]:
-        return HttpResponseBadRequest()
-    node.status = status
-    node.save()
-    return JsonResponse({"result": "ok"})
 
 
 def list_job_by_status(request, status):
@@ -194,9 +196,9 @@ def set_job_status(request, job_id, status):
                 break
         # if all finished, mark the task finished
         if all_finished:
-            task.status = "finished"
+            task.status = 'finished'
             task.save()
-    return JsonResponse({"result": "ok"})
+    return JsonResponse({'result': 'ok'})
 
 
 def set_job_node(request, job_id, node_id):
@@ -207,4 +209,48 @@ def set_job_node(request, job_id, node_id):
     node = get_object_or_404(Node, pk=node_id)
     job.node_id = node.id
     job.save()
-    return JsonResponse({"result": "ok"})
+    return JsonResponse({'result': 'ok'})
+
+
+class NodeListView(generic.ListView):
+    model = Node
+    template_name = 'easyspider/node.html'
+    context_object_name = 'node_list'
+
+    def dispatch(self, request, *args, **kwargs):
+        if 'username' not in request.session:
+            return HttpResponseForbidden('you have not logged in')
+        if request.session['username'] != 'admin':
+            return HttpResponseForbidden('you are not admin')
+        return super(NodeListView, self).dispatch(request, *args, **kwargs)
+
+
+@require_http_methods(['POST'])
+def modify_node(request):
+    """修改节点信息"""
+    if 'username' not in request.session:
+        return HttpResponseForbidden('you have not logged in')
+    if request.session['username'] != 'admin':
+        return HttpResponseForbidden('you are not admin')
+    node = get_object_or_404(Node, pk=request.POST['id'])
+    node.ip = request.POST['ip']
+    node.port = request.POST['port']
+    node.username = request.POST['username']
+    node.password = request.POST['password']
+    node.save()
+    return JsonResponse({'result': 'ok'})
+
+
+@require_http_methods(['POST'])
+def create_node(request):
+    """创建新节点"""
+    if 'username' not in request.session:
+        return HttpResponseForbidden('you have not logged in')
+    if request.session['username'] != 'admin':
+        return HttpResponseForbidden('you are not admin')
+    Node.objects.create(
+        ip=request.POST['ip'],
+        port=request.POST['port'],
+        username=request.POST['username'],
+        password=request.POST['password'], status=NodeStatus.DISABLED)
+    return JsonResponse({'result': 'ok'})

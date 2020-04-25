@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+    <meta charset="UTF-8">
+    <title>管理节点</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>管理节点</h1>
+    <div class="float-right">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#node-create-modal">
+            创建新节点
+        </button>
+    </div>
+    <div class="clearfix"></div>
+    <hr>
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">IP</th>
+            <th scope="col">端口</th>
+            <th scope="col">用户名</th>
+            <th scope="col">密码</th>
+            <th scope="col">状态</th>
+            <th scope="col">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if node_list %}
+            {% for node in node_list %}
+                <tr>
+                    <th scope="row">{{ node.id }}</th>
+                    <td>{{ node.ip }}</td>
+                    <td>{{ node.port }}</td>
+                    <td>{{ node.username }}</td>
+                    <td>{{ node.password }}</td>
+                    {% if node.status == 0 %}
+                        <td>在线</td>
+                        <td>
+                            <div class="btn-group-sm" role="group">
+                                <button type="button" class="btn btn-danger" onclick="node_disable(this)"
+                                        data-id="{{ node.id }}">禁用
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="node_modify(this)"
+                                        data-id="{{ node.id }}"
+                                        data-ip="{{ node.ip }}"
+                                        data-port="{{ node.port }}"
+                                        data-username="{{ node.username }}"
+                                        data-password="{{ node.password }}">编辑
+                                </button>
+                            </div>
+                        </td>
+                    {% elif node.status == 1 %}
+                        <td>离线</td>
+                        <td>
+                            <div class="btn-group-sm" role="group">
+                                <button type="button" class="btn btn-success" onclick="node_enable(this)"
+                                        data-id="{{ node.id }}">启用
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="node_modify(this)"
+                                        data-id="{{ node.id }}"
+                                        data-ip="{{ node.ip }}"
+                                        data-port="{{ node.port }}"
+                                        data-username="{{ node.username }}"
+                                        data-password="{{ node.password }}">编辑
+                                </button>
+                            </div>
+                        </td>
+                    {% elif node.status == 2 %}
+                        <td>禁用</td>
+                        <td>
+                            <div class="btn-group-sm" role="group">
+                                <button type="button" class="btn btn-success" onclick="node_enable(this)"
+                                        data-id="{{ node.id }}">启用
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="node_modify(this)"
+                                        data-id="{{ node.id }}"
+                                        data-ip="{{ node.ip }}"
+                                        data-port="{{ node.port }}"
+                                        data-username="{{ node.username }}"
+                                        data-password="{{ node.password }}">编辑
+                                </button>
+                            </div>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+<div id="node-modify-modal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form class="modal-content" onsubmit="return node_modify_submit(this)">
+            <div class="modal-header">
+                <h5 class="modal-title">修改节点信息</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% csrf_token %}
+                <input type="hidden" id="node-modify-id" name="id">
+                <div class="form-group">
+                    <label for="node-modify-ip">IP</label>
+                    <input type="text" class="form-control" id="node-modify-ip" name="ip">
+                </div>
+                <div class="form-group">
+                    <label for="node-modify-port">端口</label>
+                    <input type="text" class="form-control" id="node-modify-port" name="port">
+                </div>
+                <div class="form-group">
+                    <label for="node-modify-username">用户名</label>
+                    <input type="text" class="form-control" id="node-modify-username" name="username">
+                </div>
+                <div class="form-group">
+                    <label for="node-modify-password">密码</label>
+                    <input type="text" class="form-control" id="node-modify-password" name="password">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-primary">保存更改</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="node-create-modal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form class="modal-content" onsubmit="return node_create_submit(this)">
+            <div class="modal-header">
+                <h5 class="modal-title">创建新节点</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="node-create-ip">IP</label>
+                    <input type="text" class="form-control" id="node-create-ip" name="ip">
+                </div>
+                <div class="form-group">
+                    <label for="node-create-port">端口</label>
+                    <input type="text" class="form-control" id="node-create-port" name="port">
+                </div>
+                <div class="form-group">
+                    <label for="node-create-username">用户名</label>
+                    <input type="text" class="form-control" id="node-create-username" name="username">
+                </div>
+                <div class="form-group">
+                    <label for="node-create-password">密码</label>
+                    <input type="text" class="form-control" id="node-create-password" name="password">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-primary">创建</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"></script>
+<script>
+    function node_disable(o) {
+        const node_id = $(o).data('id');
+        node_set_status(node_id, 2);
+    }
+
+    function node_enable(o) {
+        const node_id = $(o).data('id');
+        node_set_status(node_id, 0);
+    }
+
+    function node_modify(o) {
+        $("#node-modify-id").val($(o).data('id'));
+        $("#node-modify-ip").val($(o).data('ip'));
+        $("#node-modify-port").val($(o).data('port'));
+        $("#node-modify-username").val($(o).data('username'));
+        $("#node-modify-password").val($(o).data('password'));
+        $('#node-modify-modal').modal('show')
+    }
+
+    function node_set_status(node_id, status) {
+        $.ajax({
+            url: "../set-status/" + node_id + "/" + status + "/",
+            method: "GET",
+            success: function (data) {
+                alert("节点状态设置成功");
+                window.location.reload();
+            },
+            error: function () {
+                alert("节点状态设置失败");
+            },
+            complete: function () {
+            }
+        });
+    }
+
+    function node_modify_submit(o) {
+        var form = $(o);
+        form.find("button[type='submit']").attr("disabled", "disabled");
+        $.ajax({
+            url: "../modify/",
+            method: "POST",
+            data: form.serialize(),
+            success: function (data) {
+                alert("修改节点成功");
+                window.location.reload();
+            },
+            error: function () {
+                alert("修改节点失败");
+            },
+            complete: function () {
+                form.find("button").removeAttr("disabled");
+            }
+        });
+        return false;
+    }
+    
+    function node_create_submit(o) {
+        var form = $(o);
+        form.find("button[type='submit']").attr("disabled", "disabled");
+        $.ajax({
+            url: "../create/",
+            method: "POST",
+            data: form.serialize(),
+            success: function (data) {
+                alert("创建节点成功");
+                form[0].reset();
+                window.location.reload();
+            },
+            error: function () {
+                alert("创建节点失败");
+            },
+            complete: function () {
+                form.find("button").removeAttr("disabled");
+            }
+        });
+        return false;
+    }
+</script>
+</body>
+</html>
