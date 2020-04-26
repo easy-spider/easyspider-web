@@ -23,6 +23,7 @@ urlpatterns = [
     path('node/list/', views.NodeListView.as_view(), name='list-node'),
     path('node/modify/', views.modify_node, name='modify-node'),
     path('node/create/', views.create_node, name='create-node'),
+    path('node/push/', views.push_node_template, name='push-node'),
     path('node/list-online/', views.list_online_node, name='list-online-node'),
     path('node/get/<int:node_id>/', views.get_node_by_id, name='get-node-by-id'),
     path('node/set-status/<int:node_id>/<int:status>/', views.set_node_status, name='set-node-status'),
