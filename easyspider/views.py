@@ -7,8 +7,9 @@ from django.shortcuts import render, redirect, get_object_or_404, get_list_or_40
 from django.urls import reverse
 from django.views import generic
 from django.views.decorators.http import require_http_methods
+import requests
 
-from easyspider.models import User, Template, Task, Node, Job
+from easyspider.models import User, Template, Task, Node, Job, SiteTemplates
 
 
 def index(request):
@@ -213,7 +214,11 @@ def set_job_status(request, job_id, status):
     job.status = status
     job.save()
     task = get_object_or_404(Task, pk=job.task_id)
-    if status == JobStatus.FINISHED:
+    if status == JobStatus.RUNNING:
+        if task.status == 'ready':
+            task.status = 'running'
+            task.save()
+    elif status == JobStatus.FINISHED:
         # check other jobs with the same task
         other_jobs = get_list_or_404(Job, task_id=task.id)
         all_finished = True
@@ -225,6 +230,7 @@ def set_job_status(request, job_id, status):
         if all_finished:
             task.status = 'finished'
             task.save()
+
     return JsonResponse({'result': 'ok'})
 
 
@@ -281,3 +287,62 @@ def create_node(request):
         username=request.POST['username'],
         password=request.POST['password'], status=NodeStatus.DISABLED)
     return JsonResponse({'result': 'ok'})
+
+
+def push_template(project_name: str, egg_path: str):
+    """
+    向所有在线节点推送模板的Egg
+
+    :param project_name: template name to be deployed
+    :param egg_path: absolute path to egg file on this machine
+    """
+    nodes = Node.objects.filter(status=NodeStatus.ONLINE)
+    for node in nodes:
+        try:
+            url = f'http://{node.ip}:{node.port}/delproject.json'
+            data = {'project': project_name}
+            requests.post(url, data=data, auth=(node.username, node.password), timeout=3)
+            url = f'http://{node.ip}:{node.port}/addversion.json'
+            data = {'project': project_name, 'version': 'r1'}
+            requests.post(url, files={'egg': open(egg_path, 'rb')}, data=data, auth=(
+                node.username, node.password))
+        except requests.exceptions.RequestException as _e:
+            node.status = NodeStatus.OFFLINE
+            node.save()
+
+
+def push_node_template(request):
+    """推送模板Egg到Scraypd节点"""
+    if 'username' not in request.session:
+        return HttpResponseForbidden('you have not logged in')
+    if request.session['username'] != 'admin':
+        return HttpResponseForbidden('you are not admin')
+    templates = SiteTemplates.objects.all()
+    for template in templates:
+        push_template(template.project_name, template.egg)
+    return JsonResponse({'result': 'ok'})
+
+
+def create_site_template(request):
+    if 'username' not in request.session:
+        return HttpResponseForbidden('you have not logged in')
+    if request.session['username'] != 'admin':
+        return HttpResponseForbidden('you are not admin')
+    if request.method == 'POST':
+        project_name = request.POST['project_name']
+        egg_path = f'egg/{project_name}.egg'
+        f = request.FILES['egg']
+        with open(egg_path, 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
+        SiteTemplates.objects.create(
+            name=request.POST['name'],
+            project_name=project_name,
+            egg=egg_path,
+            settings=request.POST['settings']
+            # TODO: 添加其他字段
+        )
+        # 推送Egg文件
+        push_template(project_name, egg_path)
+        return JsonResponse({'result': 'ok'})
+    return render(request, 'easyspider/site-template-create.html')
