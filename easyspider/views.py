@@ -97,6 +97,33 @@ def change_task_status(request, task_id, status):
         return HttpResponseForbidden('Not your task')
     task.status = status
     task.save()
+    if status == 'paused':
+        jobs = Job.objects.filter(task_id=task.id)
+        for job in jobs:
+            if job.status is JobStatus.PENDING:
+                node = job.node
+                url = f'http://{node.ip}:{node.port}/cancel.json'
+                data = {
+                    'project': job.task.template.site_templates.project_name,
+                    'job': job.uuid
+                }
+                requests.post(url, data, auth=(node.username, node.password), timeout=3)
+                job.status = JobStatus.CREATED
+                job.save()
+    elif status == 'canceled':
+        # TODO: 增加task的Model中的“已中止”状态
+        jobs = Job.objects.filter(task_id=task.id)
+        for job in jobs:
+            if job.status in [JobStatus.CREATED, JobStatus.PENDING, JobStatus.RUNNING]:
+                node = job.node
+                url = f'http://{node.ip}:{node.port}/cancel.json'
+                data = {
+                    'project': job.task.template.site_templates.project_name,
+                    'job': job.uuid
+                }
+                requests.post(url, data, auth=(node.username, node.password), timeout=3)
+                job.status = JobStatus.FINISHED
+                job.save()
     return redirect(reverse('easyspider:task-list'))
 
 
