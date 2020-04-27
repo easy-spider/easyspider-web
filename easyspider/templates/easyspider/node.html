@@ -9,9 +9,14 @@
 <div class="container">
     <h1>管理节点</h1>
     <div class="float-right">
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#node-create-modal">
-            创建新节点
-        </button>
+        <div class="btn-group">
+            <button type="button" class="btn btn-outline-primary" onclick="node_push(this)">
+                推送模板Egg到所有服务器
+            </button>
+            <button type="button" class="btn btn-outline-success" data-toggle="modal" data-target="#node-create-modal">
+                创建新节点
+            </button>
+        </div>
     </div>
     <div class="clearfix"></div>
     <hr>
@@ -39,7 +44,7 @@
                     {% if node.status == 0 %}
                         <td>在线</td>
                         <td>
-                            <div class="btn-group-sm" role="group">
+                            <div class="btn-group btn-group-sm" role="group">
                                 <button type="button" class="btn btn-danger" onclick="node_disable(this)"
                                         data-id="{{ node.id }}">禁用
                                 </button>
@@ -55,7 +60,7 @@
                     {% elif node.status == 1 %}
                         <td>离线</td>
                         <td>
-                            <div class="btn-group-sm" role="group">
+                            <div class="btn-group btn-group-sm" role="group">
                                 <button type="button" class="btn btn-success" onclick="node_enable(this)"
                                         data-id="{{ node.id }}">启用
                                 </button>
@@ -71,7 +76,7 @@
                     {% elif node.status == 2 %}
                         <td>禁用</td>
                         <td>
-                            <div class="btn-group-sm" role="group">
+                            <div class="btn-group btn-group-sm" role="group">
                                 <button type="button" class="btn btn-success" onclick="node_enable(this)"
                                         data-id="{{ node.id }}">启用
                                 </button>
@@ -222,7 +227,7 @@
         });
         return false;
     }
-    
+
     function node_create_submit(o) {
         var form = $(o);
         form.find("button[type='submit']").attr("disabled", "disabled");
@@ -243,6 +248,24 @@
             }
         });
         return false;
+    }
+
+    function node_push(o) {
+        $(o).attr("disabled", "disabled");
+        $.ajax({
+            url: "../push/",
+            method: "GET",
+            success: function (data) {
+                alert("推送成功");
+                window.location.reload();
+            },
+            error: function () {
+                alert("推送失败");
+            },
+            complete: function () {
+                $(o).removeAttr("disabled");
+            }
+        });
     }
 </script>
 </body>

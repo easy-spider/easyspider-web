@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>创建站点模板</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1>创建站点模板</h1>
+    <hr>
+    <form method="post" enctype="multipart/form-data" onsubmit="return site_template_create(this)">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>名称</label>
+            <input type="text" class="form-control" name="name">
+        </div>
+        <div class="form-group">
+            <label>项目名称（Project Name）</label>
+            <input type="text" class="form-control" name="project_name">
+        </div>
+        <div class="form-group">
+            <label>Egg的设置（Setting），以分号隔开</label>
+            <input type="text" class="form-control" name="settings">
+        </div>
+        {# TODO: 添加其他FORM的字段，input的name和Django的model字段保持一致 #}
+        <div class="form-group">
+            <label for="node-create-password">Egg文件</label>
+            <input type="file" class="form-control-file" name="egg">
+        </div>
+        <button type="submit" class="btn btn-primary">创建模板</button>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.min.js"></script>
+<script>
+    function site_template_create(o) {
+        $(o).find("button").attr("disabled", "disabled");
+        $.ajax({
+            url: "../create/",
+            method: "POST",
+            data: new FormData(o),
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            cache: false,
+            success: function (data) {
+                alert("站点模板创建成功");
+                o.reset();
+            },
+            error: function () {
+                alert("站点模板创建失败");
+            },
+            complete: function () {
+                $(o).find("button").removeAttr("disabled");
+            }
+        });
+        return false;
+    }
+
+</script>
+</body>
+</html>
