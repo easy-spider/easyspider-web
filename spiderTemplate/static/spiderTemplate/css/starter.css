@@ -52,3 +52,7 @@ blockquote {
 #hot-template-header {
   margin-bottom: -20px;
 }
+
+span.website-name {
+  color: #000;
+}

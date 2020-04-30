@@ -1,731 +1,403 @@
-<!DOCTYPE html>
-<!--
-This is a starter template page. Use this page to start your new project from
-scratch. This page gets rid of all links and provides the needed markup only.
--->
-<html lang="zh-cmn-Hans">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+{% extends 'dashboardBase.html' %}
+{% load static %}
 
-    <title>EasySpider | 模板详情</title>
+{% block title %}EasySpider | 模板详情{% endblock %}
 
-    <!-- Custom css -->
-    <link rel="stylesheet" href="css/base.css" />
-    <link rel="stylesheet" href="css/templateInfo.css" />
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css" />
-    <!-- Theme style -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/css/adminlte.min.css" />
-    <!-- Website Icon -->
-    <link rel="icon" href="img/favicon.ico" />
+{% block css_extend %}
+    <link rel="stylesheet" href="{% static 'spiderTemplate/css/templateInfo.css' %}" />
+{% endblock %}
 
-    <!-- jQuery -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.min.js"></script>
-    <!-- Bootstrap 4 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
-  </head>
-  <body class="hold-transition sidebar-mini">
-    <div class="wrapper">
-      <!-- Navbar -->
-      <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-        <!-- Left navbar links -->
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#" role="button"
-              ><i class="fas fa-bars"></i
-            ></a>
-          </li>
-          <li class="nav-item d-none d-sm-inline-block">
-            <a href="starter.html" class="nav-link">首页</a>
-          </li>
-          <li class="nav-item d-none d-sm-inline-block">
-            <a href="https://github.com/bhsei/20_H" class="nav-link"
-              >关于我们</a
-            >
-          </li>
-        </ul>
+{% block page_title %}豆瓣电影{% endblock %}
 
-        <!-- Right navbar links -->
-        <ul class="navbar-nav ml-auto">
-          <!-- Messages Dropdown Menu -->
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link"
-              data-toggle="dropdown"
-              href="#"
-              id="user-dropdown"
-            >
-              <i class="far fa-user"></i>
-              <span class="nav-username">用户名</span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-right">
-              <a class="dropdown-item" href="information.html">个人信息</a>
-              <a class="dropdown-item" href="login.html">登出</a>
-            </div>
-          </li>
-        </ul>
-      </nav>
-      <!-- /.navbar -->
+{% block page_link %}
+    <li class="breadcrumb-item">
+        <a href="{% url 'starter' %}">首页</a>
+    </li>
+    <li class="breadcrumb-item">
+        <a href="{% url 'template_first' %}">选择模板</a>
+    </li>
+    <li class="breadcrumb-item">
+        <a href="{% url 'template_second' 'douban' %}">豆瓣</a>
+    </li>
+    <li class="breadcrumb-item active">
+        豆瓣电影
+    </li>
+{% endblock %}
 
-      <!-- Main Sidebar Container -->
-      <aside class="main-sidebar sidebar-dark-primary elevation-4">
-        <!-- Brand Logo -->
-        <a href="starter.html" class="brand-link">
-          <img
-            src="img/logo.png"
-            alt="AdminLTE Logo"
-            class="brand-image"
-          />
-          <span class="brand-text font-weight-light">EasySpider</span>
-        </a>
-
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <button
-              class="btn btn-primary btn-block"
-              type="button"
-              id="createTaskBtn"
-            >
-              新建
-            </button>
-
-          <!-- Sidebar Menu -->
-          <nav class="mt-2">
-            <ul
-              class="nav nav-pills nav-sidebar flex-column"
-              data-widget="treeview"
-              role="menu"
-              data-accordion="false"
-            >
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-tasks"></i>
-                  <p>
-                    我的任务
-                  </p>
-                </a>
-              </li>
-              <li class="nav-item has-treeview">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-user-edit"></i>
-                  <p>
-                    最近编辑
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item edit-item">
-                    <a class="nav-link" href="#">
-                      <i class="far fa-circle nav-icon hidden"></i>
-                      <p>
-                        任务1
-                        <i class="right fas fa-ellipsis-h hidden"></i>
-                      </p>
-                    </a>
-                  </li>
-                  <li class="nav-item edit-item">
-                    <a class="nav-link" href="#">
-                      <i class="far fa-circle nav-icon hidden"></i>
-                      <p>
-                        任务2
-                        <i class="right fas fa-ellipsis-h hidden"></i>
-                      </p>
-                    </a>
-                  </li>
-                  <li class="nav-item edit-item">
-                    <a class="nav-link" href="#">
-                      <i class="far fa-circle nav-icon hidden"></i>
-                      <p>
-                        任务3
-                        <i class="right fas fa-ellipsis-h hidden"></i>
-                      </p>
-                    </a>
-                  </li>
-                  <li class="nav-item edit-item">
-                    <a class="nav-link" href="#">
-                      <i class="far fa-circle nav-icon hidden"></i>
-                      <p>
-                        任务4
-                        <i class="right fas fa-ellipsis-h hidden"></i>
-                      </p>
-                    </a>
-                  </li>
-                  <li class="nav-item edit-item">
-                    <a class="nav-link" href="#">
-                      <i class="far fa-circle nav-icon hidden"></i>
-                      <p>
-                        任务5
-                        <i class="right fas fa-ellipsis-h hidden"></i>
-                      </p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="nav-item hidden">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-tasks"></i>
-                  <p>
-                    我的任务
-                  </p>
-                </a>
-              </li>
-              <li class="nav-item hidden">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-tasks"></i>
-                  <p>
-                    我的任务
-                  </p>
-                </a>
-              </li>
-              <li class="nav-item hidden">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-tasks"></i>
-                  <p>
-                    我的任务
-                  </p>
-                </a>
-              </li>
-              <li class="nav-item hidden">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-tasks"></i>
-                  <p>
-                    我的任务
-                  </p>
-                </a>
-              </li>
-              <div class="dropdown-menu" role="menu" id="edit-menu">
-                <a class="dropdown-item" href="#">编辑</a>
-                <a
-                  class="dropdown-item"
-                  href="#rename-task-modal"
-                  data-toggle="modal"
-                  data-target="#rename-task-modal"
-                  >重命名</a
-                >
-                <a
-                  class="dropdown-item"
-                  href="#delete-task-modal"
-                  data-toggle="modal"
-                  data-target="#delete-task-modal"
-                  >删除</a
-                >
-              </div>
-            </ul>
-          </nav>
-          <!-- /.sidebar-menu -->
-        </div>
-        <!-- /.sidebar -->
-      </aside>
-
-      <!-- Content Wrapper. Contains page content -->
-      <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <div class="content-header">
-          <div class="container-fluid">
-            <div class="row mb-2">
-              <div class="col-sm-6">
-                <h1 class="m-0 text-dark">豆瓣电影</h1>
-              </div>
-              <!-- /.col -->
-              <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                  <li class="breadcrumb-item">
-                    <a href="starter.html">首页</a>
-                  </li>
-                  <li class="breadcrumb-item">
-                    <a href="templateFirst.html">选择模板</a>
-                  </li>
-                  <li class="breadcrumb-item">
-                    <a href="templateSecond.html">豆瓣</a>
-                  </li>
-                  <li class="breadcrumb-item active">
+{% block content %}
+    <div class="row">
+        <div class="card card-solid">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-2 text-center">
+                  <img
+                    src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/logo.jpg' %}"
+                    alt="豆瓣电影 Logo"
+                    id="template-logo"
+                  />
+                </div>
+                <div class="col-10">
+                  <h3 class="my-3">
                     豆瓣电影
-                  </li>
-                </ol>
-              </div>
-              <!-- /.col -->
-            </div>
-            <!-- /.row -->
-          </div>
-          <!-- /.container-fluid -->
-        </div>
-        <!-- /.content-header -->
-
-        <!-- Main content -->
-        <div class="content">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="card card-solid">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-2 text-center">
-                      <img
-                        src="img/douban.jpg"
-                        alt="豆瓣电影 Logo"
-                        id="template-logo"
-                      />
-                    </div>
-                    <div class="col-10">
-                      <h3 class="my-3">
-                        豆瓣电影
-                      </h3>
-                      <p>
-                        模板更新时间：<span id="template-update-time"
-                          >2020/4/20</span
-                        >
-                      </p>
-                      <div class="mt-4">
-                        <button type="button" class="btn btn-primary">
-                          立即使用
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row mt-4">
-                    <nav class="w-100">
-                      <div
-                        class="nav nav-tabs"
-                        id="template-tab"
-                        role="tablist"
-                      >
-                        <a
-                          class="nav-item nav-link active"
-                          id="template-desc-tab"
-                          data-toggle="tab"
-                          href="#template-desc"
-                          role="tab"
-                          aria-controls="template-desc"
-                          aria-selected="true"
-                          >模板介绍</a
-                        >
-                        <a
-                          class="nav-item nav-link"
-                          id="data-field-preview-tab"
-                          data-toggle="tab"
-                          href="#data-field-preview"
-                          role="tab"
-                          aria-controls="data-field-preview"
-                          aria-selected="false"
-                          >采集字段预览</a
-                        >
-                        <a
-                          class="nav-item nav-link"
-                          id="arguments-preview-tab"
-                          data-toggle="tab"
-                          href="#arguments-preview"
-                          role="tab"
-                          aria-controls="arguments-preview"
-                          aria-selected="false"
-                          >采集参数预览</a
-                        >
-                        <a
-                          class="nav-item nav-link"
-                          id="example-data-tab"
-                          data-toggle="tab"
-                          href="#example-data"
-                          role="tab"
-                          aria-controls="example-data"
-                          aria-selected="false"
-                          >示例数据</a
-                        >
-                      </div>
-                    </nav>
-                    <div
-                      class="tab-content p-3"
-                      id="template-nav-tabContent"
-                      style="width: 100%;"
+                  </h3>
+                  <p>
+                    模板更新时间：<span id="template-update-time"
+                      >2020/4/20</span
                     >
-                      <div
-                        class="tab-pane fade show active"
-                        id="template-desc"
-                        role="tabpanel"
-                        aria-labelledby="template-desc-tab"
-                      >
-                        <h4>豆瓣 - 豆瓣电影</h4>
-                        <dl>
-                          <dt>模板介绍</dt>
-                          <dd>
+                  </p>
+                  <div class="mt-4">
+                    <a type="button" class="btn btn-primary" href="{% url 'template_setting' 'douban' 'movie' %}">
+                      立即使用
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="row mt-4">
+                <nav class="w-100">
+                  <div
+                    class="nav nav-tabs"
+                    id="template-tab"
+                    role="tablist"
+                  >
+                    <a
+                      class="nav-item nav-link active"
+                      id="template-desc-tab"
+                      data-toggle="tab"
+                      href="#template-desc"
+                      role="tab"
+                      aria-controls="template-desc"
+                      aria-selected="true"
+                      >模板介绍</a
+                    >
+                    <a
+                      class="nav-item nav-link"
+                      id="data-field-preview-tab"
+                      data-toggle="tab"
+                      href="#data-field-preview"
+                      role="tab"
+                      aria-controls="data-field-preview"
+                      aria-selected="false"
+                      >采集字段预览</a
+                    >
+                    <a
+                      class="nav-item nav-link"
+                      id="arguments-preview-tab"
+                      data-toggle="tab"
+                      href="#arguments-preview"
+                      role="tab"
+                      aria-controls="arguments-preview"
+                      aria-selected="false"
+                      >采集参数预览</a
+                    >
+                    <a
+                      class="nav-item nav-link"
+                      id="example-data-tab"
+                      data-toggle="tab"
+                      href="#example-data"
+                      role="tab"
+                      aria-controls="example-data"
+                      aria-selected="false"
+                      >示例数据</a
+                    >
+                  </div>
+                </nav>
+                <div
+                  class="tab-content p-3"
+                  id="template-nav-tabContent"
+                  style="width: 100%;"
+                >
+                  <div
+                    class="tab-pane fade show active"
+                    id="template-desc"
+                    role="tabpanel"
+                    aria-labelledby="template-desc-tab"
+                  >
+                    <h4>豆瓣 - 豆瓣电影</h4>
+                    <dl>
+                      <dt>模板介绍</dt>
+                      <dd>
+                        <ul>
+                          <li>
+                            此模板用于采集豆瓣电影类目下的电影信息，如上映日期、片名、导演、编剧、主演、类型等。
+                          </li>
+                          <li>
+                            具体采集内容请点击「采集字段预览」和「示例数据」。
+                          </li>
+                        </ul>
+                      </dd>
+                      <dt>使用方法</dt>
+                      <dd>
+                        <ol>
+                          <li>点击「立即使用」进入参数配置界面</li>
+                          <li>输入列表翻页次数</li>
+                          <li>
+                            输入搜索结果网址，例如'https://search.douban.com/movie/subject_search?search_text=战狼​'
+                            <br />注：
                             <ul>
                               <li>
-                                此模板用于采集豆瓣电影类目下的电影信息，如上映日期、片名、导演、编剧、主演、类型等。
+                                如要输入多条搜索结果网址，请每条影名之间用回车进行换行
                               </li>
                               <li>
-                                具体采集内容请点击「采集字段预览」和「示例数据」。
+                                可从Excel表格和TXT文件中直接复制影名，黏贴到输入框中
+                              </li>
+                              <li>
+                                建议一次性输入的影名不要超过1万条
                               </li>
                             </ul>
-                          </dd>
-                          <dt>使用方法</dt>
-                          <dd>
-                            <ol>
-                              <li>点击「立即使用」进入参数配置界面</li>
-                              <li>输入列表翻页次数</li>
-                              <li>
-                                输入搜索结果网址，例如'https://search.douban.com/movie/subject_search?search_text=战狼​'
-                                <br />注：
-                                <ul>
-                                  <li>
-                                    如要输入多条搜索结果网址，请每条影名之间用回车进行换行
-                                  </li>
-                                  <li>
-                                    可从Excel表格和TXT文件中直接复制影名，黏贴到输入框中
-                                  </li>
-                                  <li>
-                                    建议一次性输入的影名不要超过1万条
-                                  </li>
-                                </ul>
-                              </li>
-                              <li>
-                                参数设置完毕后，请点击「保存并启动」进行采集
-                              </li>
-                            </ol>
-                          </dd>
-                        </dl>
-                      </div>
-                      <div
-                        class="tab-pane fade"
-                        id="data-field-preview"
-                        role="tabpanel"
-                        aria-labelledby="data-field-preview-tab"
-                      >
-                        <div class="row">
-                          <div class="col-5 col-sm-3">
-                            <div
-                              class="nav flex-column nav-tabs h-100"
-                              id="data-field-vert-tabs-tab"
-                              role="tablist"
-                              aria-orientation="vertical"
-                            >
-                              <a
-                                class="nav-link active"
-                                id="vert-tabs-filmname-tab"
-                                data-toggle="pill"
-                                href="#vert-tabs-filmname"
-                                role="tab"
-                                aria-controls="vert-tabs-filmname"
-                                aria-selected="true"
-                                >影名</a
-                              >
-                              <a
-                                class="nav-link"
-                                id="vert-tabs-score-tab"
-                                data-toggle="pill"
-                                href="#vert-tabs-score"
-                                role="tab"
-                                aria-controls="vert-tabs-score"
-                                aria-selected="false"
-                                >评分</a
-                              >
-                              <a
-                                class="nav-link"
-                                id="vert-tabs-people-tab"
-                                data-toggle="pill"
-                                href="#vert-tabs-people"
-                                role="tab"
-                                aria-controls="vert-tabs-people"
-                                aria-selected="false"
-                                >评价人数</a
-                              >
-                              <a
-                                class="nav-link"
-                                id="vert-tabs-lang-tab"
-                                data-toggle="pill"
-                                href="#vert-tabs-lang"
-                                role="tab"
-                                aria-controls="vert-tabs-lang"
-                                aria-selected="false"
-                                >语言</a
-                              >
-                              <a
-                                class="nav-link"
-                                id="vert-tabs-time-tab"
-                                data-toggle="pill"
-                                href="#vert-tabs-time"
-                                role="tab"
-                                aria-controls="vert-tabs-time"
-                                aria-selected="false"
-                                >时长</a
-                              >
-                            </div>
-                          </div>
-                          <div class="col-7 col-sm-9">
-                            <div
-                              class="tab-content"
-                              id="data-field-vert-tabs-tabContent"
-                            >
-                              <div
-                                class="tab-pane text-left fade show active"
-                                id="vert-tabs-filmname"
-                                role="tabpanel"
-                                aria-labelledby="vert-tabs-filmname-tab"
-                              >
-                                <img src="img/filmname.jpg" />
-                              </div>
-                              <div
-                                class="tab-pane fade"
-                                id="vert-tabs-score"
-                                role="tabpanel"
-                                aria-labelledby="vert-tabs-score-tab"
-                              >
-                                <img src="img/score.jpg" />
-                              </div>
-                              <div
-                                class="tab-pane fade"
-                                id="vert-tabs-people"
-                                role="tabpanel"
-                                aria-labelledby="vert-tabs-people-tab"
-                              >
-                                <img src="img/people.jpg" />
-                              </div>
-                              <div
-                                class="tab-pane fade"
-                                id="vert-tabs-lang"
-                                role="tabpanel"
-                                aria-labelledby="vert-tabs-lang-tab"
-                              >
-                                <img src="img/lang.jpg" />
-                              </div>
-                              <div
-                                class="tab-pane fade"
-                                id="vert-tabs-time"
-                                role="tabpanel"
-                                aria-labelledby="vert-tabs-time-tab"
-                              >
-                                <img src="img/time.jpg" />
-                              </div>
-                            </div>
-                          </div>
+                          </li>
+                          <li>
+                            参数设置完毕后，请点击「保存并启动」进行采集
+                          </li>
+                        </ol>
+                      </dd>
+                    </dl>
+                  </div>
+                  <div
+                    class="tab-pane fade"
+                    id="data-field-preview"
+                    role="tabpanel"
+                    aria-labelledby="data-field-preview-tab"
+                  >
+                    <div class="row">
+                      <div class="col-5 col-sm-3">
+                        <div
+                          class="nav flex-column nav-tabs h-100"
+                          id="data-field-vert-tabs-tab"
+                          role="tablist"
+                          aria-orientation="vertical"
+                        >
+                          <a
+                            class="nav-link active"
+                            id="vert-tabs-filmname-tab"
+                            data-toggle="pill"
+                            href="#vert-tabs-filmname"
+                            role="tab"
+                            aria-controls="vert-tabs-filmname"
+                            aria-selected="true"
+                            >影名</a
+                          >
+                          <a
+                            class="nav-link"
+                            id="vert-tabs-score-tab"
+                            data-toggle="pill"
+                            href="#vert-tabs-score"
+                            role="tab"
+                            aria-controls="vert-tabs-score"
+                            aria-selected="false"
+                            >评分</a
+                          >
+                          <a
+                            class="nav-link"
+                            id="vert-tabs-people-tab"
+                            data-toggle="pill"
+                            href="#vert-tabs-people"
+                            role="tab"
+                            aria-controls="vert-tabs-people"
+                            aria-selected="false"
+                            >评价人数</a
+                          >
+                          <a
+                            class="nav-link"
+                            id="vert-tabs-lang-tab"
+                            data-toggle="pill"
+                            href="#vert-tabs-lang"
+                            role="tab"
+                            aria-controls="vert-tabs-lang"
+                            aria-selected="false"
+                            >语言</a
+                          >
+                          <a
+                            class="nav-link"
+                            id="vert-tabs-time-tab"
+                            data-toggle="pill"
+                            href="#vert-tabs-time"
+                            role="tab"
+                            aria-controls="vert-tabs-time"
+                            aria-selected="false"
+                            >时长</a
+                          >
                         </div>
                       </div>
-                      <div
-                        class="tab-pane fade"
-                        id="arguments-preview"
-                        role="tabpanel"
-                        aria-labelledby="arguments-preview-tab"
-                      >
-                        <div class="row">
-                          <div class="col-5 col-sm-3">
-                            <div
-                              class="nav flex-column nav-tabs h-100"
-                              id="arguments-vert-tabs-tab"
-                              role="tablist"
-                              aria-orientation="vertical"
-                            >
-                              <a
-                                class="nav-link active"
-                                id="vert-tabs-page-tab"
-                                data-toggle="pill"
-                                href="#vert-tabs-page"
-                                role="tab"
-                                aria-controls="vert-tabs-page"
-                                aria-selected="true"
-                                >翻页次数</a
-                              >
-                              <a
-                                class="nav-link"
-                                id="vert-tabs-url-tab"
-                                data-toggle="pill"
-                                href="#vert-tabs-url"
-                                role="tab"
-                                aria-controls="vert-tabs-url"
-                                aria-selected="false"
-                                >网址</a
-                              >
-                            </div>
+                      <div class="col-7 col-sm-9">
+                        <div
+                          class="tab-content"
+                          id="data-field-vert-tabs-tabContent"
+                        >
+                          <div
+                            class="tab-pane text-left fade show active"
+                            id="vert-tabs-filmname"
+                            role="tabpanel"
+                            aria-labelledby="vert-tabs-filmname-tab"
+                          >
+                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/field/filmname.jpg' %}" />
                           </div>
-                          <div class="col-7 col-sm-9">
-                            <div
-                              class="tab-content"
-                              id="arguments-vert-tabs-tabContent"
-                            >
-                              <div
-                                class="tab-pane text-left fade show active"
-                                id="vert-tabs-page"
-                                role="tabpanel"
-                                aria-labelledby="vert-tabs-page-tab"
-                              >
-                                <img src="img/page.jpg" />
-                              </div>
-                              <div
-                                class="tab-pane fade"
-                                id="vert-tabs-url"
-                                role="tabpanel"
-                                aria-labelledby="vert-tabs-url-tab"
-                              >
-                                <img src="img/url.jpg" />
-                              </div>
-                            </div>
+                          <div
+                            class="tab-pane fade"
+                            id="vert-tabs-score"
+                            role="tabpanel"
+                            aria-labelledby="vert-tabs-score-tab"
+                          >
+                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/field/score.jpg' %}" />
                           </div>
-                        </div>
-                      </div>
-                      <div
-                        class="tab-pane fade"
-                        id="example-data"
-                        role="tabpanel"
-                        aria-labelledby="example-data-tab"
-                        style="width: 100%;"
-                      >
-                        <div class="card" id="example-data-table">
-                          <div class="card-body table-responsive p-0">
-                            <table
-                              class="table table-hover text-nowrap text-center"
-                            >
-                              <thead>
-                                <tr>
-                                  <th>关键词</th>
-                                  <th>页码</th>
-                                  <th>影名</th>
-                                  <th>语言</th>
-                                  <th>片长</th>
-                                  <th>评分</th>
-                                  <th>评价人数</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <td>战狼</td>
-                                  <td>1</td>
-                                  <td>战狼2(2017)</td>
-                                  <td>汉语普通话/英语</td>
-                                  <td>123分钟</td>
-                                  <td>7.1</td>
-                                  <td>724332</td>
-                                </tr>
-                                <tr>
-                                  <td>战狼</td>
-                                  <td>1</td>
-                                  <td>战狼(2015)</td>
-                                  <td>汉语普通话/英语</td>
-                                  <td>90分钟</td>
-                                  <td>6.9</td>
-                                  <td>214894</td>
-                                </tr>
-                                <tr>
-                                  <td>战狼</td>
-                                  <td>1</td>
-                                  <td>贝奥武夫 Beowulf‎(2007)</td>
-                                  <td>英语/古英语</td>
-                                  <td>115分钟</td>
-                                  <td>6.7</td>
-                                  <td>26448</td>
-                                </tr>
-                                <tr>
-                                  <td>战狼</td>
-                                  <td>1</td>
-                                  <td>斯巴达300勇士300‎(2006)</td>
-                                  <td>英语</td>
-                                  <td>117分钟</td>
-                                  <td>7.8</td>
-                                  <td>126192</td>
-                                </tr>
-                              </tbody>
-                            </table>
+                          <div
+                            class="tab-pane fade"
+                            id="vert-tabs-people"
+                            role="tabpanel"
+                            aria-labelledby="vert-tabs-people-tab"
+                          >
+                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/field/people.jpg' %}" />
                           </div>
-                          <!-- /.card-body -->
+                          <div
+                            class="tab-pane fade"
+                            id="vert-tabs-lang"
+                            role="tabpanel"
+                            aria-labelledby="vert-tabs-lang-tab"
+                          >
+                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/field/lang.jpg' %}" />
+                          </div>
+                          <div
+                            class="tab-pane fade"
+                            id="vert-tabs-time"
+                            role="tabpanel"
+                            aria-labelledby="vert-tabs-time-tab"
+                          >
+                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/field/time.jpg' %}" />
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <!-- /.card-body -->
-              </div>
-            </div>
-          </div>
-          <!-- /.container-fluid -->
-          <div class="modal fade" id="delete-task-modal">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-body">
-                  <div class="card-comments">
-                    <div class="card-comment">
-                      <img
-                        class="img-circle img-sm"
-                        src="dist/img/custom/warning.jpg"
-                        alt="warning"
-                      />
-                      <div class="comment-text">
-                        <h5 class="username">确定</h5>
-                        <!-- /.username -->
-                        确定要删除吗？
+                  <div
+                    class="tab-pane fade"
+                    id="arguments-preview"
+                    role="tabpanel"
+                    aria-labelledby="arguments-preview-tab"
+                  >
+                    <div class="row">
+                      <div class="col-5 col-sm-3">
+                        <div
+                          class="nav flex-column nav-tabs h-100"
+                          id="arguments-vert-tabs-tab"
+                          role="tablist"
+                          aria-orientation="vertical"
+                        >
+                          <a
+                            class="nav-link active"
+                            id="vert-tabs-page-tab"
+                            data-toggle="pill"
+                            href="#vert-tabs-page"
+                            role="tab"
+                            aria-controls="vert-tabs-page"
+                            aria-selected="true"
+                            >翻页次数</a
+                          >
+                          <a
+                            class="nav-link"
+                            id="vert-tabs-url-tab"
+                            data-toggle="pill"
+                            href="#vert-tabs-url"
+                            role="tab"
+                            aria-controls="vert-tabs-url"
+                            aria-selected="false"
+                            >网址</a
+                          >
+                        </div>
                       </div>
-                      <!-- /.comment-text -->
+                      <div class="col-7 col-sm-9">
+                        <div
+                          class="tab-content"
+                          id="arguments-vert-tabs-tabContent"
+                        >
+                          <div
+                            class="tab-pane text-left fade show active"
+                            id="vert-tabs-page"
+                            role="tabpanel"
+                            aria-labelledby="vert-tabs-page-tab"
+                          >
+                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/parameter/page.jpg' %}" />
+                          </div>
+                          <div
+                            class="tab-pane fade"
+                            id="vert-tabs-url"
+                            role="tabpanel"
+                            aria-labelledby="vert-tabs-url-tab"
+                          >
+                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/parameter/url.jpg' %}" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="tab-pane fade"
+                    id="example-data"
+                    role="tabpanel"
+                    aria-labelledby="example-data-tab"
+                    style="width: 100%;"
+                  >
+                    <div class="card" id="example-data-table">
+                      <div class="card-body table-responsive p-0">
+                        <table
+                          class="table table-hover text-nowrap text-center"
+                        >
+                          <thead>
+                            <tr>
+                              <th>关键词</th>
+                              <th>页码</th>
+                              <th>影名</th>
+                              <th>语言</th>
+                              <th>片长</th>
+                              <th>评分</th>
+                              <th>评价人数</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>战狼</td>
+                              <td>1</td>
+                              <td>战狼2(2017)</td>
+                              <td>汉语普通话/英语</td>
+                              <td>123分钟</td>
+                              <td>7.1</td>
+                              <td>724332</td>
+                            </tr>
+                            <tr>
+                              <td>战狼</td>
+                              <td>1</td>
+                              <td>战狼(2015)</td>
+                              <td>汉语普通话/英语</td>
+                              <td>90分钟</td>
+                              <td>6.9</td>
+                              <td>214894</td>
+                            </tr>
+                            <tr>
+                              <td>战狼</td>
+                              <td>1</td>
+                              <td>贝奥武夫 Beowulf‎(2007)</td>
+                              <td>英语/古英语</td>
+                              <td>115分钟</td>
+                              <td>6.7</td>
+                              <td>26448</td>
+                            </tr>
+                            <tr>
+                              <td>战狼</td>
+                              <td>1</td>
+                              <td>斯巴达300勇士300‎(2006)</td>
+                              <td>英语</td>
+                              <td>117分钟</td>
+                              <td>7.8</td>
+                              <td>126192</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <!-- /.card-body -->
                     </div>
                   </div>
                 </div>
-                <div class="modal-footer justify-content-between">
-                  <button
-                    type="button"
-                    class="btn btn-default"
-                    data-dismiss="modal"
-                  >
-                    取消
-                  </button>
-                  <button type="button" class="btn btn-primary">
-                    确定
-                  </button>
-                </div>
               </div>
-              <!-- /.modal-content -->
             </div>
-            <!-- /.modal-dialog -->
-          </div>
-          <div class="modal fade" id="rename-task-modal">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h4 class="modal-title">修改任务名</h4>
-                  <button
-                    type="button"
-                    class="close"
-                    data-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <div class="form-group">
-                    <label class="col-form-label" for="task-name-input"
-                      >任务名：</label
-                    >
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="task-name-input"
-                      placeholder="请输入新任务名..."
-                    />
-                  </div>
-                </div>
-                <div class="modal-footer justify-content-between">
-                  <button
-                    type="button"
-                    class="btn btn-default"
-                    data-dismiss="modal"
-                  >
-                    取消
-                  </button>
-                  <button type="button" class="btn btn-primary">
-                    确定
-                  </button>
-                </div>
-              </div>
-              <!-- /.modal-content -->
-            </div>
-            <!-- /.modal-dialog -->
-          </div>
+            <!-- /.card-body -->
         </div>
-        <!-- /.content -->
-      </div>
-      <!-- /.content-wrapper -->
     </div>
-    <!-- ./wrapper -->
-
-    <!-- REQUIRED SCRIPTS -->
-
-    <!-- AdminLTE App -->
-    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/js/adminlte.min.js"></script>
-    <!-- Custom JS -->
-    <script src="js/base.js"></script>
-  </body>
-</html>
+{% endblock %}
