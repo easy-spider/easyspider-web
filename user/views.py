@@ -36,7 +36,7 @@ def register(request):
     password = request.POST['password']
     if User.objects.filter(username=username).exists():
         return render(request, 'user/register.html', {'error_message': '用户名已存在'})
-    User.objects.create(username=username, password=password, email=email)
+    User.objects.create_user(username, email, password)
     return redirect(reverse('index'))
 
 
