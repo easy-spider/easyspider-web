@@ -21,6 +21,7 @@ class User(models.Model):
 class SiteTemplates(models.Model):
     """同网站爬虫模板集合实体类，对应一个Scrapy项目。"""
     name = models.CharField(max_length=255)  # 模板集合名称（如“豆瓣”）
+    # TODO type字段
     project_name = models.CharField(max_length=255, unique=True)  # Scrapy项目名称
     egg = models.CharField(max_length=2047)  # Scrapy项目打包egg的路径
     settings = models.CharField(max_length=2047, blank=True, null=True)  # 传递给Scrapy的其他运行设置
@@ -34,7 +35,10 @@ class Template(models.Model):
     site_templates = models.ForeignKey(SiteTemplates, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)  # 模板名称（如“豆瓣热门电影”）
     spider_name = models.CharField(max_length=255)  # 对应的Spider名字
+    # TODO 简介是HTML格式
     introduction = models.CharField(max_length=2047, null=True)
+    # TODO 采集字段
+    # TODO 模板参数增加类型number/text/textarea
     params = models.CharField(max_length=255, null=True)  # ";"分隔的模板参数
 
     def __str__(self):
