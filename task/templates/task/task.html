@@ -1,0 +1,496 @@
+{% extends 'dashboardBase.html' %}
+{% load static %}
+
+{% block css_extend %}
+    <!-- Custom css -->
+    <link rel="stylesheet" href="{% static 'task/css/task.css' %}" />
+    <!-- DataTables -->
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="https://cdn.datatables.net/v/bs4/dt-1.10.20/cr-1.5.2/r-2.2.3/datatables.min.css"
+    />
+    <!-- DataTable Checkbox -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/jquery-datatables-checkboxes@1.2.11/js/dataTables.checkboxes.min.js"
+    />
+{% endblock %}
+
+{% block nav_task_active %}active{% endblock %}
+
+{% block page_title %}我的任务{% endblock %}
+
+{% block page_link %}
+    <li class="breadcrumb-item">
+        <a href="{% url 'starter' %}">首页</a>
+    </li>
+    <li class="breadcrumb-item active">
+        我的任务
+    </li>
+    <li class="breadcrumb-item"></li>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+      <div class="card m-auto" id="task-card">
+        <div class="card-body">
+          <table
+            id="task-table"
+            class="table table-hover text-center text-nowrap"
+          >
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="refresh-delete"
+            >
+              <i class="fas fa-sync"></i>&nbsp;刷新
+            </button>
+            <thead>
+              <tr>
+                <th></th>
+                <th>任务名</th>
+                <th>采集状态</th>
+                <th>操作</th>
+                <th>最近编辑时间</th>
+                <th>运行耗时</th>
+                <th>执行次数</th>
+                <th>采集完成时间</th>
+                <th>进度情况</th>
+                <th>更多操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>
+                  <a
+                    href="#rename-task-modal"
+                    data-toggle="modal"
+                    data-target="#rename-task-modal"
+                    ><i class="fas fa-pen hidden"></i>&nbsp;</a
+                  >豆瓣电影1
+                </td>
+                <td class="ready">
+                  等待运行
+                </td>
+                <td class="ready">
+                  <a
+                    href="#cancel-task-modal"
+                    data-toggle="modal"
+                    data-target="#cancel-task-modal"
+                  >
+                    <i class="far fa-stop-circle hidden"></i>
+                  </a>
+                </td>
+                <td>20/04/22 12:00</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="progress progress-xs" title="55%">
+                    <div
+                      class="progress-bar progress-bar-danger progress-bar-striped progress-bar-animated"
+                      style="width: 55%;"
+                    ></div>
+                  </div>
+                </td>
+                <td>
+                  <div class="dropdown">
+                    <a
+                      class="nav-link task-dropdown"
+                      data-toggle="dropdown"
+                      href="#"
+                    >
+                      <i class="fas fa-ellipsis-h"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                      <a class="dropdown-item" href="#">编辑</a>
+                      <a class="dropdown-item" href="#">查看采集数据</a>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>
+                  <a
+                    href="#rename-task-modal"
+                    data-toggle="modal"
+                    data-target="#rename-task-modal"
+                    ><i class="fas fa-pen hidden"></i>&nbsp;</a
+                  >豆瓣电影2
+                </td>
+                <td class="paused">
+                  已暂停
+                </td>
+                <td class="paused">
+                  <a href="" data-toggle="modal" data-target="">
+                    <i class="far fa-play-circle hidden"></i>
+                  </a>
+                  <a
+                    href="#cancel-task-modal"
+                    data-toggle="modal"
+                    data-target="#cancel-task-modal"
+                  >
+                    <i class="far fa-stop-circle hidden"></i>
+                  </a>
+                </td>
+                <td>20/04/22 13:00</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="progress progress-xs" title="55%">
+                    <div
+                      class="progress-bar progress-bar-danger progress-bar-striped progress-bar-animated"
+                      style="width: 55%;"
+                    ></div>
+                  </div>
+                </td>
+                <td>
+                  <div class="dropdown">
+                    <a
+                      class="nav-link task-dropdown"
+                      data-toggle="dropdown"
+                      href="#"
+                    >
+                      <i class="fas fa-ellipsis-h"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                      <a class="dropdown-item" href="#">编辑</a>
+                      <a class="dropdown-item" href="#">查看采集数据</a>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>
+                  <a
+                    href="#rename-task-modal"
+                    data-toggle="modal"
+                    data-target="#rename-task-modal"
+                    ><i class="fas fa-pen hidden"></i>&nbsp;</a
+                  >豆瓣电影3
+                </td>
+                <td class="running">
+                  运行中
+                </td>
+                <td class="running">
+                  <a href="" data-toggle="modal" data-target="">
+                    <i class="far fa-pause-circle hidden"></i>
+                  </a>
+                  <a
+                    href="#cancel-task-modal"
+                    data-toggle="modal"
+                    data-target="#cancel-task-modal"
+                  >
+                    <i class="far fa-stop-circle hidden"></i>
+                  </a>
+                </td>
+                <td>20/04/22 14:00</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="progress progress-xs" title="55%">
+                    <div
+                      class="progress-bar progress-bar-danger progress-bar-striped progress-bar-animated"
+                      style="width: 55%;"
+                    ></div>
+                  </div>
+                </td>
+                <td>
+                  <div class="dropdown">
+                    <a
+                      class="nav-link task-dropdown"
+                      data-toggle="dropdown"
+                      href="#"
+                    >
+                      <i class="fas fa-ellipsis-h"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                      <a class="dropdown-item" href="#">编辑</a>
+                      <a class="dropdown-item" href="#">查看采集数据</a>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>
+                  <a
+                    href="#rename-task-modal"
+                    data-toggle="modal"
+                    data-target="#rename-task-modal"
+                    ><i class="fas fa-pen hidden"></i>&nbsp;</a
+                  >豆瓣电影4
+                </td>
+                <td class="finished">
+                  已完成
+                </td>
+                <td class="finished">
+                  <a
+                    href="#restart-task-modal"
+                    data-toggle="modal"
+                    data-target="#restart-task-modal"
+                  >
+                    <i class="far fa-play-circle hidden"></i>
+                  </a>
+                </td>
+                <td>20/04/22 15:00</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="progress progress-xs" title="55%">
+                    <div
+                      class="progress-bar progress-bar-danger progress-bar-striped progress-bar-animated"
+                      style="width: 55%;"
+                    ></div>
+                  </div>
+                </td>
+                <td>
+                  <div class="dropdown">
+                    <a
+                      class="nav-link task-dropdown"
+                      data-toggle="dropdown"
+                      href="#"
+                    >
+                      <i class="fas fa-ellipsis-h"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                      <a class="dropdown-item" href="#">编辑</a>
+                      <a class="dropdown-item" href="#">查看采集数据</a>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>
+                  <a
+                    href="#rename-task-modal"
+                    data-toggle="modal"
+                    data-target="#rename-task-modal"
+                    ><i class="fas fa-pen hidden"></i>&nbsp;</a
+                  >豆瓣电影5
+                </td>
+                <td class="canceled">
+                  已终止
+                </td>
+                <td class="canceled">
+                  <a
+                    href="#restart-task-modal"
+                    data-toggle="modal"
+                    data-target="#restart-task-modal"
+                  >
+                    <i class="far fa-play-circle hidden"></i>
+                  </a>
+                </td>
+                <td>20/04/22 16:00</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                  <div class="progress progress-xs" title="55%">
+                    <div
+                      class="progress-bar progress-bar-danger progress-bar-striped progress-bar-animated"
+                      style="width: 55%;"
+                    ></div>
+                  </div>
+                </td>
+                <td>
+                  <div class="dropdown">
+                    <a
+                      class="nav-link task-dropdown"
+                      data-toggle="dropdown"
+                      href="#"
+                    >
+                      <i class="fas fa-ellipsis-h"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                      <a class="dropdown-item" href="#">编辑</a>
+                      <a class="dropdown-item" href="#">查看采集数据</a>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+{% endblock %}
+
+{% block modal %}
+    <div class="modal fade" id="delete-task-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                  <div class="card-comments">
+                    <div class="card-comment">
+                      <img
+                        class="img-circle img-sm"
+                        src="{% static 'img/warning.JPG' %}"
+                        alt="warning"
+                      />
+                      <div class="comment-text">
+                        <h5 class="username">确定</h5>
+                        <!-- /.username -->
+                        确定要删除吗？
+                      </div>
+                      <!-- /.comment-text -->
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                  <button
+                    type="button"
+                    class="btn btn-default"
+                    data-dismiss="modal"
+                  >
+                    取消
+                  </button>
+                  <button type="button" class="btn btn-primary">
+                    确定
+                  </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="cancel-task-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                  <div class="card-comments">
+                    <div class="card-comment">
+                      <img
+                        class="img-circle img-sm"
+                        src="{% static 'img/warning.JPG' %}"
+                        alt="warning"
+                      />
+                      <div class="comment-text">
+                        <h5 class="username">确定</h5>
+                        <!-- /.username -->
+                        确定要终止吗？
+                      </div>
+                      <!-- /.comment-text -->
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                  <button
+                    type="button"
+                    class="btn btn-default"
+                    data-dismiss="modal"
+                  >
+                    取消
+                  </button>
+                  <button type="button" class="btn btn-primary">
+                    确定
+                  </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+            </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="restart-task-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                  <div class="card-comments">
+                    <div class="card-comment">
+                      <img
+                        class="img-circle img-sm"
+                        src="{% static 'img/warning.JPG' %}"
+                        alt="warning"
+                      />
+                      <div class="comment-text">
+                        <h5 class="username">确定</h5>
+                        <!-- /.username -->
+                        原有采集数据会被覆盖，确定要重新开始吗？
+                      </div>
+                      <!-- /.comment-text -->
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                  <button
+                    type="button"
+                    class="btn btn-default"
+                    data-dismiss="modal"
+                  >
+                    取消
+                  </button>
+                  <button type="button" class="btn btn-primary">
+                    确定
+                  </button>
+                </div>
+            </div>
+        <!-- /.modal-content -->
+        </div>
+    <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="rename-task-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title">修改任务名</h4>
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="form-group">
+                    <label class="col-form-label" for="task-name-input"
+                      >任务名：</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="task-name-input"
+                      placeholder="请输入新任务名..."
+                    />
+                  </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                  <button
+                    type="button"
+                    class="btn btn-default"
+                    data-dismiss="modal"
+                  >
+                    取消
+                  </button>
+                  <button type="button" class="btn btn-primary">
+                    确定
+                  </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+{% endblock %}
+
+{% block js_extend %}
+    <!-- DataTables -->
+    <script
+        type="text/javascript"
+        src="https://cdn.datatables.net/v/bs4/dt-1.10.20/cr-1.5.2/r-2.2.3/datatables.min.js"
+    ></script>
+    <!-- DataTable Checkbox -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery-datatables-checkboxes@1.2.11/js/dataTables.checkboxes.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'task/js/task.js' %}"></script>
+{% endblock %}
+
