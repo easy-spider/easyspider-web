@@ -1,9 +1,11 @@
+let starter_search_box = $("#starter-search-box");
+
 $.fn.strech_text = function () {
   var elmt = $(this),
     cont_width = elmt.width(),
     txt = elmt.html(),
     one_line = $('<span class="stretch_it">' + txt + "</span>"),
-    nb_char = elmt.text().length,
+    nb_char = elmt.text().trim().length,
     spacing = cont_width / nb_char,
     txt_width;
 
@@ -21,8 +23,16 @@ $.fn.strech_text = function () {
   }
 };
 
-$(document).ready(function () {
-  $(".stretch").each(function () {
-    $(this).strech_text();
-  });
+$(".stretch").each(function () {
+  $(this).strech_text();
+});
+
+$(".fa-search").parent("a").on("click", function () {
+  let val = starter_search_box.val().trim();
+  if(val !== "") {
+    let url = $(this).attr("href");
+    $(this).attr("href", url + "?search=" + val);
+  } else {
+    return false;
+  }
 });
