@@ -15,8 +15,7 @@ def login_view(request):
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request, user)
-        # TODO 重定向到spiderTemplate:starter
-        return redirect(reverse(''))
+        return redirect(reverse('starter'))
     else:
         return render(request, 'user/login.html', {'error_message': '用户名或密码错误'})
 
@@ -32,12 +31,12 @@ def register(request):
     """GET方法——注册页面；POST方法——提交注册表单"""
     if request.method == 'GET':
         return render(request, 'user/register.html')
-    # TODO 注册需要提交的信息：用户名？、密码、邮箱
     username = request.POST['username']
+    email = request.POST['email']
     password = request.POST['password']
     if User.objects.filter(username=username).exists():
         return render(request, 'user/register.html', {'error_message': '用户名已存在'})
-    User.objects.create(username=username, password=password)
+    User.objects.create(username=username, password=password, email=email)
     return redirect(reverse('index'))
 
 

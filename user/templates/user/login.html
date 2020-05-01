@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/css/adminlte.min.css"/>
-  <link rel="stylesheet" href="{% static 'css/login.css' %}">
+  <link rel="stylesheet" href="{% static 'user/css/login.css' %}">
   <!-- Website Icon -->
-  <link rel="icon" href="{% static 'img/favicon.ico'%}" >
+  <link rel="icon" href="{% static 'img/favicon.ico' %}" >
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
@@ -30,7 +30,7 @@
     <h5 class="widget-user-desc stretch">
         让数据触手可及
     </h5>
-</div>
+  </div>
   <!-- /.login-logo -->
   {% if error_message %}<p style="color: red">{{ error_message }}</p>{% endif %}
   <div class="card">
