@@ -10,5 +10,6 @@ __pycache__/
 # *_old.html
 *_old.html
 
-# pic
-/upload/templatepics/
+# upload
+/upload/templatepics/**/*.jpg
+!/upload/templatepics/test/**/*.jpg

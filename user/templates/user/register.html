@@ -9,11 +9,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Font Awesome Icons -->
-  <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css"/>
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Theme style -->
-  <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/css/adminlte.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/css/adminlte.min.css"/>
   <link rel="stylesheet" href="{% static 'user/css/login.css' %}">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
@@ -35,21 +35,23 @@
         </h5>
       </div>
     <!-- /.login-logo -->
+    {% if error_message %}<p style="color: red">{{ error_message }}</p>{% endif %}
     <div class="card">
       <div class="card-body login-card-body">
         <p class="login-box-msg">  </p>
 
-        <form action="{% url 'easyspider:register' %}" method="post" onsubmit="return validate();">
+        <form action="{% url 'register' %}" method="post" onsubmit="return validate();">
           {% csrf_token %}
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="用户名" name="username">
+            <input type="text" class="form-control" placeholder="用户名" name="username"
+                   maxlength="150" required>
             <div class="input-group-append">
               <div class="input-group-text">
               </div>
             </div>
           </div>
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="邮箱" name="email">
+            <input type="email" class="form-control" placeholder="邮箱" name="email" required>
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-envelope"></span>
@@ -57,7 +59,8 @@
             </div>
           </div>
           <div class="input-group mb-3">
-            <input type="password" class="form-control"  name="password" placeholder="6-16位密码，区分大小写" id="pw1">
+            <input type="password" class="form-control" name="password" placeholder="6-16位密码，区分大小写" id="pw1"
+                   minlength="6" maxlength="16" required>
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-lock"></span>

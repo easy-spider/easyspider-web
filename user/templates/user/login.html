@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -37,17 +37,17 @@
     <div class="card-body login-card-body">
       <p class="login-box-msg">  </p>
 
-      <form action="{% url 'easyspider:login' %}" method="post">
+      <form action="{% url 'login' %}" method="post">
         {% csrf_token %}
         <div class="input-group mb-3">
-          <input id="username-input" type="text" class="form-control"  name="username" placeholder="用户名" required>
+          <input id="username-input" type="text" class="form-control" name="username" placeholder="用户名" required>
           <div class="input-group-append">
             <div class="input-group-text">
             </div>
           </div>
         </div>
         <div class="input-group mb-3">
-          <input  id="password-input" type="password"  name="password"class="form-control" placeholder="密码" required>
+          <input id="password-input" type="password" name="password" class="form-control" placeholder="密码" required>
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>
@@ -67,15 +67,12 @@
             <a href="{% url 'forgot_password'%} ">忘记密码</a>
           </p>
         </div>
+          <!-- /.col -->
+          <div class="social-auth-links text-center mb-3">
+              <button type="submit" class="btn btn-primary btn-block">登录</button>
+          </div>
+          <!-- /.col -->
       </form>
-
-      <!-- /.col -->
-      <div class="social-auth-links text-center mb-3">
-        <button type="submit" class="btn btn-primary btn-block">登录</button>
-      </div>
-      <!-- /.col -->
-
-     
       <p class="mb-0">
         <a href="{% url 'register'%} " class="text-center">注册账号</a>
       </p>
