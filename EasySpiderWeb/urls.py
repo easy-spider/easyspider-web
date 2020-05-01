@@ -23,4 +23,5 @@ urlpatterns = [
     path('easyspider/', include('easyspider.urls')),
     path('user/', include('user.urls')),
     path('spiderTemplate/', include('spiderTemplate.urls')),
+    path('pic/', include('pic.urls')),
 ]

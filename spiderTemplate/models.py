@@ -23,6 +23,9 @@ class Site(models.Model):
     def __str__(self):
         return self.display_name
 
+    def logo(self):
+        return reverse('pic:site-logo', args=self.name)
+
 
 class Template(models.Model):
     """爬虫模板实体类，对应Scrapy项目中的一个Spider"""
@@ -37,6 +40,9 @@ class Template(models.Model):
     def __str__(self):
         return self.display_name
 
+    def logo(self):
+        return reverse('pic:template-logo', args=(self.site.name, self.name))
+
 
 class Field(models.Model):
     """采集字段实体类"""
@@ -49,8 +55,9 @@ class Field(models.Model):
 
     def pic(self):
         """预览图片URL"""
-        # TODO pic应用的URL
-        return reverse('')
+        return reverse('pic:template-field', args=(
+            self.template.site.name, self.template.name, self.name
+        ))
 
 
 class InputType(models.Model):
@@ -78,5 +85,6 @@ class Param(models.Model):
         return '{} - {}'.format(self.template, self.display_name)
 
     def pic(self):
-        # TODO pic应用的URL
-        return reverse('')
+        return reverse('pic:template-param', args=(
+            self.template.site.name, self.template.name, self.name
+        ))
