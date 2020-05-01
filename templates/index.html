@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,12 +10,12 @@
   <!-- css files -->
   <!-- css files -->
   <!-- Font Awesome Icons -->
-  <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css"/>
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="{% static 'css/top.css' %}">
-  <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/css/adminlte.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/css/adminlte.min.css"/>
   <!-- Website Icon -->
   <link rel="icon" href="{% static 'img/favicon.ico' %}" />
 </head>
@@ -29,8 +29,7 @@
       <b>EasySpider</b>·大数据
     </div>
     <div class='login'>
-      <a href="login.html"><button class='login-button btn btn-primary '>登录</button></a>
-{#      <a href="{% url 'login' %}"><button class='login-button btn btn-primary '>登录</button></a>  #}
+      <a href="{% url 'login' %}"><button class='login-button btn btn-primary '>登录</button></a>
     </div>
   </div>
   <div class='introduce'>
