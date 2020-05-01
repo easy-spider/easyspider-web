@@ -6,10 +6,10 @@ def login(request):
 
 
 def send_reset_email(request):
-    return render(request, 'user/email.html', {})
+    return render(request, 'user/send_reset_email.html', {})
 
 
-def forget_password(request):
+def forgot_password(request):
     return render(request, 'user/forgot_password.html', {})
 
 
