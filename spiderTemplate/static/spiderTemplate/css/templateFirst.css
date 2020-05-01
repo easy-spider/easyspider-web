@@ -70,3 +70,7 @@
 #template-search {
   margin-right: 15px;
 }
+
+span.website-name {
+  color: #000;
+}
