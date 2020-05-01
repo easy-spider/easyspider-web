@@ -8,22 +8,20 @@
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Font Awesome Icons -->
-  <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css"/>
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Theme style -->
-  <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/css/adminlte.min.css"/>
-  <link rel="stylesheet" href="{% static 'user/login.css' %}">
-{#  <link rel="stylesheet" href="css/base.css" />#}
-{#  <link rel="stylesheet" href="css/starter.css" />#}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/css/adminlte.min.css"/>
+  <link rel="stylesheet" href="{% static 'css/login.css' %}">
   <!-- Website Icon -->
-  <link rel="icon" href="img/favicon.ico" />
+  <link rel="icon" href="{% static 'img/favicon.ico'%}" >
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
   <div class="widget-user-header">
     <div class="widget-user-image text-center">
-        <img class="img" src="img/logo.png" alt="logo"/>
+        <img class="img" src="{% static 'img/logo.png' %}" alt="logo"/>
     </div>
     <!-- /.widget-user-image -->
     <h3 class="login-logo">
@@ -34,21 +32,22 @@
     </h5>
 </div>
   <!-- /.login-logo -->
+  {% if error_message %}<p style="color: red">{{ error_message }}</p>{% endif %}
   <div class="card">
     <div class="card-body login-card-body">
       <p class="login-box-msg">  </p>
 
-      <form action="./index3.html" method="post">
+      <form action="{% url 'easyspider:login' %}" method="post">
+        {% csrf_token %}
         <div class="input-group mb-3">
-          <input type="email" class="form-control" placeholder="邮箱">
+          <input id="username-input" type="text" class="form-control"  name="username" placeholder="用户名" required>
           <div class="input-group-append">
             <div class="input-group-text">
-              <span class="fas fa-envelope"></span>
             </div>
           </div>
         </div>
         <div class="input-group mb-3">
-          <input type="password" class="form-control" placeholder="密码">
+          <input  id="password-input" type="password"  name="password"class="form-control" placeholder="密码" required>
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>
@@ -65,20 +64,20 @@
             </div>
           </div>
           <p class="mb-1">
-            <a href="forgot_password.html">忘记密码</a>
+            <a href="{% url 'forgot_password'%} ">忘记密码</a>
           </p>
         </div>
       </form>
 
       <!-- /.col -->
       <div class="social-auth-links text-center mb-3">
-        <a href="starter.html"><button type="submit" class="btn btn-primary btn-block">登录</button></a>
+        <button type="submit" class="btn btn-primary btn-block">登录</button>
       </div>
       <!-- /.col -->
 
      
       <p class="mb-0">
-        <a href="register.html" class="text-center">注册账号</a>
+        <a href="{% url 'register'%} " class="text-center">注册账号</a>
       </p>
     </div>
     <!-- /.login-card-body -->

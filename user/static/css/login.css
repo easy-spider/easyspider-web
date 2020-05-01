@@ -1,0 +1,32 @@
+.login-box{
+    width:500px;
+}
+.mb-1{
+    margin-left: 60px;
+}
+.col-12 {
+    margin-bottom: 15px;
+}
+img {
+    float: left;
+    height: auto;
+    width: 65px;
+    margin-left: 80px;
+}
+.login-logo{
+    font-weight: normal!important;
+    font-size: 1.75rem;
+    line-height: 1.2;
+    margin-bottom: 0;
+    margin-top: 0;
+    margin-left: 150px;
+    text-align: left;
+}
+.widget-user-desc{
+    
+    margin-left: 150px;
+    text-align: left;
+}
+.widget-user-header{
+    padding-bottom: 10px;
+}

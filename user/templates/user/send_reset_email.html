@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>EasySpider | 忘记密码</title>
+  <title>EasySpider | 重置密码</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -38,32 +38,15 @@
   <!-- /.login-logo -->
   <div class="card">
     <div class="card-body login-card-body">
-      <p class="login-box-msg">输入您的账户已验证的电子邮箱地址，我们将向您发送密码重置链接。</p>
+      <p class="login-box-msg">检查您的电子邮箱以获取重置密码的链接。如果几分钟后仍未收到邮件，请检查您的垃圾邮件文件夹。</p>
 
-        <div class="input-group mb-3">
-          <input type="email" class="form-control" placeholder="邮箱">
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-envelope"></span>
-            </div>
-          </div>
-        </div>
         <div class="row">
           <div class="col-12">
-             <a href="{%url 'send_reset_email' %}"><button type="submit" class="btn btn-primary btn-block">发送重置密码邮件</button></a>
+            <a href="{%url 'login' %}"><button type="submit" class="btn btn-primary btn-block">返回登录页</button></a>
+            
           </div>
           <!-- /.col -->
         </div>
-      <div class="row">
-        <div class="col-8">
-          <div class="icheck-primary">
-            <a href="{%url 'login' %}">使用已有账号登录</a>
-          </div>
-        </div>
-        <p class="mb-1">
-          <a href="{%url 'register' %}" class="text-center">注册账号</a>
-        </p>
-      </div>
 
       
     </div>
@@ -71,6 +54,7 @@
   </div>
 </div>
 <!-- /.login-box -->
+
 
 <!-- jQuery -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.min.js"></script>
