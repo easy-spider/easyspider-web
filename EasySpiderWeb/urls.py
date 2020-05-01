@@ -25,4 +25,5 @@ urlpatterns = [
     path('spiderTemplate/', include('spiderTemplate.urls')),
     path('task/', include('task.urls')),
     path('pic/', include('pic.urls')),
+    path('scheduler/', include('scheduler.urls')),
 ]
