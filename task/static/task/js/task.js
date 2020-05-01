@@ -11,7 +11,7 @@ let taskTable = $("#task-table").DataTable({
     },
     {
       orderable: false,
-      targets: -1,
+      targets: [3, -2, -1],
     },
     {
       colReorder: true,
@@ -45,7 +45,7 @@ $("#task-table tbody input[type=checkbox]").change(function () {
 
 $(".dataTables_scrollHeadInner input[type=checkbox]").change(function () {
   if ($(this).is(":checked")) {
-    totalScore = 4; // 改成task的数量
+    totalScore = $("#task-table tbody tr").length;
     btnEle.html("<i class='fas fa-trash'></i>&nbsp;删除");
   } else {
     totalScore = 0;

@@ -1,0 +1,45 @@
+.task-dropdown {
+  padding: 0px !important;
+}
+
+#task-table tbody tr:hover i {
+  visibility: visible;
+}
+
+#task-card {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+#refresh-delete {
+  margin-bottom: -50px;
+}
+
+#task-table tbody tr td:nth-of-type(9) {
+  vertical-align: middle;
+}
+
+#task-table .canceled,
+#task-table .canceled i {
+  color: #f00;
+}
+
+#task-table .finished,
+#task-table .finished i {
+  color: #080;
+}
+
+#task-table .ready,
+#task-table .ready i {
+  color: #7f8180;
+}
+
+#task-table .running,
+#task-table .running i {
+  color: #007aff;
+}
+
+#task-table .paused,
+#task-table .paused i {
+  color: #faa316;
+}

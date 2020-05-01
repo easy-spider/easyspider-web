@@ -1,0 +1,363 @@
+{% extends 'dashboardBase.html' %}
+{% load static %}
+
+{% block title %}EasySpider | 数据下载{% endblock %}
+
+{% block css_extend %}
+    <link rel="stylesheet" href="{% static 'task/css/dataDownload.css' %}" />
+    <!-- DataTables -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/datatables.net-bs4@1.10.20/css/dataTables.bootstrap4.min.css"
+    />
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/datatables.net-responsive-bs4@2.2.3/css/responsive.bootstrap4.min.css"
+    />
+{% endblock %}
+
+{% block page_title %}数据下载{% endblock %}
+
+{% block page_link %}
+    <li class="breadcrumb-item">
+        <a href="{% url 'starter' %}">首页</a>
+    </li>
+    <li class="breadcrumb-item">
+        <a href="{% url 'my_task' %}">我的任务</a>
+    </li>
+    <li class="breadcrumb-item active">
+        数据下载
+    </li>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="card m-auto" id="data-table-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-table"></i
+                    >&nbsp;已采集数据预览
+                </h3>
+            </div>
+            <div class="card-body">
+                <table
+                    id="data-table"
+                    class="table table-bordered table-hover text-nowrap text-center"
+                >
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>详情</th>
+                            <th>关键词</th>
+                            <th>页码</th>
+                            <th>影名</th>
+                            <th>语言</th>
+                            <th>片长</th>
+                            <th>评分</th>
+                            <th>评价人数</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>
+                                <button
+                                    type="button"
+                                    class="btn btn-default"
+                                    data-toggle="modal"
+                                    data-target="#data-modal"
+                                >
+                                    <i
+                                        class="fas fa-ellipsis-h"
+                                    ></i>
+                                </button>
+                            </td>
+                            <td>战狼</td>
+                            <td>1</td>
+                            <td>战狼2(2017)</td>
+                            <td>汉语普通话/英语</td>
+                            <td>123分钟</td>
+                            <td>7.1</td>
+                            <td>724332</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>
+                                <button
+                                    type="button"
+                                    class="btn btn-default"
+                                    data-toggle="modal"
+                                    data-target="#data-modal"
+                                >
+                                    <i
+                                        class="fas fa-ellipsis-h"
+                                    ></i>
+                                </button>
+                            </td>
+                            <td>战狼</td>
+                            <td>1</td>
+                            <td>战狼(2015)</td>
+                            <td>汉语普通话/英语</td>
+                            <td>90分钟</td>
+                            <td>6.9</td>
+                            <td>214894</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>
+                                <button
+                                    type="button"
+                                    class="btn btn-default"
+                                    data-toggle="modal"
+                                    data-target="#data-modal"
+                                >
+                                    <i
+                                        class="fas fa-ellipsis-h"
+                                    ></i>
+                                </button>
+                            </td>
+                            <td>战狼</td>
+                            <td>1</td>
+                            <td>贝奥武夫 Beowulf‎(2007)</td>
+                            <td>英语/古英语</td>
+                            <td>115分钟</td>
+                            <td>6.7</td>
+                            <td>26448</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>
+                                <button
+                                    type="button"
+                                    class="btn btn-default"
+                                    data-toggle="modal"
+                                    data-target="#data-modal"
+                                >
+                                    <i
+                                        class="fas fa-ellipsis-h"
+                                    ></i>
+                                </button>
+                            </td>
+                            <td>战狼</td>
+                            <td>1</td>
+                            <td>斯巴达300勇士300‎(2006)</td>
+                            <td>英语</td>
+                            <td>117分钟</td>
+                            <td>7.8</td>
+                            <td>126192</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">
+                <button
+                    id="export-data-btn"
+                    type="button"
+                    class="btn btn-primary float-right"
+                    data-toggle="modal"
+                    data-target="#export-modal"
+                >
+                    导出数据
+                </button>
+                <button
+                    id="clear-data-btn"
+                    type="button"
+                    class="btn btn-danger float-right"
+                    data-toggle="modal"
+                    data-target="#clear-modal"
+                >
+                    清除数据
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block modal %}
+    <div class="modal fade" id="clear-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="card-comments">
+                        <div class="card-comment">
+                            <img
+                                class="img-circle img-sm"
+                                src="{% static 'img/warning.JPG' %}"
+                                alt="warning"
+                            />
+                            <div class="comment-text">
+                                <h5 class="username">确定</h5>
+                                <!-- /.username -->
+                                确定要全部清除吗？
+                            </div>
+                            <!-- /.comment-text -->
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="modal-footer justify-content-between"
+                >
+                    <button
+                        type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal"
+                    >
+                        取消
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                    >
+                        确定
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="export-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">
+                        导出本地数据（任务名）
+                    </h6>
+                    <button
+                        type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"
+                    >
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6>选择导出方式</h6>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                name="export-way"
+                                checked=""
+                            />
+                            <label class="form-check-label"
+                                >JSON</label
+                            >
+                        </div>
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                name="export-way"
+                            />
+                            <label class="form-check-label"
+                                >CSV</label
+                            >
+                        </div>
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                name="export-way"
+                            />
+                            <label class="form-check-label"
+                                >EXCEL</label
+                            >
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="modal-footer justify-content-between"
+                >
+                    <button
+                        type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal"
+                    >
+                        取消
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                    >
+                        确定
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="data-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title">#1 数据详情</h6>
+                    <button
+                        type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"
+                    >
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">关键词</dt>
+                        <dd class="col-sm-8">
+                            战狼
+                        </dd>
+                        <dt class="col-sm-4">页码</dt>
+                        <dd class="col-sm-8">
+                            1
+                        </dd>
+                        <dt class="col-sm-4">影名</dt>
+                        <dd class="col-sm-8">
+                            战狼2(2017)
+                        </dd>
+                        <dt class="col-sm-4">
+                            语言
+                        </dt>
+                        <dd class="col-sm-8">
+                            汉语普通话/英语
+                        </dd>
+                        <dt class="col-sm-4">
+                            片长
+                        </dt>
+                        <dd class="col-sm-8">
+                            123分钟
+                        </dd>
+                        <dt class="col-sm-4">
+                            评分
+                        </dt>
+                        <dd class="col-sm-8">
+                            7.1
+                        </dd>
+                        <dt class="col-sm-4">
+                            评价人数
+                        </dt>
+                        <dd class="col-sm-8">
+                            724332
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+{% endblock %}
+
+{% block js_extend %}
+    <!-- DataTables -->
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net@1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs4@1.10.20/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net-responsive@2.2.3/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net-responsive-bs4@2.2.3/js/responsive.bootstrap4.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'task/js/dataDownload.js' %}"></script>
+{% endblock %}
