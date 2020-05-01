@@ -4,16 +4,7 @@ from easyspider import views
 
 app_name = 'easyspider'
 urlpatterns = [
-    path('index/', views.index, name='index'),
-    path('register/', views.register, name='register'),
-    path('login/', views.login, name='login'),
-    path('logout/', views.logout, name='logout'),
-
-    path('template/list/', views.TemplateListView.as_view(), name='template-list'),
-    path('template/detail/<int:pk>/', views.TemplateDetailView.as_view(), name='template-detail'),
     path('site-template/create/', views.create_site_template, name='site-template-create'),
-    path('task/create/', views.create_task, name='create-task'),
-    path('task/list/', views.TaskListView.as_view(), name='task-list'),
     path('task/start/<int:task_id>/', views.change_task_status,
          {'status': 'running'}, name='start-task'),
     path('task/pause/<int:task_id>/', views.change_task_status,

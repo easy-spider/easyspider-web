@@ -13,7 +13,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <title>EasySpider | 个人信息</title>
 
         <!-- Custom css -->
-        <link rel="stylesheet" href=" {% static 'css/information' %}" />
+        <link rel="stylesheet" href=" {% static 'css/base.css' %}" />
         <!-- Font Awesome Icons -->
         <link
             rel="stylesheet"
@@ -25,7 +25,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             href="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/css/adminlte.min.css"
         />
         <!-- Website Icon -->
-        <link rel="icon" href="{% static 'img/favicon.ico'%}" >
+        <link rel="icon" href="{% static 'img/favicon.ico' %}" >
 
         <!-- jQuery -->
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.min.js"></script>
@@ -86,7 +86,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <!-- Brand Logo -->
                 <a href="#" class="brand-link">
                     <img
-                        src="{% static 'img/logo.png'%} "
+                        src="{% static 'img/logo.png' %} "
                         alt="AdminLTE Logo"
                         class="brand-image"
                     />
@@ -300,7 +300,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     <div class="card-body box-profile">
                                     <div class="text-center">
                                         <img class="profile-user-img img-fluid img-circle"
-                                            src="{% static 'img/user4-128x128.jpg'%}"
+                                            src="{% static 'user/img/user4-128x128.jpg' %}"
                                             alt="User profile picture">
                                     </div>
             
@@ -404,7 +404,5 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <!-- AdminLTE App -->
         <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/js/adminlte.min.js"></script>
         <!-- Custom JS -->
-        <script src="{% static 'js/base.js'%} "></script>
-        <script src="{% static 'js/starter.js' %} "></script>
     </body>
 </html>
