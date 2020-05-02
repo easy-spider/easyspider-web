@@ -62,232 +62,40 @@
         </div>
     </div>
     <div class="row hot-templates">
-        <div class="col-md-auto m-auto">
-            <a href="{% url 'template_second' 'douban' %}">
-                <!-- Widget: user widget style 2 -->
-                <div class="card card-widget widget-user-2">
-                    <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img
-                                class="img"
-                                src="{% static 'spiderTemplate/img/website/douban/logo.jpg' %}"
-                                alt="豆瓣 Logo"
-                            />
+        {% for site in sites %}
+            {% if forloop.counter0 != 0 and forloop.counter0|divisibleby:"4" == True %}
+                <!-- Force next columns to break to new line -->
+                <div class="w-100"></div>
+            {% endif %}
+            <div class="col-md-auto m-auto">
+                <a href="{% url 'template_second' site.pk %}">
+                    <!-- Widget: user widget style 2 -->
+                    <div class="card card-widget widget-user-2">
+                        <!-- Add the bg color to the header using any of the bg-* classes -->
+                        <div class="widget-user-header">
+                            <div class="widget-user-image text-center">
+                                <img
+                                    class="img"
+                                    src="{{ site.logo }}"
+                                    alt="{{ site.name }} Logo"
+                                />
+                            </div>
+                            <!-- /.widget-user-image -->
                         </div>
-                        <!-- /.widget-user-image -->
-                    </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    豆瓣
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
-        <div class="col-md-auto m-auto">
-            <a href="{% url 'template_second' 'bilibili' %}">
-                <!-- Widget: user widget style 2 -->
-                <div class="card card-widget widget-user-2">
-                    <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img
-                                class="img"
-                                src="{% static 'spiderTemplate/img/website/bilibili/logo.jpg' %}"
-                                alt="b站 Logo"
-                            />
+                        <div class="card-footer p-0">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <span class="nav-link text-center website-name">
+                                        {{ site.display_name }}
+                                    </span>
+                                </li>
+                            </ul>
                         </div>
-                        <!-- /.widget-user-image -->
                     </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    b站
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
-        <div class="col-md-auto m-auto">
-            <a href="{% url 'template_second' 'jingdong' %}">
-                <!-- Widget: user widget style 2 -->
-                <div class="card card-widget widget-user-2">
-                    <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img
-                                class="img"
-                                src="{% static 'spiderTemplate/img/website/jingdong/logo.jpg' %}"
-                                alt="京东 Logo"
-                            />
-                        </div>
-                        <!-- /.widget-user-image -->
-                    </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    京东
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
-        <div class="col-md-auto m-auto">
-            <a href="{% url 'template_second' '58' %}">
-                <!-- Widget: user widget style 2 -->
-                <div class="card card-widget widget-user-2">
-                    <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img
-                                class="img"
-                                src="{% static 'spiderTemplate/img/website/58/logo.jpg' %}"
-                                alt="58 Logo"
-                            />
-                        </div>
-                        <!-- /.widget-user-image -->
-                    </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    58同城
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
-         <!-- Force next columns to break to new line -->
-        <div class="w-100"></div>
-        <div class="col-md-auto m-auto">
-            <a href="{% url 'template_second' 'taobao' %}">
-                <!-- Widget: user widget style 2 -->
-                <div class="card card-widget widget-user-2">
-                    <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img
-                                class="img"
-                                src="{% static 'spiderTemplate/img/website/taobao/logo.jpg' %}"
-                                alt="淘宝 Logo"
-                            />
-                        </div>
-                        <!-- /.widget-user-image -->
-                    </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    淘宝
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
-        <div class="col-md-auto m-auto">
-            <a href="{% url 'template_second' 'tianmao' %}">
-                <!-- Widget: user widget style 2 -->
-                <div class="card card-widget widget-user-2">
-                    <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img
-                                class="img"
-                                src="{% static 'spiderTemplate/img/website/tianmao/logo.jpg' %}"
-                                alt="天猫 Logo"
-                            />
-                        </div>
-                        <!-- /.widget-user-image -->
-                    </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    天猫
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
+                    <!-- /.widget-user -->
+                </a>
             </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
-        <div class="col-md-auto m-auto">
-            <a href="{% url 'template_second' 'weibo' %}">
-                <!-- Widget: user widget style 2 -->
-                <div class="card card-widget widget-user-2">
-                    <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img
-                                class="img"
-                                src="{% static 'spiderTemplate/img/website/weibo/logo.jpg' %}"
-                                alt="微博 Logo"
-                            />
-                        </div>
-                        <!-- /.widget-user-image -->
-                    </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    微博
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
-        <div class="col-md-auto m-auto">
-            <a href="{% url 'template_second' 'zhihu' %}">
-                <!-- Widget: user widget style 2 -->
-                <div class="card card-widget widget-user-2">
-                <!-- Add the bg color to the header using any of the bg-* classes -->
-                <div class="widget-user-header">
-                    <div class="widget-user-image text-center">
-                        <img
-                            class="img"
-                            src="{% static 'spiderTemplate/img/website/zhihu/logo.jpg' %}"
-                            alt="知乎 Logo"
-                        />
-                    </div>
-                    <!-- /.widget-user-image -->
-                </div>
-                <div class="card-footer p-0">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <span class="nav-link text-center website-name">
-                                知乎
-                            </span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
+        {% endfor %}
     </div>
     <div class="row hot-template-footer">
         <div class="ml-auto"></div>

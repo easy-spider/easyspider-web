@@ -1,5 +1,6 @@
 {% extends 'dashboardBase.html' %}
 {% load static %}
+{% load spiderTemplate_extras %}
 
 {% block title %}EasySpider | 二级模板选择{% endblock %}
 
@@ -7,7 +8,7 @@
     <link rel="stylesheet" href="{% static 'spiderTemplate/css/templateFirst.css' %}" />
 {% endblock %}
 
-{% block page_title %}豆瓣{% endblock %}
+{% block page_title %}{{ template_list.first.site.display_name }}{% endblock %}
 
 {% block page_link %}
     <li class="breadcrumb-item">
@@ -16,219 +17,94 @@
     <li class="breadcrumb-item">
         <a href="{% url 'template_first' %}">选择模板</a>
     </li>
-    <li class="breadcrumb-item active">豆瓣</li>
+    <li class="breadcrumb-item active">{{ template_list.first.site.display_name }}</li>
     <li class="breadcrumb-item"></li>
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-      <div class="card" style="width: 100%;">
-        <div class="card-header d-flex p-0">
-          <h3 class="card-title p-3">模板类型：</h3>
-          <ul class="nav nav-pills p-2" id="template-type">
-            <li class="nav-item">
-                <a class="nav-link active" href="{% url 'template_first' %}">热门</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'template_first' %}?type=life">本地生活</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'template_first' %}?type=ecommerce">电子商务</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'template_first'%}?type=media">媒体阅读</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'template_first'%}?type=search">搜索引擎</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'template_first'%}?type=social">社交平台</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'template_first'%}?type=education">科研教育</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'template_first'%}?type=other">其他</a>
-            </li>
-          </ul>
-          <form class="form-inline ml-auto" id="template-search">
-            <div class="input-group">
-              <input
-                type="text"
-                name="search"
-                class="form-control float-right"
-                placeholder="搜索模板..."
-              />
-              <div class="input-group-append">
-                <a type="submit" class="btn btn-default" href="{% url 'template_first' %}">
-                  <i class="fas fa-search"></i>
-                </a>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="card">
-        <div class="card-header d-flex p-0">
-          <h3 class="card-title p-3">模板排序：</h3>
-          <ul class="nav nav-pills ml-auto p-2" id="template-order">
-            <li class="nav-item">
-              <a class="nav-link active" href="{% url 'template_first' %}?type=&order=">热门</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'template_first' %}?type=&order=">上线时间</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
     <div class="row hot-templates">
-      <div class="col-md-auto m-auto">
-          <a href="{% url 'template_info' 'douban' 'movie' %}">
-              <!-- Widget: user widget style 2 -->
-              <div class="card card-widget widget-user-2">
-                  <!-- Add the bg color to the header using any of the bg-* classes -->
-                  <div class="widget-user-header">
-                    <div class="widget-user-image text-center">
-                      <img
-                        class="img"
-                        src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/logo.jpg' %}"
-                        alt="豆瓣 Logo"
-                      />
+        {% for template in template_list %}
+            {% if forloop.counter0 != 0 and forloop.counter0|divisibleby:"4" == True %}
+                <!-- Force next columns to break to new line -->
+                <div class="w-100"></div>
+            {% endif %}
+            <div class="col-md-auto m-auto">
+              <a href="{% url 'template_info' template.pk %}">
+                  <!-- Widget: user widget style 2 -->
+                  <div class="card card-widget widget-user-2">
+                      <!-- Add the bg color to the header using any of the bg-* classes -->
+                      <div class="widget-user-header">
+                        <div class="widget-user-image text-center">
+                          <img
+                            class="img"
+                            src="{{ template.logo }}"
+                            alt="{{ template.display_name }} Logo"
+                          />
+                        </div>
+                        <!-- /.widget-user-image -->
+                      </div>
+                      <div class="card-footer p-0">
+                        <ul class="nav flex-column">
+                          <li class="nav-item">
+                            <span class="nav-link text-center website-name">
+                              {{ template.display_name }}
+                            </span>
+                          </li>
+                          <li class="nav-item">
+                            <span class="nav-link">
+                              <i class="far fa-eye"></i>&nbsp; 123 &nbsp;&nbsp;
+                              <span class="float-right"
+                                ><i class="fas fa-cloud-download-alt"></i>&nbsp;
+                                123</span
+                              >
+                            </span>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
-                    <!-- /.widget-user-image -->
-                  </div>
-                  <div class="card-footer p-0">
-                    <ul class="nav flex-column">
-                      <li class="nav-item">
-                        <span class="nav-link text-center website-name">
-                          豆瓣电影
-                        </span>
-                      </li>
-                      <li class="nav-item">
-                        <span class="nav-link">
-                          <i class="far fa-eye"></i>&nbsp; 123 &nbsp;&nbsp;
-                          <span class="float-right"
-                            ><i class="fas fa-cloud-download-alt"></i>&nbsp;
-                            123</span
-                          >
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
+                  <!-- /.widget-user -->
+              </a>
+            </div>
+        {% endfor %}
+        {% if template_list.count|divisibleby:"4" == False %}
+            {% for i in template_list.count|remainder_list %}
+                <div class="col-md-auto m-auto hidden">
+                    <!-- Widget: user widget style 2 -->
+                    <div class="card card-widget widget-user-2">
+                      <!-- Add the bg color to the header using any of the bg-* classes -->
+                      <div class="widget-user-header">
+                        <div class="widget-user-image text-center">
+                          <img
+                            class="img"
+                            src="{{ template_list.last.logo }}"
+                            alt="{{ template_list.last.display_name }} Logo"
+                          />
+                        </div>
+                        <!-- /.widget-user-image -->
+                      </div>
+                      <div class="card-footer p-0">
+                        <ul class="nav flex-column">
+                          <li class="nav-item">
+                            <span class="nav-link text-center">
+                              {{ template_list.last.display_name }}
+                            </span>
+                          </li>
+                          <li class="nav-item">
+                            <span class="nav-link">
+                              <i class="far fa-eye"></i>&nbsp; 123 &nbsp;&nbsp;
+                              <span class="float-right"
+                                ><i class="fas fa-cloud-download-alt"></i>&nbsp;
+                                123</span
+                              >
+                            </span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <!-- /.widget-user -->
                 </div>
-              <!-- /.widget-user -->
-          </a>
-      </div>
-      <div class="col-md-auto m-auto">
-          <a href="{% url 'template_info' 'douban' 'book' %}">
-              <!-- Widget: user widget style 2 -->
-              <div class="card card-widget widget-user-2">
-              <!-- Add the bg color to the header using any of the bg-* classes -->
-                  <div class="widget-user-header">
-                    <div class="widget-user-image text-center">
-                      <img
-                        class="img"
-                        src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanbook/logo.jpg' %}"
-                        alt="豆瓣 Logo"
-                      />
-                    </div>
-                    <!-- /.widget-user-image -->
-                  </div>
-                  <div class="card-footer p-0">
-                    <ul class="nav flex-column">
-                      <li class="nav-item">
-                        <span class="nav-link text-center website-name">
-                          豆瓣图书
-                        </span>
-                      </li>
-                      <li class="nav-item">
-                        <span class="nav-link">
-                          <i class="far fa-eye"></i>&nbsp; 123 &nbsp;&nbsp;
-                          <span class="float-right"
-                            ><i class="fas fa-cloud-download-alt"></i>&nbsp;
-                            123</span
-                          >
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-              </div>
-        <!-- /.widget-user -->
-          </a>
-      </div>
-      <div class="col-md-auto m-auto hidden">
-        <!-- Widget: user widget style 2 -->
-        <div class="card card-widget widget-user-2">
-          <!-- Add the bg color to the header using any of the bg-* classes -->
-          <div class="widget-user-header">
-            <div class="widget-user-image text-center">
-              <img
-                class="img"
-                src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanbook/logo.jpg' %}"
-                alt="豆瓣 Logo"
-              />
-            </div>
-            <!-- /.widget-user-image -->
-          </div>
-          <div class="card-footer p-0">
-            <ul class="nav flex-column">
-              <li class="nav-item">
-                <span class="nav-link text-center">
-                  豆瓣图书
-                </span>
-              </li>
-              <li class="nav-item">
-                <span class="nav-link">
-                  <i class="far fa-eye"></i>&nbsp; 123 &nbsp;&nbsp;
-                  <span class="float-right"
-                    ><i class="fas fa-cloud-download-alt"></i>&nbsp;
-                    123</span
-                  >
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <!-- /.widget-user -->
-      </div>
-      <div class="col-md-auto m-auto hidden">
-        <!-- Widget: user widget style 2 -->
-        <div class="card card-widget widget-user-2">
-          <!-- Add the bg color to the header using any of the bg-* classes -->
-          <div class="widget-user-header">
-            <div class="widget-user-image text-center">
-              <img
-                class="img"
-                src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanbook/logo.jpg' %}"
-                alt="豆瓣 Logo"
-              />
-            </div>
-            <!-- /.widget-user-image -->
-          </div>
-          <div class="card-footer p-0">
-            <ul class="nav flex-column">
-              <li class="nav-item">
-                <span class="nav-link text-center">
-                  豆瓣图书
-                </span>
-              </li>
-              <li class="nav-item">
-                <span class="nav-link">
-                  <i class="far fa-eye"></i>&nbsp; 123 &nbsp;&nbsp;
-                  <span class="float-right"
-                    ><i class="fas fa-cloud-download-alt"></i>&nbsp;
-                    123</span
-                  >
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <!-- /.widget-user -->
-      </div>
+            {% endfor %}
+        {% endif %}
     </div>
 {% endblock %}
 

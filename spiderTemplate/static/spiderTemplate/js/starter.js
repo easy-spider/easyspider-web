@@ -27,12 +27,23 @@ $(".stretch").each(function () {
   $(this).strech_text();
 });
 
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+});
+
 $(".fa-search").parent("a").on("click", function () {
   let val = starter_search_box.val().trim();
   if(val !== "") {
     let url = $(this).attr("href");
     $(this).attr("href", url + "?search=" + val);
   } else {
+    Toast.fire({
+        icon: "error",
+        title: "&nbsp;搜索框输入不能为空",
+    });
     return false;
   }
 });
