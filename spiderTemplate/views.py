@@ -1,6 +1,6 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.http import JsonResponse
 
 from spiderTemplate.models import Site, SiteType, Template
 
@@ -26,29 +26,25 @@ def sites_view(request):
     if not request.user.is_authenticated:
         return redirect(reverse("login"))
     else:
-        sites = Site.objects.all()
+        order = request.GET.get('order', 'hot')
+        sites = list(Site.objects.all().order_by('-update_time')) if order == 'update_time' \
+            else list(Site.objects.all())
 
-        site_type = request.GET.get('type')
-        if site_type:
-            sites = sites.filter(site_type__name=site_type)
+        site_type = request.GET.get('type', 'hot')
+        if site_type and site_type != 'hot':
+            sites = [s for s in sites if s.site_type.name == site_type]
         else:
             sites = sites[:8]
-            site_type = 'hot'
 
-        keyword = request.GET.get('search')
+        keyword = request.GET.get('search', '')
         if keyword:
-            sites = sites.filter(display_name__contains=keyword)
-
-        order = request.GET.get('order')
-        if order == 'update_time':
-            sites.order_by('-update_time')
-        else:
-            order = 'hot'
+            sites = [s for s in sites if keyword.lower() in s.display_name.lower()]
+            site_type = ''
 
         context = {
             'site_types': SiteType.objects.all(),
             'type': site_type,
-            'search': '',
+            'search': keyword,
             'order': order,
             'sites': sites
         }
@@ -59,7 +55,11 @@ def templates_view(request, pk):
     if not request.user.is_authenticated:
         return redirect(reverse("login"))
     else:
-        context = {'template_list': Site.objects.get(pk=pk).template_set.all()}
+        site = Site.objects.get(pk=pk)
+        context = {
+            'site_name': site.display_name,
+            'template_list': site.template_set.all()
+        }
         return render(request, 'spiderTemplate/templateSecond.html', context)
 
 
