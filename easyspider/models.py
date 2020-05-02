@@ -24,7 +24,8 @@ class Task(models.Model):
         ('ready', '等待运行'),
         ('running', '正在运行'),
         ('paused', '暂停运行'),
-        ('finished', '完成运行')
+        ('finished', '完成运行'),
+        ('canceled', '已终止')
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -2,23 +2,23 @@ from django.db import models
 from django.urls import reverse
 
 
+class SiteType(models.Model):
+    """网站类型实体类"""
+    name = models.CharField(max_length=255, unique=True)
+    display_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.display_name
+
+
 class Site(models.Model):
     """同网站爬虫模板集合实体类，对应一个Scrapy项目"""
-    TYPE_CHOICES = [
-        ('life', '本地生活'),
-        ('business', '电子商务'),
-        ('reading', '媒体阅读'),
-        ('search engine', '搜索引擎'),
-        ('social', '社交平台'),
-        ('education', '科研教育'),
-        ('other', '其他'),
-    ]
-
     name = models.CharField(max_length=255, unique=True)  # 网站英文名（如"douban"），对应Scrapy项目名称
     display_name = models.CharField(max_length=255)  # 展示名称（如“豆瓣”）
-    site_type = models.CharField(db_column='type', max_length=255, choices=TYPE_CHOICES)  # tag筛选
+    site_type = models.ForeignKey(SiteType, on_delete=models.SET_NULL, null=True)
     egg = models.CharField(max_length=2047)  # Scrapy项目打包egg的路径
     settings = models.CharField(max_length=2047, blank=True, null=True)  # 传递给Scrapy的其他运行设置
+    update_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
         return self.display_name
@@ -34,7 +34,7 @@ class Template(models.Model):
     display_name = models.CharField(max_length=255)  # 展示名称（如“豆瓣热门电影”）
     introduction = models.TextField()  # 模板简介（HTML格式）
     split_param = models.CharField(max_length=255)  # 用哪个参数划分任务
-    update_time = models.DateTimeField()
+    update_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     sample_data = models.TextField()  # 示例数据（HTML格式）
 
     def __str__(self):
@@ -60,14 +60,6 @@ class Field(models.Model):
         ))
 
 
-class InputType(models.Model):
-    """表示<input>标签的type属性"""
-    name = models.CharField(max_length=255, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
 class Param(models.Model):
     """模板参数实体类"""
     INPUT_LABEL_CHOICES = [
@@ -75,11 +67,16 @@ class Param(models.Model):
         ('textarea', 'textarea')
     ]
 
+    INPUT_TYPE_CHOICES = [
+        ('text', 'text'),
+        ('number', 'number')
+    ]
+
     template = models.ForeignKey(Template, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)  # 参数英文名（如"name"），对应预览图片文件名
     display_name = models.CharField(max_length=255)  # 展示名称（如“电影名称”）
-    input_label = models.CharField(max_length=255, choices=INPUT_LABEL_CHOICES)
-    input_type = models.ForeignKey(InputType, on_delete=models.SET('text'), null=True, blank=True)
+    input_label = models.CharField(max_length=255, choices=INPUT_LABEL_CHOICES, default='input')
+    input_type = models.CharField(max_length=255, choices=INPUT_TYPE_CHOICES, default='text')
 
     def __str__(self):
         return '{} - {}'.format(self.template, self.display_name)
