@@ -128,39 +128,41 @@
                     <!-- /.widget-user -->
                 </a>
             </div>
-        {% endfor %}
-        {% if sites.count|divisibleby:"4" == False %}
-            {% for i in sites.count|remainder_list %}
-                <div class="col-md-auto m-auto hidden">
-                    <a href="{% url 'template_second' site.pk %}">
-                        <div class="card card-widget widget-user-2">
-                            <!-- Add the bg color to the header using any of the bg-* classes -->
-                            <div class="widget-user-header">
-                                <div class="widget-user-image text-center">
-                                    <img class="img" src="{{ site.logo }}" alt="{{ site.display_name }} Logo" />
+            {% if forloop.counter == sites|length %}
+                {% if sites|length|divisibleby:"4" == False %}
+                    {% for i in sites|length|remainder_list %}
+                        <div class="col-md-auto m-auto hidden">
+                            <a href="{% url 'template_second' site.pk %}">
+                                <div class="card card-widget widget-user-2">
+                                    <!-- Add the bg color to the header using any of the bg-* classes -->
+                                    <div class="widget-user-header">
+                                        <div class="widget-user-image text-center">
+                                            <img class="img" src="{{ site.logo }}" alt="{{ site.display_name }} Logo" />
+                                        </div>
+                                        <!-- /.widget-user-image -->
+                                    </div>
+                                    <div class="card-footer p-0">
+                                        <ul class="nav flex-column">
+                                            <li class="nav-item">
+                                                <span class="nav-link text-center website-name">
+                                                    {{ site.display_name }}
+                                                </span>
+                                            </li>
+                                            <li class="nav-item">
+                                                <span class="nav-link text-center">
+                                                    共{{ site.template_set.count }}个模板>>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
-                                <!-- /.widget-user-image -->
-                            </div>
-                            <div class="card-footer p-0">
-                                <ul class="nav flex-column">
-                                    <li class="nav-item">
-                                        <span class="nav-link text-center website-name">
-                                            {{ site.display_name }}
-                                        </span>
-                                    </li>
-                                    <li class="nav-item">
-                                        <span class="nav-link text-center">
-                                            共{{ site.template_set.count }}个模板>>
-                                        </span>
-                                    </li>
-                                </ul>
-                            </div>
-                    </div>
-                        <!-- /.widget-user -->
-                    </a>
-                </div>
-            {% endfor %}
-        {% endif %}
+                                <!-- /.widget-user -->
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
     </div>
 {% endblock %}
 
