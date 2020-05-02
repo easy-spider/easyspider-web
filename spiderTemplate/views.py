@@ -48,8 +48,9 @@ def sites_view(request):
         context = {
             'site_types': SiteType.objects.all(),
             'type': site_type,
+            'search': '',
             'order': order,
-            'sites': sites,
+            'sites': sites
         }
         return render(request, 'spiderTemplate/templateFirst.html', context)
 
@@ -58,7 +59,7 @@ def templates_view(request, pk):
     if not request.user.is_authenticated:
         return redirect(reverse("login"))
     else:
-        context = {'template_list': Site.objects.get(pk=pk).template_set}
+        context = {'template_list': Site.objects.get(pk=pk).template_set.all()}
         return render(request, 'spiderTemplate/templateSecond.html', context)
 
 
@@ -78,7 +79,7 @@ def template_setting(request, pk):
             task_name = request.POST.get('inputTaskName', '')
             args = {}
             template = Template.objects.get(pk=pk)
-            for param in template.param_set:
+            for param in template.param_set.all():
                 args[param.name] = request.POST[param.name]
             # data validation, for example same task name...
             # according to Task model create a task instance & start a scrapy task

@@ -3,7 +3,7 @@ let img = $("#setting-img-wrapper img");
 $(".arguments-form input, .arguments-form textarea").on("click", function () {
     let imgUrl = img.attr("src");
     let curField = $(this).siblings(".sr-only").text().trim();
-    let url = imgUrl.split('/').slice(0, -1).join("/") + "/" + curField + '.jpg';
+    let url = imgUrl.split('/').slice(0, -2).join("/") + "/" + curField + '/';
     if (imgUrl !== url) {
         img.attr("src", url);
     }
@@ -19,7 +19,7 @@ const Toast = Swal.mixin({
 
 $("#setting-form").submit(function () {
     $.ajax({
-        url: "{% url 'templateSetting' 'douban' 'movie' %}",
+        url: $(this).attr("action"),
         type: "POST",
         data: $(this).serialize(),
         cache: false,

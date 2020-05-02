@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{% static 'spiderTemplate/css/templateInfo.css' %}" />
 {% endblock %}
 
-{% block page_title %}豆瓣电影{% endblock %}
+{% block page_title %}{{ template.display_name }}{% endblock %}
 
 {% block page_link %}
     <li class="breadcrumb-item">
@@ -17,10 +17,10 @@
         <a href="{% url 'template_first' %}">选择模板</a>
     </li>
     <li class="breadcrumb-item">
-        <a href="{% url 'template_second' 'douban' %}">豆瓣</a>
+        <a href="{% url 'template_second' template.site.pk %}">{{ template.site.display_name }}</a>
     </li>
     <li class="breadcrumb-item active">
-        豆瓣电影
+        {{ template.display_name }}
     </li>
 {% endblock %}
 
@@ -31,22 +31,22 @@
               <div class="row">
                 <div class="col-2 text-center">
                   <img
-                    src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/logo.jpg' %}"
-                    alt="豆瓣电影 Logo"
+                    src="{{ template.logo }}"
+                    alt="{{ template.display_name }} Logo"
                     id="template-logo"
                   />
                 </div>
                 <div class="col-10">
                   <h3 class="my-3">
-                    豆瓣电影
+                    {{ template.display_name }}
                   </h3>
                   <p>
                     模板更新时间：<span id="template-update-time"
-                      >2020/4/20</span
+                      >{{ template.update_time|date:"Y/m/d" }}</span
                     >
                   </p>
                   <div class="mt-4">
-                    <a type="button" class="btn btn-primary" href="{% url 'template_setting' 'douban' 'movie' %}">
+                    <a type="button" class="btn btn-primary" href="{% url 'template_setting' template.pk %}">
                       立即使用
                     </a>
                   </div>
@@ -112,45 +112,7 @@
                     role="tabpanel"
                     aria-labelledby="template-desc-tab"
                   >
-                    <h4>豆瓣 - 豆瓣电影</h4>
-                    <dl>
-                      <dt>模板介绍</dt>
-                      <dd>
-                        <ul>
-                          <li>
-                            此模板用于采集豆瓣电影类目下的电影信息，如上映日期、片名、导演、编剧、主演、类型等。
-                          </li>
-                          <li>
-                            具体采集内容请点击「采集字段预览」和「示例数据」。
-                          </li>
-                        </ul>
-                      </dd>
-                      <dt>使用方法</dt>
-                      <dd>
-                        <ol>
-                          <li>点击「立即使用」进入参数配置界面</li>
-                          <li>输入列表翻页次数</li>
-                          <li>
-                            输入搜索结果网址，例如'https://search.douban.com/movie/subject_search?search_text=战狼​'
-                            <br />注：
-                            <ul>
-                              <li>
-                                如要输入多条搜索结果网址，请每条影名之间用回车进行换行
-                              </li>
-                              <li>
-                                可从Excel表格和TXT文件中直接复制影名，黏贴到输入框中
-                              </li>
-                              <li>
-                                建议一次性输入的影名不要超过1万条
-                              </li>
-                            </ul>
-                          </li>
-                          <li>
-                            参数设置完毕后，请点击「保存并启动」进行采集
-                          </li>
-                        </ol>
-                      </dd>
-                    </dl>
+                    {{ template.introduction|safe }}
                   </div>
                   <div
                     class="tab-pane fade"
@@ -166,56 +128,18 @@
                           role="tablist"
                           aria-orientation="vertical"
                         >
-                          <a
-                            class="nav-link active"
-                            id="vert-tabs-filmname-tab"
-                            data-toggle="pill"
-                            href="#vert-tabs-filmname"
-                            role="tab"
-                            aria-controls="vert-tabs-filmname"
-                            aria-selected="true"
-                            >影名</a
-                          >
-                          <a
-                            class="nav-link"
-                            id="vert-tabs-score-tab"
-                            data-toggle="pill"
-                            href="#vert-tabs-score"
-                            role="tab"
-                            aria-controls="vert-tabs-score"
-                            aria-selected="false"
-                            >评分</a
-                          >
-                          <a
-                            class="nav-link"
-                            id="vert-tabs-people-tab"
-                            data-toggle="pill"
-                            href="#vert-tabs-people"
-                            role="tab"
-                            aria-controls="vert-tabs-people"
-                            aria-selected="false"
-                            >评价人数</a
-                          >
-                          <a
-                            class="nav-link"
-                            id="vert-tabs-lang-tab"
-                            data-toggle="pill"
-                            href="#vert-tabs-lang"
-                            role="tab"
-                            aria-controls="vert-tabs-lang"
-                            aria-selected="false"
-                            >语言</a
-                          >
-                          <a
-                            class="nav-link"
-                            id="vert-tabs-time-tab"
-                            data-toggle="pill"
-                            href="#vert-tabs-time"
-                            role="tab"
-                            aria-controls="vert-tabs-time"
-                            aria-selected="false"
-                            >时长</a
-                          >
+                            {% for field in template.field_set.all %}
+                              <a
+                                class="nav-link {% if forloop.counter0 == 0 %}active{% endif %}"
+                                id="vert-tabs-{{ field.name }}-tab"
+                                data-toggle="pill"
+                                href="#vert-tabs-{{ field.name }}"
+                                role="tab"
+                                aria-controls="vert-tabs-{{ field.name }}"
+                                aria-selected="true"
+                                >{{ field.display_name }}</a
+                              >
+                            {% endfor %}
                         </div>
                       </div>
                       <div class="col-7 col-sm-9">
@@ -223,46 +147,16 @@
                           class="tab-content"
                           id="data-field-vert-tabs-tabContent"
                         >
-                          <div
-                            class="tab-pane text-left fade show active"
-                            id="vert-tabs-filmname"
-                            role="tabpanel"
-                            aria-labelledby="vert-tabs-filmname-tab"
-                          >
-                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/field/filmname.jpg' %}" />
-                          </div>
-                          <div
-                            class="tab-pane fade"
-                            id="vert-tabs-score"
-                            role="tabpanel"
-                            aria-labelledby="vert-tabs-score-tab"
-                          >
-                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/field/score.jpg' %}" />
-                          </div>
-                          <div
-                            class="tab-pane fade"
-                            id="vert-tabs-people"
-                            role="tabpanel"
-                            aria-labelledby="vert-tabs-people-tab"
-                          >
-                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/field/people.jpg' %}" />
-                          </div>
-                          <div
-                            class="tab-pane fade"
-                            id="vert-tabs-lang"
-                            role="tabpanel"
-                            aria-labelledby="vert-tabs-lang-tab"
-                          >
-                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/field/lang.jpg' %}" />
-                          </div>
-                          <div
-                            class="tab-pane fade"
-                            id="vert-tabs-time"
-                            role="tabpanel"
-                            aria-labelledby="vert-tabs-time-tab"
-                          >
-                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/field/time.jpg' %}" />
-                          </div>
+                            {% for field in template.field_set.all %}
+                              <div
+                                class="tab-pane fade {% if forloop.counter0 == 0 %}show active{% endif %}"
+                                id="vert-tabs-{{ field.name }}"
+                                role="tabpanel"
+                                aria-labelledby="vert-tabs-{{ field.name }}-tab"
+                              >
+                                <img src="{{ field.pic }}" />
+                              </div>
+                            {% endfor %}
                         </div>
                       </div>
                     </div>
@@ -281,26 +175,18 @@
                           role="tablist"
                           aria-orientation="vertical"
                         >
-                          <a
-                            class="nav-link active"
-                            id="vert-tabs-page-tab"
-                            data-toggle="pill"
-                            href="#vert-tabs-page"
-                            role="tab"
-                            aria-controls="vert-tabs-page"
-                            aria-selected="true"
-                            >翻页次数</a
-                          >
-                          <a
-                            class="nav-link"
-                            id="vert-tabs-url-tab"
-                            data-toggle="pill"
-                            href="#vert-tabs-url"
-                            role="tab"
-                            aria-controls="vert-tabs-url"
-                            aria-selected="false"
-                            >网址</a
-                          >
+                            {% for param in template.param_set.all %}
+                                <a
+                                    class="nav-link {% if forloop.counter0 == 0 %}active{% endif %}"
+                                    id="vert-tabs-{{ param.name }}-tab"
+                                    data-toggle="pill"
+                                    href="#vert-tabs-{{ param.name }}"
+                                    role="tab"
+                                    aria-controls="vert-tabs-{{ param.name }}"
+                                    aria-selected="true"
+                                    >{{ param.display_name }}</a
+                                >
+                            {% endfor %}
                         </div>
                       </div>
                       <div class="col-7 col-sm-9">
@@ -308,22 +194,16 @@
                           class="tab-content"
                           id="arguments-vert-tabs-tabContent"
                         >
-                          <div
-                            class="tab-pane text-left fade show active"
-                            id="vert-tabs-page"
-                            role="tabpanel"
-                            aria-labelledby="vert-tabs-page-tab"
-                          >
-                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/parameter/page.jpg' %}" />
-                          </div>
-                          <div
-                            class="tab-pane fade"
-                            id="vert-tabs-url"
-                            role="tabpanel"
-                            aria-labelledby="vert-tabs-url-tab"
-                          >
-                            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/parameter/url.jpg' %}" />
-                          </div>
+                            {% for param in template.param_set.all %}
+                                <div
+                                    class="tab-pane fade {% if forloop.counter0 == 0 %}show active{% endif %}"
+                                    id="vert-tabs-{{ param.name }}"
+                                    role="tabpanel"
+                                    aria-labelledby="vert-tabs-{{ param.name }}-tab"
+                                  >
+                                    <img src="{{ param.pic }}" />
+                                </div>
+                            {% endfor %}
                         </div>
                       </div>
                     </div>
@@ -337,59 +217,7 @@
                   >
                     <div class="card" id="example-data-table">
                       <div class="card-body table-responsive p-0">
-                        <table
-                          class="table table-hover text-nowrap text-center"
-                        >
-                          <thead>
-                            <tr>
-                              <th>关键词</th>
-                              <th>页码</th>
-                              <th>影名</th>
-                              <th>语言</th>
-                              <th>片长</th>
-                              <th>评分</th>
-                              <th>评价人数</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>战狼</td>
-                              <td>1</td>
-                              <td>战狼2(2017)</td>
-                              <td>汉语普通话/英语</td>
-                              <td>123分钟</td>
-                              <td>7.1</td>
-                              <td>724332</td>
-                            </tr>
-                            <tr>
-                              <td>战狼</td>
-                              <td>1</td>
-                              <td>战狼(2015)</td>
-                              <td>汉语普通话/英语</td>
-                              <td>90分钟</td>
-                              <td>6.9</td>
-                              <td>214894</td>
-                            </tr>
-                            <tr>
-                              <td>战狼</td>
-                              <td>1</td>
-                              <td>贝奥武夫 Beowulf‎(2007)</td>
-                              <td>英语/古英语</td>
-                              <td>115分钟</td>
-                              <td>6.7</td>
-                              <td>26448</td>
-                            </tr>
-                            <tr>
-                              <td>战狼</td>
-                              <td>1</td>
-                              <td>斯巴达300勇士300‎(2006)</td>
-                              <td>英语</td>
-                              <td>117分钟</td>
-                              <td>7.8</td>
-                              <td>126192</td>
-                            </tr>
-                          </tbody>
-                        </table>
+                        {{ template.sample_data|safe }}
                       </div>
                       <!-- /.card-body -->
                     </div>

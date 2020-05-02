@@ -5,11 +5,6 @@
 
 {% block css_extend %}
     <link rel="stylesheet" href="{% static 'spiderTemplate/css/templateSetting.css' %}" />
-    <!-- SweetAlert2 -->
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4@3.1.4/bootstrap-4.min.css"
-    />
 {% endblock %}
 
 {% block page_title %}参数配置{% endblock %}
@@ -24,10 +19,10 @@
         >
     </li>
     <li class="breadcrumb-item">
-        <a href="{% url 'template_second' 'douban' %}">豆瓣</a>
+        <a href="{% url 'template_second' template.site.pk %}">{{ template.site.display_name }}</a>
     </li>
     <li class="breadcrumb-item">
-        <a href="{% url 'template_info' 'douban' 'movie' %}">豆瓣电影</a>
+        <a href="{% url 'template_info' template.pk %}">{{ template.display_name }}</a>
     </li>
     <li class="breadcrumb-item active">
         参数配置
@@ -41,7 +36,7 @@
             id="arguments-card"
         >
             <!-- form start -->
-            <form role="form" action="" method="post" id="setting-form">
+            <form role="form" action="{% url 'template_setting' template.pk %}" method="post" id="setting-form">
                 {% csrf_token %}
                 <div class="card-body">
                     <h5>基本信息</h5>
@@ -57,28 +52,30 @@
                         />
                     </div>
                     <h5>配置参数</h5>
-                    <div class="form-group arguments-form">
-                        <span class="sr-only">page</span>
-                        <label for="inputPageNum"
-                            >翻页次数</label
-                        >
-                        <input
-                            type="number"
-                            class="form-control"
-                            placeholder="请输入翻页次数"
-                            name="inputPageNum"
-                        />
-                    </div>
-                    <div class="form-group arguments-form">
-                        <span class="sr-only">url</span>
-                        <label>网址(1-9999)</label>
-                        <textarea
-                            class="form-control"
-                            rows="3"
-                            placeholder="请输入网址"
-                            name="textareaUrl"
-                        ></textarea>
-                    </div>
+                    {% for param in template.param_set.all %}
+                        <div class="form-group arguments-form">
+                            <span class="sr-only">{{ param.name }}</span>
+                            <label for="input_{{ param.name }}"
+                                >{{ param.display_name }}</label
+                            >
+                            {% if param.input_label == "input" %}
+                                <input
+                                    type="{{ param.input_type }}"
+                                    id="input_{{ param.name }}"
+                                    class="form-control"
+                                    placeholder="请输入{{ param.display_name }}"
+                                    name="{{ param.name }}"
+                                />
+                            {% else %}
+                                <textarea
+                                    class="form-control"
+                                    rows="3"
+                                    placeholder="请输入{{ param.display_name }}"
+                                    name="{{ param.name }}"
+                                ></textarea>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                     <button
                         type="submit"
                         class="btn btn-primary swalDefaultSuccess"
@@ -90,13 +87,11 @@
             </form>
         </div>
         <div class="col-6" id="setting-img-wrapper">
-            <img src="{% static 'spiderTemplate/img/website/douban/subtemplates/doubanmovie/parameter/page.jpg' %}" />
+            <img src="{{ template.param_set.all.first.pic }}" />
         </div>
     </div>
 {% endblock %}
 
 {% block js_extend %}
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9.10.12/dist/sweetalert2.min.js"></script>
     <script src="{% static 'spiderTemplate/js/templateSetting.js' %}"></script>
 {% endblock %}

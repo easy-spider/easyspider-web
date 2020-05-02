@@ -1,5 +1,6 @@
 {% extends 'dashboardBase.html' %}
 {% load static %}
+{% load spiderTemplate_extras %}
 
 {% block title %}EasySpider | 模板选择{% endblock %}
 
@@ -22,34 +23,30 @@
 
 {% block content %}
     <div class="row">
-        <div class="card" style="width: 100%;">
+        <div class="card" id="template-type-card">
             <div class="card-header d-flex p-0">
                 <h3 class="card-title p-3">模板类型：</h3>
                 <ul class="nav nav-pills p-2" id="template-type">
                     <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'template_first' %}">热门</a>
+                        <a class="nav-link
+                            {% if type == 'hot' %}
+                                active
+                            {% endif %}"
+                           href="{% url 'template_first' %}?type=hot&order={{ order }}">
+                            热门
+                        </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'template_first' %}?type=life">本地生活</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'template_first' %}?type=ecommerce">电子商务</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'template_first'%}?type=media">媒体阅读</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'template_first'%}?type=search">搜索引擎</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'template_first'%}?type=social">社交平台</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'template_first'%}?type=education">科研教育</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'template_first'%}?type=other">其他</a>
-                    </li>
+                    {% for site_type in site_types %}
+                        <li class="nav-item">
+                            <a class="nav-link
+                            {% if type == site_type.name %}
+                                active
+                            {% endif %}"
+                            href="{% url 'template_first' %}?type={{ site_type.name }}&order={{ order }}">
+                                {{ site_type.display_name }}
+                            </a>
+                        </li>
+                    {% endfor %}
                 </ul>
                 <form class="form-inline ml-auto" id="template-search">
                     <div class="input-group">
@@ -57,11 +54,11 @@
                             type="text"
                             name="search"
                             class="form-control float-right"
-                            placeholder="搜索模板..."
+                            placeholder="搜索模板组..."
                             id="template-search-box"
                         />
                         <div class="input-group-append">
-                            <a type="submit" class="btn btn-default" href="{% url 'template_first' %}">
+                            <a type="submit" class="btn btn-default" href="{% url 'template_first' %}?order={{ order }}">
                                 <i class="fas fa-search"></i>
                             </a>
                         </div>
@@ -76,247 +73,94 @@
                 <h3 class="card-title p-3">模板排序：</h3>
                 <ul class="nav nav-pills ml-auto p-2" id="template-order">
                     <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'template_first' %}?type=&order=">热门</a>
+                        <a class="nav-link
+                        {% if order == 'hot' %}
+                            active
+                        {% endif %}"
+                        href="{% url 'template_first' %}?type={{ type }}&order=hot&search={{ search }}">
+                            热门
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'template_first' %}?type=&order=">上线时间</a>
+                        <a class="nav-link
+                        {% if order == 'update_time' %}
+                            active
+                        {% endif %}"
+                        href="{% url 'template_first' %}?type={{ type }}&order=update_time&search={{ search }}">
+                            更新时间
+                        </a>
                     </li>
                 </ul>
             </div>
         </div>
     </div>
     <div class="row hot-templates">
-        <div class="col-md-auto m-auto">
-            <a href="{% url 'template_second' 'douban' %}?type=&order=">
-                <div class="card card-widget widget-user-2">
-                    <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img class="img" src="{% static 'spiderTemplate/img/website/douban/logo.jpg' %}" alt="豆瓣 Logo" />
+        {% for site in sites %}
+            {% if forloop.counter0 != 0 and forloop.counter0|divisibleby:"4" == True %}
+                <!-- Force next columns to break to new line -->
+                <div class="w-100"></div>
+            {% endif %}
+            <div class="col-md-auto m-auto">
+                <a href="{% url 'template_second' site.pk %}">
+                    <div class="card card-widget widget-user-2">
+                        <!-- Add the bg color to the header using any of the bg-* classes -->
+                        <div class="widget-user-header">
+                            <div class="widget-user-image text-center">
+                                <img class="img" src="{{ site.logo }}" alt="{{ site.display_name }} Logo" />
+                            </div>
+                            <!-- /.widget-user-image -->
                         </div>
-                        <!-- /.widget-user-image -->
-                    </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    豆瓣
-                                </span>
-                            </li>
-                            <li class="nav-item">
-                                <span class="nav-link text-center">
-                                    共5个模板>>
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
+                        <div class="card-footer p-0">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <span class="nav-link text-center website-name">
+                                        {{ site.display_name }}
+                                    </span>
+                                </li>
+                                <li class="nav-item">
+                                    <span class="nav-link text-center">
+                                        共{{ site.template_set.count }}个模板>>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                </div>
+                    <!-- /.widget-user -->
+                </a>
             </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
-        <div class="col-md-auto m-auto">
-            <a href="{% url 'template_second' 'bilibili' %}?type=&order=">
-                <div class="card card-widget widget-user-2">
-                    <div class="widget-user-header">
-                    <div class="widget-user-image text-center">
-                        <img class="img" src="{% static 'spiderTemplate/img/website/bilibili/logo.jpg' %}" alt="b站 Logo" />
+        {% endfor %}
+        {% if sites.count|divisibleby:"4" == False %}
+            {% for i in sites.count|remainder_list %}
+                <div class="col-md-auto m-auto hidden">
+                    <a href="{% url 'template_second' site.pk %}">
+                        <div class="card card-widget widget-user-2">
+                            <!-- Add the bg color to the header using any of the bg-* classes -->
+                            <div class="widget-user-header">
+                                <div class="widget-user-image text-center">
+                                    <img class="img" src="{{ site.logo }}" alt="{{ site.display_name }} Logo" />
+                                </div>
+                                <!-- /.widget-user-image -->
+                            </div>
+                            <div class="card-footer p-0">
+                                <ul class="nav flex-column">
+                                    <li class="nav-item">
+                                        <span class="nav-link text-center website-name">
+                                            {{ site.display_name }}
+                                        </span>
+                                    </li>
+                                    <li class="nav-item">
+                                        <span class="nav-link text-center">
+                                            共{{ site.template_set.count }}个模板>>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
                     </div>
-                    <!-- /.widget-user-image -->
+                        <!-- /.widget-user -->
+                    </a>
                 </div>
-                    <div class="card-footer p-0">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <span class="nav-link text-center website-name">
-                                b站
-                            </span>
-                        </li>
-                        <li class="nav-item">
-                            <span class="nav-link text-center">
-                                共0个模板>>
-                            </span>
-                        </li>
-                    </ul>
-                </div>
-                </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
-        <div class="col-md-auto m-auto">
-            <a href="{% url 'template_second' 'jingdong' %}?type=&order=">
-                <!-- Widget: user widget style 2 -->
-                <div class="card card-widget widget-user-2">
-                <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img class="img" src="{% static 'spiderTemplate/img/website/jingdong/logo.jpg' %}" alt="京东 Logo" />
-                        </div>
-                        <!-- /.widget-user-image -->
-                    </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    京东
-                                </span>
-                            </li>
-                            <li class="nav-item">
-                                <span class="nav-link text-center">
-                                    共0个模板>>
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
-        <div class="col-md-auto m-auto">
-            <a href="{% url 'template_second' '58' %}?type=&order=">
-                <!-- Widget: user widget style 2 -->
-                <div class="card card-widget widget-user-2">
-                    <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img class="img" src="{% static 'spiderTemplate/img/website/58/logo.jpg' %}" alt="58 Logo" />
-                        </div>
-                        <!-- /.widget-user-image -->
-                    </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    58同城
-                                </span>
-                            </li>
-                            <li class="nav-item">
-                                <span class="nav-link text-center">
-                                    共0个模板>>
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
-        <!-- Force next columns to break to new line -->
-        <div class="w-100"></div>
-        <div class="col-md-auto m-auto">
-            <!-- Widget: user widget style 2 -->
-            <a href="{% url 'template_second' 'taobao' %}?type=&order=">
-                <div class="card card-widget widget-user-2">
-                <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img class="img" src="{% static 'spiderTemplate/img/website/taobao/logo.jpg' %}" alt="淘宝 Logo" />
-                        </div>
-                    <!-- /.widget-user-image -->
-                </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    淘宝
-                                </span>
-                            </li>
-                            <li class="nav-item">
-                                <span class="nav-link text-center">
-                                    共0个模板>>
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            <!-- /.widget-user -->
-            </a>
-        </div>
-        <div class="col-md-auto m-auto">
-            <!-- Widget: user widget style 2 -->
-            <a href="{% url 'template_second' 'tianmao' %}?type=&order=">
-                <div class="card card-widget widget-user-2">
-                <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img class="img" src="{% static 'spiderTemplate/img/website/tianmao/logo.jpg' %}" alt="天猫 Logo" />
-                        </div>
-                    <!-- /.widget-user-image -->
-                    </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    天猫
-                                </span>
-                            </li>
-                            <li class="nav-item">
-                                <span class="nav-link text-center">
-                                    共0个模板>>
-                                </span>
-                            </li>
-                        </ul>
-                </div>
-                </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
-        <div class="col-md-auto m-auto">
-            <!-- Widget: user widget style 2 -->
-            <a href="{% url 'template_second' 'weibo' %}?type=&order=">
-                <div class="card card-widget widget-user-2">
-                <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img class="img" src="{% static 'spiderTemplate/img/website/weibo/logo.jpg' %}" alt="微博 Logo" />
-                        </div>
-                        <!-- /.widget-user-image -->
-                    </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    微博
-                                </span>
-                            </li>
-                            <li class="nav-item">
-                                <span class="nav-link text-center">
-                                    共0个模板>>
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-            </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
-        <div class="col-md-auto m-auto">
-            <!-- Widget: user widget style 2 -->
-            <a href="{% url 'template_second' 'zhihu' %}?type=&order=">
-                <div class="card card-widget widget-user-2">
-                <!-- Add the bg color to the header using any of the bg-* classes -->
-                    <div class="widget-user-header">
-                        <div class="widget-user-image text-center">
-                            <img class="img" src="{% static 'spiderTemplate/img/website/zhihu/logo.jpg' %}" alt="知乎 Logo" />
-                        </div>
-                        <!-- /.widget-user-image -->
-                    </div>
-                    <div class="card-footer p-0">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <span class="nav-link text-center website-name">
-                                    知乎
-                                </span>
-                            </li>
-                            <li class="nav-item">
-                                <span class="nav-link text-center">
-                                    共0个模板>>
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-            </div>
-                <!-- /.widget-user -->
-            </a>
-        </div>
+            {% endfor %}
+        {% endif %}
     </div>
 {% endblock %}
 

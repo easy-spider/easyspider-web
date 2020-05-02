@@ -24,7 +24,7 @@ class Site(models.Model):
         return self.display_name
 
     def logo(self):
-        return reverse('pic:site-logo', args=self.name)
+        return reverse('pic:site-logo', args=(self.name,))
 
 
 class Template(models.Model):

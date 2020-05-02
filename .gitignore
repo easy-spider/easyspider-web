@@ -6,5 +6,10 @@ __pycache__/
 
 /EasySpiderWeb/settings.py
 /my.ini
+
+# *_old.html
+*_old.html
+
+# upload
 /upload/templatepics/**/*.jpg
 !/upload/templatepics/test/**/*.jpg
