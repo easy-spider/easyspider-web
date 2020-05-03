@@ -1,4 +1,3 @@
-from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
@@ -21,7 +20,7 @@ def sites_view(request):
     type - 按网站类型筛选，为空表示“热门”\n
     order - 排序规则，"update_time"表示按更新时间排序，为空表示“热门”，
     网站的更新时间为其关联的所有模板中最新的更新时间\n
-    search - 搜索关键词，为空表示全部
+    search - 搜索关键词（此时type无效），为空表示全部
     """
     if not request.user.is_authenticated:
         return redirect(reverse("login"))
@@ -30,16 +29,16 @@ def sites_view(request):
         sites = list(Site.objects.all().order_by('-update_time')) if order == 'update_time' \
             else list(Site.objects.all())
 
-        site_type = request.GET.get('type', 'hot')
-        if site_type and site_type != 'hot':
-            sites = [s for s in sites if s.site_type.name == site_type]
-        else:
-            sites = sites[:8]
-
         keyword = request.GET.get('search', '')
         if keyword:
             sites = [s for s in sites if keyword.lower() in s.display_name.lower()]
             site_type = ''
+        else:
+            site_type = request.GET.get('type', 'hot')
+            if site_type and site_type != 'hot':
+                sites = [s for s in sites if s.site_type.name == site_type]
+            else:
+                sites = sites[:8]
 
         context = {
             'site_types': SiteType.objects.all(),
@@ -75,19 +74,5 @@ def template_setting(request, pk):
     if not request.user.is_authenticated:
         return redirect(reverse("login"))
     else:
-        if request.method == 'POST':
-            task_name = request.POST.get('inputTaskName', '')
-            args = {}
-            template = Template.objects.get(pk=pk)
-            for param in template.param_set.all():
-                args[param.name] = request.POST[param.name]
-            # data validation, for example same task name...
-            # according to Task model create a task instance & start a scrapy task
-            # return jsonresponse
-            # 成功：{'status': 'SUCCESS'}
-            # 失败：{'status': 'ERROR', 'message': message中文}
-            # 创建task
-            return JsonResponse({'status': 'SUCCESS'})
-        else:
-            context = {'template': Template.objects.get(pk=pk)}
-            return render(request, 'spiderTemplate/templateSetting.html', context)
+        context = {'template': Template.objects.get(pk=pk)}
+        return render(request, 'spiderTemplate/templateSetting.html', context)

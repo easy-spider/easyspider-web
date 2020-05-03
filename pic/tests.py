@@ -10,65 +10,65 @@ class SiteLogoViewTests(TestCase):
 
     def test_ok(self):
         response = self.client.get(reverse('pic:site-logo', args=('test',)))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
         with open(os.path.join(views.PIC_DIR, 'test/logo.jpg'), 'rb') as f:
-            self.assertEqual(response.content, f.read())
+            self.assertEqual(f.read(), response.content)
 
     def test_not_found(self):
         response = self.client.get(reverse('pic:site-logo', args=('abc',)))
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(404, response.status_code)
 
     def test_forbidden(self):
         response = self.client.get(reverse('pic:site-logo', args=('..',)))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(403, response.status_code)
 
 
 class TemplateLogoViewTests(TestCase):
 
     def test_ok(self):
         response = self.client.get(reverse('pic:template-logo', args=('test', 'movie')))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
         with open(os.path.join(views.PIC_DIR, 'test/movie/logo.jpg'), 'rb') as f:
-            self.assertEqual(response.content, f.read())
+            self.assertEqual(f.read(), response.content)
 
     def test_not_found(self):
         response = self.client.get(reverse('pic:template-logo', args=('test', 'book')))
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(404, response.status_code)
 
     def test_forbidden(self):
         response = self.client.get(reverse('pic:template-logo', args=('..', '..')))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(403, response.status_code)
 
 
 class TemplateFieldViewTests(TestCase):
 
     def test_ok(self):
         response = self.client.get(reverse('pic:template-field', args=('test', 'movie', 'title')))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
         with open(os.path.join(views.PIC_DIR, 'test/movie/field/title.jpg'), 'rb') as f:
-            self.assertEqual(response.content, f.read())
+            self.assertEqual(f.read(), response.content)
 
     def test_not_found(self):
         response = self.client.get(reverse('pic:template-field', args=('test', 'movie', 'name')))
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(404, response.status_code)
 
     def test_forbidden(self):
         response = self.client.get(reverse('pic:template-field', args=('..', '..', '..')))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(403, response.status_code)
 
 
 class TemplateParamViewTests(TestCase):
 
     def test_ok(self):
         response = self.client.get(reverse('pic:template-param', args=('test', 'movie', 'page')))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
         with open(os.path.join(views.PIC_DIR, 'test/movie/param/page.jpg'), 'rb') as f:
-            self.assertEqual(response.content, f.read())
+            self.assertEqual(f.read(), response.content)
 
     def test_not_found(self):
         response = self.client.get(reverse('pic:template-param', args=('test', 'movie', 'date')))
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(404, response.status_code)
 
     def test_forbidden(self):
         response = self.client.get(reverse('pic:template-param', args=('..', '..', '..')))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(403, response.status_code)

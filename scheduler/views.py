@@ -4,7 +4,8 @@ from django.forms import model_to_dict
 from django.http import HttpResponseForbidden, JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, get_list_or_404
 
-from easyspider.models import Node, Job, Task
+from scheduler.models import Node, Job
+from task.models import Task
 
 
 class JobStatus(IntEnum):

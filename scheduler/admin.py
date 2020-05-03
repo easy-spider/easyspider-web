@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from scheduler import models
+
+admin.site.register(models.Node)
+admin.site.register(models.Job)

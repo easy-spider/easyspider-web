@@ -36,7 +36,7 @@
             id="arguments-card"
         >
             <!-- form start -->
-            <form role="form" action="{% url 'template_setting' template.pk %}" method="post" id="setting-form">
+            <form role="form" action="{% url 'create_task' template.pk %}" method="post" id="setting-form">
                 {% csrf_token %}
                 <div class="card-body">
                     <h5>基本信息</h5>
