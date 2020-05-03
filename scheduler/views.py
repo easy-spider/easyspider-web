@@ -21,14 +21,6 @@ class NodeStatus(IntEnum):
     DISABLED = 2
 
 
-class TaskStatus(Enum):
-    READY = 'ready'
-    RUNNING = 'running'
-    PAUSED = 'paused'
-    FINISHED = 'finished'
-    CANCELED = 'canceled'
-
-
 def get_client_ip(request):
     """获取请求客户端的IP地址"""
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -82,7 +74,7 @@ def list_job_by_status(request, status):
             'spider_name': job.task.template.name,
             'settings': job.task.template.site.settings,
             'args': job.args,
-            'node_id': job.node.id,
+            'node_id': job.node_id,
             'status': job.status,
             'task_status': job.task.status,
             'task_id': job.task.id
@@ -101,8 +93,8 @@ def set_job_status(request, job_id, status):
     job.save()
     task = get_object_or_404(Task, pk=job.task_id)
     if status == JobStatus.RUNNING:
-        if task.status == TaskStatus.READY:
-            task.status = TaskStatus.RUNNING
+        if task.status == 'ready':
+            task.status = 'running'
             task.save()
     elif status == JobStatus.FINISHED:
         # check other jobs with the same task
@@ -114,7 +106,7 @@ def set_job_status(request, job_id, status):
                 break
         # if all finished, mark the task finished
         if all_finished:
-            task.status = TaskStatus.FINISHED
+            task.status = 'finished'
             task.save()
     return HttpResponse(status=204)
 
