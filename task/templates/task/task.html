@@ -13,7 +13,7 @@
     <!-- DataTable Checkbox -->
     <link
         rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/jquery-datatables-checkboxes@1.2.11/js/dataTables.checkboxes.min.js"
+        href="https://cdn.jsdelivr.net/npm/jquery-datatables-checkboxes@1.2.11/css/dataTables.checkboxes.css"
     />
 {% endblock %}
 
@@ -491,6 +491,27 @@
     <!-- DataTable Checkbox -->
     <script src="https://cdn.jsdelivr.net/npm/jquery-datatables-checkboxes@1.2.11/js/dataTables.checkboxes.min.js"></script>
     <!-- Custom JS -->
+    <script>
+        let userID = {{ user.pk }};
+
+        let taskID = 1;
+
+        {# 后面需要改成循环格式 #}
+
+        let taskSocket = new WebSocket(
+            'ws://' + window.location.host +
+            '/ws/task/' + userID + '/' + taskID + '/');
+
+        taskSocket.onmessage = function(e) {
+            let data = JSON.parse(e.data);
+            let message = data['message'];
+            console.log(message);
+        };
+
+        taskSocket.onclose = function(e) {
+            console.error('Task socket closed unexpectedly');
+        };
+
+    </script>
     <script src="{% static 'task/js/task.js' %}"></script>
 {% endblock %}
-
