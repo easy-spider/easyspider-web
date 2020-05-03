@@ -1,3 +1,178 @@
-from django.test import TestCase
+from datetime import datetime
 
-# Create your tests here.
+from django.contrib.auth.models import User
+from django.test import TestCase
+from django.urls import reverse
+
+from spiderTemplate.models import Site, Template, Field, Param, SiteType
+
+
+class SiteModelTests(TestCase):
+
+    def test_logo(self):
+        """网站图标URL"""
+        site = Site(name='site1', display_name='site1', egg='')
+        self.assertEqual('/pic/site/logo/site1/', site.logo())
+
+
+class TemplateModelTests(TestCase):
+
+    def test_logo(self):
+        """模板图标URL"""
+        site = Site(name='site1', display_name='site1', egg='')
+        template = Template(
+            site=site, name='template1', display_name='template1',
+            introduction='', split_param='', sample_data=''
+        )
+        self.assertEqual('/pic/template/logo/site1/template1/', template.logo())
+
+
+class FieldModelTests(TestCase):
+
+    def test_pic(self):
+        """采集字段预览图片URL"""
+        site = Site(name='site1', display_name='site1', egg='')
+        template = Template(
+            site=site, name='template1', display_name='template1',
+            introduction='', split_param='', sample_data=''
+        )
+        field = Field(template=template, name='field1', display_name='field1')
+        self.assertEqual('/pic/template/field/site1/template1/field1/', field.pic())
+
+
+class ParamModelTests(TestCase):
+
+    def test_pic(self):
+        """模板参数预览图片URL"""
+        site = Site(name='site1', display_name='site1', egg='')
+        template = Template(
+            site=site, name='template1', display_name='template1',
+            introduction='', split_param='', sample_data=''
+        )
+        param = Param(template=template, name='param1', display_name='field1')
+        self.assertEqual('/pic/template/param/site1/template1/param1/', param.pic())
+
+
+class StarterViewTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        User.objects.create_user(username='zzy', password='123456', email='zzy@example.com')
+        for i in range(1, 11):
+            Site.objects.create(name='S' + str(i), display_name='S' + str(i), egg='')
+
+    def test_not_login(self):
+        """未登录时重定向到登录页面"""
+        response = self.client.get(reverse('starter'))
+        self.assertRedirects(response, reverse('login'))
+
+    def test_logged_in(self):
+        """已登录时访问index重定向到starter"""
+        data = {'username': 'zzy', 'password': '123456'}
+        self.client.post(reverse('login'), data)
+        response = self.client.get(reverse('index'), follow=True)
+        self.assertRedirects(response, reverse('starter'))
+        self.assertQuerysetEqual(
+            response.context['sites'],
+            ['<Site: S{}>'.format(i) for i in range(1, 9)],
+            ordered=False
+        )
+
+
+class SitesViewTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        User.objects.create_user(username='zzy', password='123456', email='zzy@example.com')
+        site_types = [SiteType.objects.create(name=t, display_name=t) for t in 'ABC']
+        for i in range(10):
+            name = 'S' + str(i + 1)
+            Site.objects.create(
+                name=name, display_name=name, site_type=site_types[i % 3], egg='',
+                update_time=datetime(2020, 5, i + 1)
+            )
+
+    def test_not_login(self):
+        """未登录时重定向到登录页面"""
+        response = self.client.get(reverse('template_first'))
+        self.assertRedirects(response, reverse('login'))
+
+    def test_no_args(self):
+        """无参数跳转到该页面"""
+        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        response = self.client.get(reverse('template_first'))
+        self.assertEqual('hot', response.context['type'])
+        self.assertEqual('', response.context['search'])
+        self.assertEqual('hot', response.context['order'])
+        self.assertEqual(
+            {'S' + str(i) for i in range(1, 9)},
+            {str(s) for s in response.context['sites']}
+        )
+
+    def test_search(self):
+        """按网站名称搜索，只有search参数"""
+        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        response = self.client.get(reverse('template_first') + '?search=S1')
+        self.assertEqual('', response.context['type'])
+        self.assertEqual('S1', response.context['search'])
+        self.assertEqual('hot', response.context['order'])
+        self.assertEqual({'S1', 'S10'}, {str(s) for s in response.context['sites']})
+
+    def test_search_order_update_time(self):
+        """按网站名称搜索，search+order参数，order=update_time"""
+        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        response = self.client.get(reverse('template_first') + '?search=S1&order=update_time')
+        self.assertEqual('', response.context['type'])
+        self.assertEqual('S1', response.context['search'])
+        self.assertEqual('update_time', response.context['order'])
+        self.assertEqual(['S10', 'S1'], [str(s) for s in response.context['sites']])
+
+    def test_type_order_hot(self):
+        """按类型筛选，type+order参数，order=hot"""
+        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        response = self.client.get(reverse('template_first') + '?type=A&order=hot')
+        self.assertEqual('A', response.context['type'])
+        self.assertEqual('', response.context['search'])
+        self.assertEqual('hot', response.context['order'])
+        self.assertEqual({'S1', 'S4', 'S7', 'S10'}, {str(s) for s in response.context['sites']})
+
+    def test_type_order_update_time(self):
+        """按类型筛选，type+order参数，order=update_time"""
+        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        response = self.client.get(reverse('template_first') + '?type=B&order=update_time')
+        self.assertEqual('B', response.context['type'])
+        self.assertEqual('', response.context['search'])
+        self.assertEqual('update_time', response.context['order'])
+        self.assertEqual(['S8', 'S5', 'S2'], [str(s) for s in response.context['sites']])
+
+
+class TemplatesViewTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        User.objects.create_user(username='zzy', password='123456', email='zzy@example.com')
+        for i in range(1, 3):
+            site_name = 'S' + str(i)
+            site = Site.objects.create(id=i, name=site_name, display_name=site_name, egg='')
+            for j in range(1, 3):
+                template_name = 'T{:d}{:d}'.format(i, j)
+                Template.objects.create(
+                    site=site, name=template_name, display_name=template_name,
+                    introduction='', split_param='', sample_data=''
+                )
+
+    def test_not_login(self):
+        """未登录时重定向到登录页面"""
+        response = self.client.get(reverse('template_second', args=(1,)))
+        self.assertRedirects(response, reverse('login'))
+
+    def test_ok(self):
+        """正常访问"""
+        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        response = self.client.get(reverse('template_second', args=(1,)))
+        self.assertEqual('S1', response.context['site_name'])
+        self.assertQuerysetEqual(
+            response.context['template_list'],
+            ['<Template: T11>', '<Template: T12>'],
+            ordered=False
+        )

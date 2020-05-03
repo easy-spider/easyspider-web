@@ -21,7 +21,7 @@ def sites_view(request):
     type - 按网站类型筛选，为空表示“热门”\n
     order - 排序规则，"update_time"表示按更新时间排序，为空表示“热门”，
     网站的更新时间为其关联的所有模板中最新的更新时间\n
-    search - 搜索关键词，为空表示全部
+    search - 搜索关键词（此时type无效），为空表示全部
     """
     if not request.user.is_authenticated:
         return redirect(reverse("login"))
@@ -30,16 +30,16 @@ def sites_view(request):
         sites = list(Site.objects.all().order_by('-update_time')) if order == 'update_time' \
             else list(Site.objects.all())
 
-        site_type = request.GET.get('type', 'hot')
-        if site_type and site_type != 'hot':
-            sites = [s for s in sites if s.site_type.name == site_type]
-        else:
-            sites = sites[:8]
-
         keyword = request.GET.get('search', '')
         if keyword:
             sites = [s for s in sites if keyword.lower() in s.display_name.lower()]
             site_type = ''
+        else:
+            site_type = request.GET.get('type', 'hot')
+            if site_type and site_type != 'hot':
+                sites = [s for s in sites if s.site_type.name == site_type]
+            else:
+                sites = sites[:8]
 
         context = {
             'site_types': SiteType.objects.all(),
