@@ -1,4 +1,3 @@
-from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
@@ -75,19 +74,5 @@ def template_setting(request, pk):
     if not request.user.is_authenticated:
         return redirect(reverse("login"))
     else:
-        if request.method == 'POST':
-            task_name = request.POST.get('inputTaskName', '')
-            args = {}
-            template = Template.objects.get(pk=pk)
-            for param in template.param_set.all():
-                args[param.name] = request.POST[param.name]
-            # data validation, for example same task name...
-            # according to Task model create a task instance & start a scrapy task
-            # return jsonresponse
-            # 成功：{'status': 'SUCCESS'}
-            # 失败：{'status': 'ERROR', 'message': message中文}
-            # 创建task
-            return JsonResponse({'status': 'SUCCESS'})
-        else:
-            context = {'template': Template.objects.get(pk=pk)}
-            return render(request, 'spiderTemplate/templateSetting.html', context)
+        context = {'template': Template.objects.get(pk=pk)}
+        return render(request, 'spiderTemplate/templateSetting.html', context)

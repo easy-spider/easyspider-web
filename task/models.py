@@ -27,6 +27,28 @@ class Task(models.Model):
     def __str__(self):
         return self.name
 
+    def set_args(self, arg_dict):
+        """设置任务的模板参数
+
+        :param arg_dict: {'param_name': 'value_str'}
+        :return: 划分参数的值；如果没有关联的模板则返回None
+        """
+        if not self.template:
+            return None
+        template_params = {p.name: p for p in self.template.param_set.all()}
+        args = {}
+        split_arg = None
+        for param_name in arg_dict:
+            if param_name not in template_params:
+                continue
+            param = template_params[param_name]
+            if param.input_label == 'textarea' or param.input_type == 'text':
+                args[param_name] = arg_dict[param_name]
+            elif param.input_type == 'number':
+                split_arg = args[param_name] = int(arg_dict[param_name])
+        self.args = json.dumps(args, ensure_ascii=False)
+        return split_arg
+
     def args_dict(self):
         """以字典形式返回模板参数"""
-        return json.loads(self.args)
+        return json.loads(self.args) if self.args else {}

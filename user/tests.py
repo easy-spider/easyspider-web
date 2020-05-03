@@ -34,7 +34,7 @@ class LoginViewTests(TestCase):
         response = self.client.post(reverse('login'), data, follow=True)
         self.assertRedirects(response, reverse('starter'))
         self.assertTrue(hasattr(response.wsgi_request, 'user'))
-        self.assertEqual(response.wsgi_request.user.username, 'zzy')
+        self.assertEqual('zzy', response.wsgi_request.user.username)
 
     def test_wrong_username(self):
         """用户名错误"""
@@ -61,4 +61,4 @@ class LogoutViewTests(TestCase):
         self.client.post(reverse('login'), data, follow=True)
         response = self.client.get(reverse('logout'), follow=True)
         self.assertRedirects(response, reverse('index'))
-        self.assertNotEqual(response.wsgi_request.user.username, 'zzy')
+        self.assertNotEqual('zzy', response.wsgi_request.user.username)
