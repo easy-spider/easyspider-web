@@ -4,12 +4,18 @@
 # Python
 __pycache__/
 
-/EasySpiderWeb/settings.py
-/my.ini
-
-# *_old.html
-*_old.html
+EasySpiderWeb/settings.py
+my.ini
 
 # upload
 /upload/templatepics/**/*.jpg
 !/upload/templatepics/test/**/*.jpg
+
+# virtual environment
+venv
+
+# runtime static
+static-runtime
+
+# uploaded eggs
+egg
