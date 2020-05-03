@@ -2,14 +2,15 @@ from enum import IntEnum
 
 import requests
 from django.contrib.auth import get_user
-from django.http import HttpResponseForbidden, JsonResponse, HttpResponseBadRequest, HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
+from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import generic
 from django.views.decorators.http import require_http_methods
 
-from easyspider.models import Task, Node, Job
+from scheduler.models import Job, Node
 from spiderTemplate.models import Site
+from task.models import Task
 
 
 def change_task_status(request, task_id, status):
