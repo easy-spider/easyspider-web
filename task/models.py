@@ -27,6 +27,16 @@ class Task(models.Model):
     def __str__(self):
         return self.name
 
+    def set_name(self, name):
+        """设置任务名称，删除首尾空白符，并检查长度在3~20之间
+
+        :exception ValueError: 如果名称长度不在3~20之间
+        """
+        name = name.strip()
+        if not 3 <= len(name) <= 20:
+            raise ValueError('任务名长度应在3~20之间')
+        self.name = name
+
     def set_args(self, arg_dict):
         """设置任务的模板参数
 

@@ -18,18 +18,26 @@ def create_task(request, template_pk):
         return redirect(reverse('login'))
     else:
         template = get_object_or_404(Template, pk=template_pk)
-        task = Task(user=request.user, template=template, name=request.POST['inputTaskName'])
+        task = Task(user=request.user, template=template)
+        try:
+            task.set_name(request.POST['inputTaskName'])
+        except ValueError as e:
+            return JsonResponse(
+                {'status': 'ERROR', 'message': e.args[0]},
+                json_dumps_params={'ensure_ascii': False}
+            )
+        if request.user.task_set.filter(name=task.name):
+            return JsonResponse(
+                {'status': 'ERROR', 'message': '任务名称已存在'},
+                json_dumps_params={'ensure_ascii': False}
+            )
+
         split_arg = task.set_args(
             {param.name: request.POST[param.name] for param in template.param_set.all()}
         )
-        if split_arg <= 0:
+        if not 1 <= split_arg <= 99:
             return JsonResponse(
-                {'status': 'ERROR', 'message': '错误的值：{}，请输入1~100'.format(split_arg)},
-                json_dumps_params={'ensure_ascii': False}
-            )
-        elif split_arg > 100:
-            return JsonResponse(
-                {'status': 'ERROR', 'message': '值过大：{}，请输入1~100'.format(split_arg)},
+                {'status': 'ERROR', 'message': '错误的值：{}，请输入1~99'.format(split_arg)},
                 json_dumps_params={'ensure_ascii': False}
             )
         else:
@@ -41,9 +49,24 @@ def create_task(request, template_pk):
             return JsonResponse({'status': 'SUCCESS'})
 
 
+def my_task(request):
+    context = {'task_list': request.user.task_set.all()}
+    return render(request, 'task/task.html', context)
+
+
+@require_http_methods(['POST'])
+def rename_task(request, task_pk):
+    return redirect(reverse('my_task'))
+
+
+def delete_task(request, task_pk):
+    # 删除task, job, mongodb
+    return redirect(reverse('my_task'))
+
+
+def clear_data(request, task_pk):
+    return redirect(reverse('data_download'))
+
+
 def data_download(request, task_pk):
     return render(request, 'task/dataDownload.html', {})
-
-
-def my_task(request):
-    return render(request, 'task/task.html', {})
