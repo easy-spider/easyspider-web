@@ -34,6 +34,14 @@ class TaskModelTests(TestCase):
                 task.set_name(name)
             self.assertEqual('任务名长度应在3~20之间', cm.exception.args[0])
 
+    def test_name_already_exists(self):
+        """任务名称已存在"""
+        Task.objects.create(user=self.user, template=self.template, name='task1')
+        task = Task(user=self.user, template=self.template)
+        with self.assertRaises(ValueError) as cm:
+            task.set_name(' task1\t\r\n')
+        self.assertEqual('任务名称已存在', cm.exception.args[0])
+
     def test_set_name(self):
         task = Task(user=self.user, template=self.template)
         task.set_name('  task1\t\r\n')
@@ -69,14 +77,14 @@ class CreateTaskViewTests(TestCase):
 
     def test_404(self):
         """模板id不存在"""
-        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        self.client.login(username='zzy', password='123456')
         data = {'inputTaskName': 'task1', 'p1': 'abc', 'p2': '42'}
         response = self.client.post(reverse('create_task', args=(9999,)), data)
         self.assertEqual(404, response.status_code)
 
     def test_invalid_name_length(self):
         """任务名称长度不在规定的范围内"""
-        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        self.client.login(username='zzy', password='123456')
         data = {'p1': 'abc', 'p2': '42'}
         for name in ('t1', ' t1 ', '     ', 't' * 30):
             data['inputTaskName'] = name
@@ -85,17 +93,15 @@ class CreateTaskViewTests(TestCase):
 
     def test_name_already_exists(self):
         """任务名称已存在"""
-        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
-        data = {'inputTaskName': 'task1', 'p1': 'abc', 'p2': '42'}
-        response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
-        self.assertEqual({'status': 'SUCCESS'}, response.json())
-        data['inputTaskName'] = ' task1\t\r\n'
+        self.client.login(username='zzy', password='123456')
+        Task.objects.create(user=self.user, template=self.template, name='task1')
+        data = {'inputTaskName': ' task1\t\r\n', 'p1': 'abc', 'p2': '42'}
         response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
         self.assertEqual({'status': 'ERROR', 'message': '任务名称已存在'}, response.json())
 
     def test_split_arg_invalid(self):
         """划分参数的值不在规定的范围内"""
-        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        self.client.login(username='zzy', password='123456')
         data = {'inputTaskName': 'task1', 'p1': 'abc'}
         for p2 in (-5, 0, 100, 9999):
             data['p2'] = p2
@@ -107,7 +113,7 @@ class CreateTaskViewTests(TestCase):
 
     def test_ok(self):
         """成功创建task和job"""
-        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        self.client.login(username='zzy', password='123456')
         data = {'inputTaskName': 'task1', 'p1': 'abc', 'p2': '18'}
         response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
         self.assertEqual({'status': 'SUCCESS'}, response.json())
@@ -117,3 +123,135 @@ class CreateTaskViewTests(TestCase):
         jobs = task.job_set.all()
         self.assertEqual({'abc'}, {json.loads(j.args)['p1'] for j in jobs})
         self.assertEqual(set(range(1, 19)), {json.loads(j.args)['p2'] for j in jobs})
+
+
+class TaskListViewTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        for username in ('foo', 'bar'):
+            user = User.objects.create_user(username=username, password='123456', email='')
+            for i in range(1, 3):
+                Task.objects.create(user=user, name='{}_task{}'.format(username, i))
+
+    def test_not_login(self):
+        """未登录时重定向到登录页面"""
+        response = self.client.get(reverse('my_task'))
+        self.assertRedirects(response, reverse('login'))
+
+    def test_ok(self):
+        self.client.login(username='foo', password='123456')
+        response = self.client.get(reverse('my_task'))
+        self.assertQuerysetEqual(
+            response.context['task_list'],
+            ['<Task: foo_task1>', '<Task: foo_task2>'],
+            ordered=False
+        )
+
+
+class RenameTaskViewTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.foo = User.objects.create_user(username='foo', password='123456', email='')
+        cls.foo_task = Task.objects.create(user=cls.foo, name='foo_task1')
+        Task.objects.create(user=cls.foo, name='foo_task2')
+        cls.bar = User.objects.create_user(username='bar', password='123456', email='')
+        cls.bar_task = Task.objects.create(user=cls.bar, name='bar_task1')
+
+    def test_not_login(self):
+        """未登录时重定向到登录页面"""
+        data = {'inputTaskName': 'foo_task2'}
+        response = self.client.post(reverse('rename_task', args=(self.foo_task.id,)), data)
+        self.assertRedirects(response, reverse('login'))
+
+    def test_not_found(self):
+        """任务id不存在"""
+        self.client.login(username='foo', password='123456')
+        data = {'inputTaskName': 'foo_task2'}
+        response = self.client.post(reverse('rename_task', args=(9999,)), data)
+        self.assertEqual(404, response.status_code)
+
+    def test_forbidden(self):
+        """任务id不属于当前用户"""
+        self.client.login(username='foo', password='123456')
+        data = {'inputTaskName': 'foo_task2'}
+        response = self.client.post(reverse('rename_task', args=(self.bar_task.id,)), data)
+        self.assertEqual(403, response.status_code)
+        self.assertEqual(b'Not your task', response.content)
+
+    def test_invalid_name_length(self):
+        """任务名称长度不在规定的范围内"""
+        self.client.login(username='foo', password='123456')
+        for name in ('t1', ' t1 ', '     ', 't' * 30):
+            data = {'inputTaskName': name}
+            response = self.client.post(reverse('rename_task', args=(self.foo_task.id,)), data)
+            self.assertEqual({'status': 'ERROR', 'message': '任务名长度应在3~20之间'}, response.json())
+
+    def test_name_already_exists(self):
+        """任务名称已存在"""
+        self.client.login(username='foo', password='123456')
+        data = {'inputTaskName': 'foo_task2'}
+        response = self.client.post(reverse('rename_task', args=(self.foo_task.id,)), data)
+        self.assertEqual({'status': 'ERROR', 'message': '任务名称已存在'}, response.json())
+
+    def test_ok(self):
+        self.client.login(username='foo', password='123456')
+        data = {'inputTaskName': ' foo_task3\t\r\n'}
+        response = self.client.post(reverse('rename_task', args=(self.foo_task.id,)), data)
+        self.assertEqual({'status': 'SUCCESS'}, response.json())
+        self.assertEqual('foo_task3', Task.objects.get(pk=self.foo_task.id).name)
+
+
+class ChangeTaskStatusViewTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='zzy', password='123456', email='')
+        cls.ready_task = Task.objects.create(user=cls.user, name='task1', status='ready')
+        cls.running_task = Task.objects.create(user=cls.user, name='task2', status='running')
+        cls.paused_task = Task.objects.create(user=cls.user, name='task3', status='paused')
+        cls.finished_task = Task.objects.create(user=cls.user, name='task4', status='finished')
+        cls.canceled_task = Task.objects.create(user=cls.user, name='task5', status='canceled')
+        user2 = User.objects.create_user(username='foo', password='123456', email='')
+        cls.other_task = Task.objects.create(user=user2, name='task6')
+
+    def test_not_login(self):
+        """未登录时重定向到登录页面"""
+        for view_name in ('pause_task', 'resume_task', 'cancel_task'):
+            response = self.client.post(reverse(view_name, args=(self.ready_task.id,)))
+            self.assertRedirects(response, reverse('login'))
+
+    def test_not_found(self):
+        """任务id不存在"""
+        self.client.login(username='zzy', password='123456')
+        for view_name in ('pause_task', 'resume_task', 'cancel_task'):
+            response = self.client.post(reverse(view_name, args=(9999,)))
+            self.assertEqual(404, response.status_code)
+
+    def test_not_your_task(self):
+        """任务id不属于当前用户"""
+        self.client.login(username='zzy', password='123456')
+        for view_name in ('pause_task', 'resume_task', 'cancel_task'):
+            response = self.client.post(reverse(view_name, args=(self.other_task.id,)))
+            self.assertEqual(403, response.status_code)
+            self.assertEqual(b'Not your task', response.content)
+
+    def test_operation_not_allowed(self):
+        """操作不符合状态转移图"""
+        self.client.login(username='zzy', password='123456')
+
+        for task in (self.ready_task, self.running_task):
+            response = self.client.get(reverse('resume_task', args=(task.id,)))
+            self.assertEqual(403, response.status_code)
+            self.assertEqual(b'Operation not allowed', response.content)
+
+        response = self.client.get(reverse('pause_task', args=(self.paused_task.id,)))
+        self.assertEqual(403, response.status_code)
+        self.assertEqual(b'Operation not allowed', response.content)
+
+        for task in (self.finished_task, self.canceled_task):
+            for view_name in ('pause_task', 'resume_task', 'cancel_task'):
+                response = self.client.get(reverse(view_name, args=(task.id,)))
+                self.assertEqual(403, response.status_code)
+                self.assertEqual(b'Operation not allowed', response.content)

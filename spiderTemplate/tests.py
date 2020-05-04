@@ -68,8 +68,7 @@ class StarterViewTests(TestCase):
 
     def test_logged_in(self):
         """已登录时访问index重定向到starter"""
-        data = {'username': 'zzy', 'password': '123456'}
-        self.client.post(reverse('login'), data)
+        self.client.login(username='zzy', password='123456')
         response = self.client.get(reverse('index'), follow=True)
         self.assertRedirects(response, reverse('starter'))
         self.assertQuerysetEqual(
@@ -99,7 +98,7 @@ class SitesViewTests(TestCase):
 
     def test_no_args(self):
         """无参数跳转到该页面"""
-        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        self.client.login(username='zzy', password='123456')
         response = self.client.get(reverse('template_first'))
         self.assertEqual('hot', response.context['type'])
         self.assertEqual('', response.context['search'])
@@ -111,7 +110,7 @@ class SitesViewTests(TestCase):
 
     def test_search(self):
         """按网站名称搜索，只有search参数"""
-        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        self.client.login(username='zzy', password='123456')
         response = self.client.get(reverse('template_first') + '?search=S1')
         self.assertEqual('', response.context['type'])
         self.assertEqual('S1', response.context['search'])
@@ -120,7 +119,7 @@ class SitesViewTests(TestCase):
 
     def test_search_order_update_time(self):
         """按网站名称搜索，search+order参数，order=update_time"""
-        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        self.client.login(username='zzy', password='123456')
         response = self.client.get(reverse('template_first') + '?search=S1&order=update_time')
         self.assertEqual('', response.context['type'])
         self.assertEqual('S1', response.context['search'])
@@ -129,7 +128,7 @@ class SitesViewTests(TestCase):
 
     def test_type_order_hot(self):
         """按类型筛选，type+order参数，order=hot"""
-        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        self.client.login(username='zzy', password='123456')
         response = self.client.get(reverse('template_first') + '?type=A&order=hot')
         self.assertEqual('A', response.context['type'])
         self.assertEqual('', response.context['search'])
@@ -138,7 +137,7 @@ class SitesViewTests(TestCase):
 
     def test_type_order_update_time(self):
         """按类型筛选，type+order参数，order=update_time"""
-        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        self.client.login(username='zzy', password='123456')
         response = self.client.get(reverse('template_first') + '?type=B&order=update_time')
         self.assertEqual('B', response.context['type'])
         self.assertEqual('', response.context['search'])
@@ -168,7 +167,7 @@ class TemplatesViewTests(TestCase):
 
     def test_ok(self):
         """正常访问"""
-        self.client.post(reverse('login'), {'username': 'zzy', 'password': '123456'})
+        self.client.login(username='zzy', password='123456')
         response = self.client.get(reverse('template_second', args=(1,)))
         self.assertEqual('S1', response.context['site_name'])
         self.assertQuerysetEqual(
