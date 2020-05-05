@@ -62,6 +62,12 @@ class TaskModelTests(TestCase):
         self.assertEqual({'p1': 'abc', 'p2': 123}, task.args_dict())
         self.assertEqual(123, split_arg)
 
+    def test_display_status(self):
+        task = Task.objects.create(user=self.user, template=self.template, name='task1')
+        for s in Task.STATUS_CHOICES:
+            task.status = s[0]
+            self.assertEqual(s[1], task.display_status())
+
 
 class CreateTaskViewTests(TestCase):
 
@@ -219,21 +225,21 @@ class ChangeTaskStatusViewTests(TestCase):
     def test_not_login(self):
         """未登录时重定向到登录页面"""
         for view_name in ('pause_task', 'resume_task', 'cancel_task'):
-            response = self.client.post(reverse(view_name, args=(self.ready_task.id,)))
+            response = self.client.get(reverse(view_name, args=(self.ready_task.id,)))
             self.assertRedirects(response, reverse('login'))
 
     def test_not_found(self):
         """任务id不存在"""
         self.client.login(username='zzy', password='123456')
         for view_name in ('pause_task', 'resume_task', 'cancel_task'):
-            response = self.client.post(reverse(view_name, args=(9999,)))
+            response = self.client.get(reverse(view_name, args=(9999,)))
             self.assertEqual(404, response.status_code)
 
     def test_not_your_task(self):
         """任务id不属于当前用户"""
         self.client.login(username='zzy', password='123456')
         for view_name in ('pause_task', 'resume_task', 'cancel_task'):
-            response = self.client.post(reverse(view_name, args=(self.other_task.id,)))
+            response = self.client.get(reverse(view_name, args=(self.other_task.id,)))
             self.assertEqual(403, response.status_code)
             self.assertEqual(b'Not your task', response.content)
 
@@ -255,3 +261,34 @@ class ChangeTaskStatusViewTests(TestCase):
                 response = self.client.get(reverse(view_name, args=(task.id,)))
                 self.assertEqual(403, response.status_code)
                 self.assertEqual(b'Operation not allowed', response.content)
+
+
+class TaskDataViewTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='zzy', password='123456', email='')
+        cls.my_task = Task.objects.create(user=cls.user, name='task1')
+        user2 = User.objects.create_user(username='foo', password='123456', email='')
+        cls.other_task = Task.objects.create(user=user2, name='task2')
+
+    def test_not_login(self):
+        """未登录时重定向到登录页面"""
+        for view_name in ('clear_data', 'preview_data', 'download_data'):
+            response = self.client.get(reverse(view_name, args=(self.my_task.id,)))
+            self.assertRedirects(response, reverse('login'))
+
+    def test_not_found(self):
+        """任务id不存在"""
+        self.client.login(username='zzy', password='123456')
+        for view_name in ('clear_data', 'preview_data', 'download_data'):
+            response = self.client.get(reverse(view_name, args=(9999,)))
+            self.assertEqual(404, response.status_code)
+
+    def test_not_your_task(self):
+        """任务id不属于当前用户"""
+        self.client.login(username='zzy', password='123456')
+        for view_name in ('clear_data', 'preview_data', 'download_data'):
+            response = self.client.get(reverse(view_name, args=(self.other_task.id,)))
+            self.assertEqual(403, response.status_code)
+            self.assertEqual(b'Not your task', response.content)

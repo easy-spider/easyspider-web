@@ -11,8 +11,8 @@ class Task(models.Model):
     STATUS_CHOICES = [
         ('ready', '等待运行'),
         ('running', '正在运行'),
-        ('paused', '暂停运行'),
-        ('finished', '完成运行'),
+        ('paused', '已暂停'),
+        ('finished', '已完成'),
         ('canceled', '已终止')
     ]
 
