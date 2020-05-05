@@ -11,8 +11,8 @@ class Task(models.Model):
     STATUS_CHOICES = [
         ('ready', '等待运行'),
         ('running', '正在运行'),
-        ('paused', '暂停运行'),
-        ('finished', '完成运行'),
+        ('paused', '已暂停'),
+        ('finished', '已完成'),
         ('canceled', '已终止')
     ]
 
@@ -26,6 +26,20 @@ class Task(models.Model):
 
     def __str__(self):
         return self.name
+
+    def set_name(self, name):
+        """设置任务名称，删除首尾空白符
+
+        验证：检查长度在3~20之间；同一个用户关联的任务名称没有重复
+
+        :exception ValueError: 如果名称长度不在规定的范围内；或同任务名称已存在
+        """
+        name = name.strip()
+        if not 3 <= len(name) <= 20:
+            raise ValueError('任务名长度应在3~20之间')
+        elif self.user.task_set.filter(name=name).exists():
+            raise ValueError('任务名称已存在')
+        self.name = name
 
     def set_args(self, arg_dict):
         """设置任务的模板参数
@@ -52,3 +66,12 @@ class Task(models.Model):
     def args_dict(self):
         """以字典形式返回模板参数"""
         return json.loads(self.args) if self.args else {}
+
+    def display_status(self):
+        for s in self.STATUS_CHOICES:
+            if s[0] == self.status:
+                return s[1]
+
+    def progress(self):
+        """以字符串形式返回完成进度百分比（如"70%"）"""
+        return '{:.0%}'.format(self.job_set.filter(status=3).count() / self.job_set.count())

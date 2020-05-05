@@ -33,7 +33,7 @@ $("#setting-form").submit(function () {
             } else {
                 Toast.fire({
                     icon: "error",
-                    title: "&nbsp;" + data["error_message"],
+                    title: "&nbsp;" + data["message"],
                 });
             }
         },

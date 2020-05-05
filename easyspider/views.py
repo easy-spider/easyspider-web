@@ -3,57 +3,12 @@ from enum import IntEnum
 import requests
 from django.contrib.auth import get_user
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
+from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from django.views.decorators.http import require_http_methods
 
-from scheduler.models import Job, Node
+from scheduler.models import Node
 from spiderTemplate.models import Site
-from task.models import Task
-
-
-def change_task_status(request, task_id, status):
-    """修改任务状态"""
-    task = get_object_or_404(Task, pk=task_id)
-    if task.user.username != request.session['username']:
-        return HttpResponseForbidden('Not your task')
-    task.status = status
-    task.save()
-    if status == 'paused':
-        jobs = Job.objects.filter(task_id=task.id)
-        for job in jobs:
-            if job.status is JobStatus.PENDING:
-                node = job.node
-                url = f'http://{node.ip}:{node.port}/cancel.json'
-                data = {
-                    'project': job.task.template.site_templates.project_name,
-                    'job': job.uuid
-                }
-                requests.post(url, data, auth=(node.username, node.password), timeout=3)
-                job.status = JobStatus.CREATED
-                job.save()
-    elif status == 'canceled':
-        jobs = Job.objects.filter(task_id=task.id)
-        for job in jobs:
-            if job.status in [JobStatus.CREATED, JobStatus.PENDING, JobStatus.RUNNING]:
-                node = job.node
-                url = f'http://{node.ip}:{node.port}/cancel.json'
-                data = {
-                    'project': job.task.template.site_templates.project_name,
-                    'job': job.uuid
-                }
-                requests.post(url, data, auth=(node.username, node.password), timeout=3)
-                job.status = JobStatus.FINISHED
-                job.save()
-    return redirect(reverse('easyspider:task-list'))
-
-
-class JobStatus(IntEnum):
-    CREATED = 0
-    PENDING = 1
-    RUNNING = 2
-    FINISHED = 3
 
 
 class NodeStatus(IntEnum):

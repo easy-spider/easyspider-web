@@ -8,9 +8,8 @@ def starter(request):
     """登录之后的起始页，展示8个网站模板集合"""
     if not request.user.is_authenticated:
         return redirect(reverse("login"))
-    else:
-        sites = Site.objects.all()[:8]
-        return render(request, 'spiderTemplate/starter.html', {'sites': sites})
+    sites = Site.objects.all()[:8]
+    return render(request, 'spiderTemplate/starter.html', {'sites': sites})
 
 
 def sites_view(request):
@@ -24,55 +23,51 @@ def sites_view(request):
     """
     if not request.user.is_authenticated:
         return redirect(reverse("login"))
+    order = request.GET.get('order', 'hot')
+    sites = list(Site.objects.all().order_by('-update_time')) if order == 'update_time' \
+        else list(Site.objects.all())
+
+    keyword = request.GET.get('search', '')
+    if keyword:
+        sites = [s for s in sites if keyword.lower() in s.display_name.lower()]
+        site_type = ''
     else:
-        order = request.GET.get('order', 'hot')
-        sites = list(Site.objects.all().order_by('-update_time')) if order == 'update_time' \
-            else list(Site.objects.all())
-
-        keyword = request.GET.get('search', '')
-        if keyword:
-            sites = [s for s in sites if keyword.lower() in s.display_name.lower()]
-            site_type = ''
+        site_type = request.GET.get('type', 'hot')
+        if site_type and site_type != 'hot':
+            sites = [s for s in sites if s.site_type.name == site_type]
         else:
-            site_type = request.GET.get('type', 'hot')
-            if site_type and site_type != 'hot':
-                sites = [s for s in sites if s.site_type.name == site_type]
-            else:
-                sites = sites[:8]
+            sites = sites[:8]
 
-        context = {
-            'site_types': SiteType.objects.all(),
-            'type': site_type,
-            'search': keyword,
-            'order': order,
-            'sites': sites
-        }
-        return render(request, 'spiderTemplate/templateFirst.html', context)
+    context = {
+        'site_types': SiteType.objects.all(),
+        'type': site_type,
+        'search': keyword,
+        'order': order,
+        'sites': sites
+    }
+    return render(request, 'spiderTemplate/templateFirst.html', context)
 
 
 def templates_view(request, pk):
     if not request.user.is_authenticated:
         return redirect(reverse("login"))
-    else:
-        site = Site.objects.get(pk=pk)
-        context = {
-            'site_name': site.display_name,
-            'template_list': site.template_set.all()
-        }
-        return render(request, 'spiderTemplate/templateSecond.html', context)
+    site = Site.objects.get(pk=pk)
+    context = {
+        'site_name': site.display_name,
+        'template_list': site.template_set.all()
+    }
+    return render(request, 'spiderTemplate/templateSecond.html', context)
 
 
 def template_info(request, pk):
     if not request.user.is_authenticated:
         return redirect(reverse("login"))
-    else:
-        context = {'template': Template.objects.get(pk=pk)}
-        return render(request, 'spiderTemplate/templateInfo.html', context)
+    context = {'template': Template.objects.get(pk=pk)}
+    return render(request, 'spiderTemplate/templateInfo.html', context)
 
 
 def template_setting(request, pk):
     if not request.user.is_authenticated:
         return redirect(reverse("login"))
-    else:
-        context = {'template': Template.objects.get(pk=pk)}
-        return render(request, 'spiderTemplate/templateSetting.html', context)
+    context = {'template': Template.objects.get(pk=pk)}
+    return render(request, 'spiderTemplate/templateSetting.html', context)
