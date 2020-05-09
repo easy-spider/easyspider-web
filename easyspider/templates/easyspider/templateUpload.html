@@ -1,412 +1,165 @@
-<!DOCTYPE html>
-<!--
-This is a starter template page. Use this page to start your new project from
-scratch. This page gets rid of all links and provides the needed markup only.
--->
-<html lang="zh-cmn-Hans">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+{% extends 'dashboardBase.html' %}
+{% load static %}
 
-        <title>EasySpider | 上传模板</title>
+{% block title %}EasySpider | 上传模板{% endblock %}
 
-        <!-- Custom css -->
-        <link rel="stylesheet" href="/static/css/templateUpload.css" />
-        <link rel="stylesheet" href="/static/css/base.css" />
-        <link rel="stylesheet" href="/static/css/starter.css" />
-        <!-- Font Awesome Icons -->
-        <link
-            rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css"
-        />
-        <!-- Theme style -->
-        <link
-            rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/css/adminlte.min.css"
-        />
-        <!-- Website Icon -->
-        <link rel="icon" href="/static/img/favicon.ico" />
+{% block css_extend %}
+    <link rel="stylesheet" href="{% static 'easyspider/css/templateUpload.css' %}" />
+{% endblock %}
 
-        <!-- jQuery -->
-        <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.min.js"></script>
-        <!-- Bootstrap 4 -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- Website Icon -->
-        <link rel="icon" href="/static/img/favicon.ico" />
-    </head>
-    <body class="hold-transition sidebar-mini">
-        
-        
-            <!-- Navbar -->
-            <nav
-                class="main-header navbar navbar-expand navbar-white navbar-light"
-            >
-                <!-- Left navbar links -->
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a
-                            class="nav-link"
-                            data-widget="pushmenu"
-                            href="#"
-                            role="button"
-                            ><i class="fas fa-bars"></i
-                        ></a>
-                    </li>
-                    <li class="nav-item d-none d-sm-inline-block">
-                        <a href="starter.html" class="nav-link">首页</a>
-                    </li>
-                    <li class="nav-item d-none d-sm-inline-block">
-                        <a href="https://github.com/bhsei/20_H" class="nav-link"
-                            >关于我们</a
-                        >
-                    </li>
+{% block page_title %}上传模板{% endblock %}
+
+{% block page_link %}
+    <li class="breadcrumb-item">
+        <a href="{% url 'starter' %}">首页</a>
+    </li>
+    <li class="breadcrumb-item active">
+        上传模板
+    </li>
+{% endblock %}
+
+{% block content %}
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+        <div class="row">
+            <!-- /.col -->
+            <div class="col-md">
+            <div class="card">
+                <div class="card-header p-2">
+                <ul class="nav nav-pills">
+                    <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">模板信息</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">采集字段</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#parameter" data-toggle="tab">模板参数</a></li>
                 </ul>
-
-                <!-- Right navbar links -->
-                <ul class="navbar-nav ml-auto">
-                    <!-- Messages Dropdown Menu -->
-                    <li class="nav-item dropdown">
-                        <a
-                            class="nav-link"
-                            data-toggle="dropdown"
-                            href="#"
-                            id="user-dropdown"
-                        >
-                            <i class="far fa-user"></i>
-                            <span class="nav-username">用户名</span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="information.html">个人信息</a>
-                            <a class="dropdown-item" href="login.html">登出</a>
+                </div><!-- /.card-header -->
+                <div class="card-body">
+                <form>
+                <div class="tab-content">
+                    <div class="active tab-pane" id="activity">
+                        <form class="form-horizontal">
+                        <div class="form-group row">
+                            <label for="inputName" class="col-sm-2 col-form-label">模板英文名称</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="inputName" placeholder="模板英文名称">
+                            </div>
                         </div>
-                    </li>
-                </ul>
-            </nav>
-            <!-- /.navbar -->
-
-            <!-- Main Sidebar Container -->
-            <aside class="main-sidebar sidebar-dark-primary elevation-4">
-                <!-- Brand Logo -->
-                <a href="#" class="brand-link">
-                    <img
-                        src="/static/img/logo.png"
-                        alt="AdminLTE Logo"
-                        class="brand-image"
-                    />
-                    <span class="brand-text font-weight-light">EasySpider</span>
-                </a>
-
-                <!-- Sidebar -->
-                <div class="sidebar">
-                    <button
-                        class="btn btn-primary btn-block"
-                        type="button"
-                        id="createTaskBtn"
-                    >
-                        新建
-                    </button>
-
-                    <!-- Sidebar Menu -->
-                    <nav class="mt-2">
-                        <ul
-                            class="nav nav-pills nav-sidebar flex-column"
-                            data-widget="treeview"
-                            role="menu"
-                            data-accordion="false"
-                        >
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="nav-icon fas fa-tasks"></i>
-                                    <p>
-                                        我的任务
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item has-treeview">
-                                <a href="#" class="nav-link">
-                                    <i class="nav-icon fas fa-user-edit"></i>
-                                    <p>
-                                        最近编辑
-                                        <i class="right fas fa-angle-left"></i>
-                                    </p>
-                                </a>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item edit-item">
-                                        <a class="nav-link" href="#">
-                                            <i
-                                                class="far fa-circle nav-icon hidden"
-                                            ></i>
-                                            <p>
-                                                任务1
-                                                <i
-                                                    class="right fas fa-ellipsis-h hidden"
-                                                ></i>
-                                            </p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item edit-item">
-                                        <a class="nav-link" href="#">
-                                            <i
-                                                class="far fa-circle nav-icon hidden"
-                                            ></i>
-                                            <p>
-                                                任务2
-                                                <i
-                                                    class="right fas fa-ellipsis-h hidden"
-                                                ></i>
-                                            </p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item edit-item">
-                                        <a class="nav-link" href="#">
-                                            <i
-                                                class="far fa-circle nav-icon hidden"
-                                            ></i>
-                                            <p>
-                                                任务3
-                                                <i
-                                                    class="right fas fa-ellipsis-h hidden"
-                                                ></i>
-                                            </p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item edit-item">
-                                        <a class="nav-link" href="#">
-                                            <i
-                                                class="far fa-circle nav-icon hidden"
-                                            ></i>
-                                            <p>
-                                                任务4
-                                                <i
-                                                    class="right fas fa-ellipsis-h hidden"
-                                                ></i>
-                                            </p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item edit-item">
-                                        <a class="nav-link" href="#">
-                                            <i
-                                                class="far fa-circle nav-icon hidden"
-                                            ></i>
-                                            <p>
-                                                任务5
-                                                <i
-                                                    class="right fas fa-ellipsis-h hidden"
-                                                ></i>
-                                            </p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="nav-item hidden">
-                                <a href="#" class="nav-link">
-                                    <i class="nav-icon fas fa-tasks"></i>
-                                    <p>
-                                        我的任务
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item hidden">
-                                <a href="#" class="nav-link">
-                                    <i class="nav-icon fas fa-tasks"></i>
-                                    <p>
-                                        我的任务
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item hidden">
-                                <a href="#" class="nav-link">
-                                    <i class="nav-icon fas fa-tasks"></i>
-                                    <p>
-                                        我的任务
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item hidden">
-                                <a href="#" class="nav-link">
-                                    <i class="nav-icon fas fa-tasks"></i>
-                                    <p>
-                                        我的任务
-                                    </p>
-                                </a>
-                            </li>
-                            <div
-                                class="dropdown-menu"
-                                role="menu"
-                                id="edit-menu"
-                            >
-                                <a class="dropdown-item" href="#">编辑</a>
-                                <a
-                                    class="dropdown-item"
-                                    href="#rename-task-modal"
-                                    data-toggle="modal"
-                                    data-target="#rename-task-modal"
-                                    >重命名</a
-                                >
-                                <a
-                                    class="dropdown-item"
-                                    href="#delete-task-modal"
-                                    data-toggle="modal"
-                                    data-target="#delete-task-modal"
-                                    >删除</a
-                                >
-                            </div>
-                        </ul>
-                    </nav>
-                    <!-- /.sidebar-menu -->
-                </div>
-                <!-- /.sidebar -->
-            </aside>
-
-            <!-- Content Wrapper. Contains page content -->
-            <div class="content-wrapper">
-                <!-- Content Header (Page header) -->
-                <div class="content-header">
-                    <div class="container-fluid">
-                        <div class="row mb-2">
-                            <div class="col-sm-6">
-                                <h1 class="m-0 text-dark">上传模板</h1>
-                            </div>
-                            
-                            <!-- /.col -->
-                            <div class="col-sm-6">
-                                <ol class="breadcrumb float-sm-right">
-                                    <li class="breadcrumb-item active"> <a href="starter.html">首页</a></li>
-                                    <li class="breadcrumb-item">上传模板</li>
-                                </ol>
-                            </div>
-                            <!-- /.col -->
+                        <div class="form-group row">
+                        <label for="inputName" class="col-sm-2 col-form-label">模板中文名称</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="inputName" placeholder="模板中文名称">
                         </div>
-                        <!-- /.row -->
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="inputName" class="col-sm-2 col-form-label">模板类型</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="inputName" placeholder="模板类型">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputExperience" class="col-sm-2 col-form-label">模板介绍</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" id="inputExperience" placeholder="模板介绍"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputExperience" class="col-sm-2 col-form-label">示例数据</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" id="inputExperience" placeholder="示例数据"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputName" class="col-sm-2 col-form-label">split_param</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="inputName" placeholder="split_param">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                          <label for="inputExperience" class="col-sm-2 col-form-label">上传爬虫图片</label>
+                          <div class="col-sm-10">
+                            <div class="custom-file">
+                                <div class="input-group-append">
+                                    <input type="file" class="custom-file-input" id="file-1" onchange="handleFile1()">
+                                    <div class="input-group-text menu">预览图片<img src="" height="400" id='img-1'></div>
+                                </div>
+                                <label class="custom-file-label" for="exampleInputFile" id='fileName-1'>添加图片</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <label for="inputExperience" class="col-sm-2 col-form-label">上传egg</label>
+                          <div class="col-sm-10">
+                            <div class="custom-file">
+                              <input type="file" class="custom-file-input" id="file-2" onchange="handleFile2()">
+                              <label class= "custom-file-label" for="exampleInputFile" id='fileName-2'>选择文件</label>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button type="submit" class="btn btn-danger">上传模板</button>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- /.card -->
                     </div>
-                    <!-- /.container-fluid -->
-                </div>
-                <!-- /.content-header -->
-
-                <!-- Main content -->
-                <section class="content">
-                    <div class="container-fluid">
-                    <div class="row">
-                        <!-- /.col -->
-                        <div class="col-md">
-                        <div class="card">
-                            <div class="card-header p-2">
-                            <ul class="nav nav-pills">
-                                <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">模板信息</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">采集字段</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#parameter" data-toggle="tab">采集参数</a></li>
-                            </ul>
-                            </div><!-- /.card-header -->
-                            <div class="card-body">
-                            <div class="tab-content">
-                                <div class="active tab-pane" id="activity">
-                                    <form class="form-horizontal">
-                                    <div class="form-group row">
-                                    <label for="inputName" class="col-sm-2 col-form-label">模板名称</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="inputName" placeholder="模板名称">
-                                    </div>
-                                    </div>
-                                    
-                                    <div class="form-group row">
-                                    <label for="inputExperience" class="col-sm-2 col-form-label">模板介绍</label>
-                                    <div class="col-sm-10">
-                                        <textarea class="form-control" id="inputExperience" placeholder="模板介绍"></textarea>
-                                    </div>
-                                    </div>
-                                    <div class="form-group row">
-                                      <label for="inputExperience" class="col-sm-2 col-form-label">上传爬虫图片</label>
-                                      <div class="col-sm-10">
-                                        <div class="custom-file">
-                                            <div class="input-group-append">
-                                            <input type="file" class="custom-file-input" id="file-1" onchange="handleFile1()">
-                                                <div class="input-group-text menu">预览图片<img src="" height="400" id='haha'></div>
-                                              </div>
-                                            <label class="custom-file-label" for="exampleInputFile" id='fileName-1'>选择文件</label>
-                                           
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div class="form-group row">
-                                      <label for="inputExperience" class="col-sm-2 col-form-label">上传egg</label>
-                                      <div class="col-sm-10">
-                                        <div class="custom-file">
-                                          <input type="file" class="custom-file-input" id="file-2" onchange="handleFile2()">
-                                          <label class= "custom-file-label" for="exampleInputFile" id='fileName-2'>选择文件</label>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <div class="offset-sm-2 col-sm-10">
-                                            <button type="submit" class="btn btn-danger">上传模板</button>
-                                        </div>
-                                    </div>
-                                </form>
-                                <!-- /.card -->
-                                </div>
-                                <div class="tab-pane" id="settings"><div class="card-body">
-                                    <button class='btn btn-success' type="button" onclick="add1()">新增采集字段</button>
-                                    <table id="example2" class="table table-bordered table-hover">
-                                      <thead>
-                                      <tr>
-                                        <th>字段名称</th>
-                                        <th>预览截图</th>
-                                        <th>操作</th>
-                                      </tr>
-                                      </thead>
-                                      <tbody id='body1'>
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                </div>
-                                <!-- /.tab-pane -->
-                                <div class="tab-pane" id="parameter">
-                                    <div class="card-body">
-                                    <button class='btn btn-success' type="button" onclick="add2()">新增爬虫参数</button>
-                                    
-                                    <table id="example2" class="table table-bordered table-hover">
-                                      <thead>
-                                      <tr>
-                                        <th>参数名称</th>
-                                        <th>预览截图</th>
-                                        <th>操作</th>
-                                      </tr>
-                                      </thead>
-                                      <tbody id='body2'>
-                                      </tbody>
-                                    </table></div>
-                                </div>
-                            </div>
-                            <!-- /.tab-content -->
-                            </div><!-- /.card-body -->
-                        </div>
-                        <!-- /.nav-tabs-custom -->
-                        </div>
-                        <!-- /.col -->
+                    <div class="tab-pane" id="settings"><div class="card-body">
+                        <button class='btn btn-success' type="button" onclick="add1()">新增采集字段</button>
+                        <table id="example2" class="table table-bordered table-hover">
+                          <thead>
+                          <tr>
+                            <th>字段英文名称</th>
+                            <th>字段中文名称</th>
+                            <th>预览截图</th>
+                            <th>操作</th>
+                          </tr>
+                          </thead>
+                          <tbody id='body1'>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                    <!-- /.row -->
-                    </div><!-- /.container-fluid -->
-                </section>
-                <!-- /.content -->
+                    <!-- /.tab-pane -->
+                    <div class="tab-pane" id="parameter">
+                        <div class="card-body">
+                        <button class='btn btn-success' type="button" onclick="add2()">新增模板参数</button>
+
+                        <table id="example2" class="table table-bordered table-hover">
+                          <thead>
+                          <tr>
+                            <th>参数英文名称</th>
+                            <th>参数中文名称</th>
+                            <th>input_label</th>
+                            <th>input_type</th>
+                            <th>预览截图</th>
+                            <th>操作</th>
+                          </tr>
+                          </thead>
+                          <tbody id='body2'>
+                          </tbody>
+                        </table></div>
+                    </div>
+                </div>
+                </form>
+                <!-- /.tab-content -->
+                </div><!-- /.card-body -->
             </div>
-            <!-- /.content-wrapper -->
+            <!-- /.nav-tabs-custom -->
+            </div>
+            <!-- /.col -->
         </div>
-        <!-- ./wrapper -->
+        <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </section>
+{% endblock %}
 
-        <!-- REQUIRED SCRIPTS -->
-
-        <!-- AdminLTE App -->
-        <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/js/adminlte.min.js"></script>
-        <!-- Custom JS -->
-        <script src="/static/js/base.js"></script>
-        <script src="/static/js/starter.js"></script>
-        <script src="/static/js/templateUpload.js"></script>
-        <script src="/static/js/bs-custom-file-input.min.js"></script>
-        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-        <script>
+{% block js_extend %}
+    <script src="{% static 'easyspider/js/templateUpload.js' %}"></script>
+    <script src="{% static 'easyspider/js/bs-custom-file-input.min.js' %}"></script>
+    <script>
                 var fileInput = document.getElementById('file-1'),
-                previewImg = document.getElementById('haha');
+                previewImg = document.getElementById('img-1');
                 fileInput.addEventListener('change', function () {
                 var file = this.files[0];
                 var reader = new FileReader();
@@ -418,5 +171,5 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 reader.readAsDataURL(file);
             }, false);
         </script>
-    </body>
-</html>
+{% endblock %}
+
