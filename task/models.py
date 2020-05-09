@@ -17,7 +17,7 @@ class Task(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    template = models.ForeignKey(Template, on_delete=models.SET_NULL, null=True)
+    template = models.ForeignKey(Template, on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
     create_time = models.DateTimeField(auto_now_add=True)
     finish_time = models.DateTimeField(null=True, blank=True)
@@ -45,10 +45,8 @@ class Task(models.Model):
         """设置任务的模板参数
 
         :param arg_dict: {'param_name': 'value_str'}
-        :return: 划分参数的值；如果没有关联的模板则返回None
+        :return: 模板划分参数的值
         """
-        if not self.template:
-            return None
         template_params = {p.name: p for p in self.template.param_set.all()}
         args = {}
         split_arg = None

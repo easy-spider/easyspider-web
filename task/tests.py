@@ -9,7 +9,6 @@ from task.models import Task
 
 
 def create_test_data():
-    user = User.objects.create_user(username='zzy', password='123456', email='')
     site = Site.objects.create(name='S1', display_name='S1', egg='')
     template = Template.objects.create(
         site=site, name='T1', display_name='T1',
@@ -17,14 +16,15 @@ def create_test_data():
     )
     Param.objects.create(template=template, name='p1', display_name='p1', input_type='text')
     Param.objects.create(template=template, name='p2', display_name='p2', input_type='number')
-    return user, template
+    return template
 
 
 class TaskModelTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user, cls.template = create_test_data()
+        cls.user = User.objects.create_user(username='zzy', password='123456', email='')
+        cls.template = create_test_data()
 
     def test_set_name_invalid_length(self):
         """任务名称长度不在规定的范围内"""
@@ -47,14 +47,6 @@ class TaskModelTests(TestCase):
         task.set_name('  task1\t\r\n')
         self.assertEqual('task1', task.name)
 
-    def test_set_args_no_template(self):
-        """任务没有关联的模板"""
-        task = Task.objects.create(user=self.user, name='task1')
-        split_arg = task.set_args({'p1': 'abc', 'p2': '123'})
-        self.assertIsNone(task.args)
-        self.assertEqual({}, task.args_dict())
-        self.assertIsNone(split_arg)
-
     def test_set_args(self):
         task = Task.objects.create(user=self.user, template=self.template, name='task1')
         split_arg = task.set_args({'p1': 'abc', 'p2': '123', 'p3': 'what'})
@@ -73,7 +65,8 @@ class CreateTaskViewTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user, cls.template = create_test_data()
+        cls.user = User.objects.create_user(username='zzy', password='123456', email='')
+        cls.template = create_test_data()
 
     def test_not_login(self):
         """未登录时重定向到登录页面"""
@@ -135,10 +128,11 @@ class TaskListViewTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        t = create_test_data()
         for username in ('foo', 'bar'):
             user = User.objects.create_user(username=username, password='123456', email='')
             for i in range(1, 3):
-                Task.objects.create(user=user, name='{}_task{}'.format(username, i))
+                Task.objects.create(user=user, template=t, name='{}_task{}'.format(username, i))
 
     def test_not_login(self):
         """未登录时重定向到登录页面"""
@@ -159,11 +153,12 @@ class RenameTaskViewTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        template = create_test_data()
         cls.foo = User.objects.create_user(username='foo', password='123456', email='')
-        cls.foo_task = Task.objects.create(user=cls.foo, name='foo_task1')
-        Task.objects.create(user=cls.foo, name='foo_task2')
+        cls.foo_task = Task.objects.create(user=cls.foo, template=template, name='foo_task1')
+        Task.objects.create(user=cls.foo, template=template, name='foo_task2')
         cls.bar = User.objects.create_user(username='bar', password='123456', email='')
-        cls.bar_task = Task.objects.create(user=cls.bar, name='bar_task1')
+        cls.bar_task = Task.objects.create(user=cls.bar, template=template, name='bar_task1')
 
     def test_not_login(self):
         """未登录时重定向到登录页面"""
@@ -214,13 +209,19 @@ class ChangeTaskStatusViewTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_user(username='zzy', password='123456', email='')
-        cls.ready_task = Task.objects.create(user=cls.user, name='task1', status='ready')
-        cls.running_task = Task.objects.create(user=cls.user, name='task2', status='running')
-        cls.paused_task = Task.objects.create(user=cls.user, name='task3', status='paused')
-        cls.finished_task = Task.objects.create(user=cls.user, name='task4', status='finished')
-        cls.canceled_task = Task.objects.create(user=cls.user, name='task5', status='canceled')
+        template = create_test_data()
+        cls.ready_task = Task.objects.create(user=cls.user, template=template,
+                                             name='task1', status='ready')
+        cls.running_task = Task.objects.create(user=cls.user, template=template,
+                                               name='task2', status='running')
+        cls.paused_task = Task.objects.create(user=cls.user, template=template,
+                                              name='task3', status='paused')
+        cls.finished_task = Task.objects.create(user=cls.user, template=template,
+                                                name='task4', status='finished')
+        cls.canceled_task = Task.objects.create(user=cls.user, template=template,
+                                                name='task5', status='canceled')
         user2 = User.objects.create_user(username='foo', password='123456', email='')
-        cls.other_task = Task.objects.create(user=user2, name='task6')
+        cls.other_task = Task.objects.create(user=user2, template=template, name='task6')
 
     def test_not_login(self):
         """未登录时重定向到登录页面"""
@@ -268,9 +269,10 @@ class TaskDataViewTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_user(username='zzy', password='123456', email='')
-        cls.my_task = Task.objects.create(user=cls.user, name='task1')
+        template = create_test_data()
+        cls.my_task = Task.objects.create(user=cls.user, template=template, name='task1')
         user2 = User.objects.create_user(username='foo', password='123456', email='')
-        cls.other_task = Task.objects.create(user=user2, name='task2')
+        cls.other_task = Task.objects.create(user=user2, template=template, name='task2')
 
     def test_not_login(self):
         """未登录时重定向到登录页面"""
