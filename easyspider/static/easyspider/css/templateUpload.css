@@ -1,0 +1,28 @@
+.custom-file-label::after{
+    content:"浏览"!important;
+}
+
+.card-body>.table {
+    margin-top: 20px;
+}
+.menu {
+    position:relative;
+    width: 40px;
+    z-index: 2;
+}
+
+.menu img
+{
+    display:none;
+}
+
+.menu:hover img
+{
+    display:block;
+    position: absolute; 
+    right: 120px; 
+    z-index: 3;
+}
+.input-group-text{
+    width: 110px!important;
+}
