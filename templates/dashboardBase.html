@@ -74,7 +74,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             id="user-dropdown"
                         >
                             <i class="far fa-user"></i>
-                            <span class="nav-username">{{ request.user.username }}</span>
+                            <span class="nav-username">{% firstof request.user.first_name request.user.username %}</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
                             <a class="dropdown-item" href="{% url 'user_profile' %}">个人信息</a>
