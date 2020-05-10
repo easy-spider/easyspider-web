@@ -1,14 +1,71 @@
-$("#data-table").DataTable({
+let dataTable = $("#data-table").DataTable({
   scrollX: true,
   searching: false,
   ordering: false,
   bLengthChange: false,
-  pageLength: 100,
+  pageLength: 5,
   language: {
     info: "_TOTAL_ 条数据中的第 _START_ 至 _END_ 条",
+    infoEmpty: "_TOTAL_ 条数据中的第 0 至 _END_ 条",
     paginate: {
       next: "下一页",
       previous: "上一页",
     },
+    emptyTable: "暂无数据"
   },
+});
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+});
+
+$('#clear-modal').on('show.bs.modal', function(e) {
+    let clearForm = $("#clear-form");
+    clearForm.off("submit");
+    clearForm.submit(function () {
+      let form = this;
+      $.ajax({
+        url: $(form).attr("action"),
+        type: "POST",
+        data: $(form).serialize() + "&for=clearData",
+        cache: false,
+        success: function (data) {
+          if(data["status"] === "SUCCESS") {
+            Toast.fire({
+                icon: "success",
+                title: "&nbsp;数据已清空",
+            });
+            dataTable.clear().draw();
+            $('#clear-modal').modal('hide');
+          } else {
+              Toast.fire({
+                  icon: "error",
+                  title: "&nbsp;" + data["message"],
+              });
+          }
+        },
+        error: function (xhr) {
+          console.log(xhr);
+        }
+      });
+      return false;
+    });
+});
+
+$('#data-modal').on('show.bs.modal', function(e) {
+  let dtEles = $(this).find("dt");
+  let rowIndex = $(e.relatedTarget).data('id');
+  $(this).find(".modal-title").html("#" + rowIndex + " 数据详情");
+  for(let i = 0; i < dtEles.length; i++) {
+    let next = dtEles.eq(i).next();
+    let updateStr = "<dd>"+ dataTable.cell(rowIndex - 1, i + 2).data().trim() +"</dd>";
+    if(next.is("dd")) {
+      next.html(updateStr);
+    } else {
+      $(updateStr).insertAfter(dtEles.eq(i));
+    }
+  }
 });

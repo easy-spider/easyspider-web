@@ -49,6 +49,9 @@ def create_task(request, template_pk):
 def task_list(request):
     if not request.user.is_authenticated:
         return redirect(reverse('login'))
+    if request.method == "POST":
+        # 根据for参数编写不同后端逻辑
+        return JsonResponse({"status": "SUCCESS"})
     context = {'task_list': request.user.task_set.all()}
     return render(request, 'task/task.html', context)
 
@@ -151,6 +154,16 @@ def clear_data(request, task_pk):
         db.drop_collection('{}_{}'.format(task.id, job.uuid))
     client.close()
     return redirect(reverse('preview_data', args=(task_pk,)))
+
+
+# def preview_data(request, task_pk):
+#     if not request.user.is_authenticated:
+#         return redirect(reverse('login'))
+#     if request.method == "POST":
+#         # 根据for参数编写不同后端逻辑
+#         return JsonResponse({"status": "SUCCESS"})
+#     # get中也包含参数，关于download的
+#     return render(request, 'task/dataDownload.html', {})
 
 
 def preview_data(request, task_pk):

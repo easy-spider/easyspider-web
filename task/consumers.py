@@ -8,8 +8,7 @@ import json
 class TaskConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.user_pk = self.scope['url_route']['kwargs']['user_pk']
-        self.task_pk = self.scope['url_route']['kwargs']['task_pk']
-        self.group_name = 'task_%s_%s' % (self.user_pk, self.task_pk)
+        self.group_name = 'task_%s' % self.user_pk
 
         # Join room group
         await self.channel_layer.group_add(
@@ -58,9 +57,10 @@ def send_group_msg(user_pk, task_pk, message):
     :param message:
     :return:
     """
+    message["task_id"] = task_pk
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
-        'task_{}_{}'.format(user_pk, task_pk),  # 构造Channels组名称
+        'task_{}'.format(user_pk),  # 构造Channels组名称
         {
             "type": "task_message",
             "message": message,

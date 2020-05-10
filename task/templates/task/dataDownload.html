@@ -62,6 +62,7 @@
                             <td>1</td>
                             <td>
                                 <button
+                                    data-id="1"
                                     type="button"
                                     class="btn btn-default"
                                     data-toggle="modal"
@@ -84,6 +85,7 @@
                             <td>2</td>
                             <td>
                                 <button
+                                    data-id="2"
                                     type="button"
                                     class="btn btn-default"
                                     data-toggle="modal"
@@ -106,6 +108,7 @@
                             <td>3</td>
                             <td>
                                 <button
+                                    data-id="3"
                                     type="button"
                                     class="btn btn-default"
                                     data-toggle="modal"
@@ -128,6 +131,7 @@
                             <td>4</td>
                             <td>
                                 <button
+                                    data-id="4"
                                     type="button"
                                     class="btn btn-default"
                                     data-toggle="modal"
@@ -178,40 +182,44 @@
     <div class="modal fade" id="clear-modal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-body">
-                    <div class="card-comments">
-                        <div class="card-comment">
-                            <img
-                                class="img-circle img-sm"
-                                src="{% static 'img/warning.JPG' %}"
-                                alt="warning"
-                            />
-                            <div class="comment-text">
-                                <h5 class="username">确定</h5>
-                                <!-- /.username -->
-                                确定要全部清除吗？
+{#                <form method="POST" action="{% url 'preview_data' 1 %}" id="clear-form">#}
+                <form method="POST" action="#" id="clear-form">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="card-comments">
+                            <div class="card-comment">
+                                <img
+                                    class="img-circle img-sm"
+                                    src="{% static 'img/warning.JPG' %}"
+                                    alt="warning"
+                                />
+                                <div class="comment-text">
+                                    <h5 class="username">确定</h5>
+                                    <!-- /.username -->
+                                    确定要全部清除吗？
+                                </div>
+                                <!-- /.comment-text -->
                             </div>
-                            <!-- /.comment-text -->
                         </div>
                     </div>
-                </div>
-                <div
-                    class="modal-footer justify-content-between"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-default"
-                        data-dismiss="modal"
+                    <div
+                        class="modal-footer justify-content-between"
                     >
-                        取消
-                    </button>
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                    >
-                        确定
-                    </button>
-                </div>
+                        <button
+                            type="button"
+                            class="btn btn-default"
+                            data-dismiss="modal"
+                        >
+                            取消
+                        </button>
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            确定
+                        </button>
+                    </div>
+                </form>
             </div>
             <!-- /.modal-content -->
         </div>
@@ -279,12 +287,13 @@
                     >
                         取消
                     </button>
-                    <button
+                    <a
+                        id="confirm-file-type-btn"
                         type="button"
                         class="btn btn-primary"
                     >
                         确定
-                    </button>
+                    </a>
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -306,43 +315,14 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <dl class="row">
-                        <dt class="col-sm-4">关键词</dt>
-                        <dd class="col-sm-8">
-                            战狼
-                        </dd>
-                        <dt class="col-sm-4">页码</dt>
-                        <dd class="col-sm-8">
-                            1
-                        </dd>
-                        <dt class="col-sm-4">影名</dt>
-                        <dd class="col-sm-8">
-                            战狼2(2017)
-                        </dd>
-                        <dt class="col-sm-4">
-                            语言
-                        </dt>
-                        <dd class="col-sm-8">
-                            汉语普通话/英语
-                        </dd>
-                        <dt class="col-sm-4">
-                            片长
-                        </dt>
-                        <dd class="col-sm-8">
-                            123分钟
-                        </dd>
-                        <dt class="col-sm-4">
-                            评分
-                        </dt>
-                        <dd class="col-sm-8">
-                            7.1
-                        </dd>
-                        <dt class="col-sm-4">
-                            评价人数
-                        </dt>
-                        <dd class="col-sm-8">
-                            724332
-                        </dd>
+                    <dl>
+                        <dt>关键词</dt>
+                        <dt>页码</dt>
+                        <dt>影名</dt>
+                        <dt>语言</dt>
+                        <dt>片长</dt>
+                        <dt>评分</dt>
+                        <dt>评价人数</dt>
                     </dl>
                 </div>
             </div>
@@ -358,6 +338,55 @@
     <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs4@1.10.20/js/dataTables.bootstrap4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/datatables.net-responsive@2.2.3/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/datatables.net-responsive-bs4@2.2.3/js/responsive.bootstrap4.min.js"></script>
+    <!-- FileSaver -->
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
+    <!-- XLSX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.0/xlsx.full.min.js"></script>
     <!-- Custom JS -->
     <script src="{% static 'task/js/dataDownload.js' %}"></script>
+    <script>
+        let spiderData = [{"a": 1, "b": 2, "c": 3}, {"a": 4, "b": 5, "c": 6}];
+        let json = JSON.stringify(spiderData);
+        let blob = new Blob([json], {type: "application/json"});
+        let url  = URL.createObjectURL(blob);
+        let btn = $("#confirm-file-type-btn");
+        $("#export-modal").on('show.bs.modal', function (e) {
+            btn.off("click");
+            btn.on("click", function () {
+                let way = $("#export-modal").find("input[name=export-way]:checked").next().text().trim();
+                if(way === "JSON") {
+                  way = ".json";
+                } else if (way === "CSV") {
+                  way = ".csv";
+                } else {
+                  way = ".xlsx"
+                }
+                $.ajax({
+                    {#url: "{% url 'preview_data' 1 %}?way=%s" % way,#}
+                    url: '',
+                    type: "GET",
+                    cache: false,
+                    success: function (data) {
+                    },
+                    error: function (xhr) {
+                        console.log(xhr);
+                    }
+                });
+                Toast.fire({
+                    icon: "success",
+                    title: "&nbsp;数据下载成功",
+                });
+                if(way === ".json") {
+                    btn.attr({"href": url, "download": "test" + way});
+                }
+                else {
+                    btn.removeAttr("href");
+                    let wb = XLSX.utils.book_new();
+                    let ws = XLSX.utils.json_to_sheet(spiderData);
+                    XLSX.utils.book_append_sheet(wb, ws, way === '.xlsx'? 'Sheet1': '');
+                    XLSX.writeFile(wb, 'test' + way);
+                }
+            });
+        });
+    </script>
 {% endblock %}

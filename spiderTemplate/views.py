@@ -3,6 +3,8 @@ from django.urls import reverse
 
 from spiderTemplate.models import Site, SiteType, Template
 
+from datetime import datetime
+
 
 def starter(request):
     """登录之后的起始页，展示8个网站模板集合"""
@@ -59,11 +61,20 @@ def templates_view(request, pk):
     return render(request, 'spiderTemplate/templateSecond.html', context)
 
 
+# 增加计数
 def template_info(request, pk):
     if not request.user.is_authenticated:
         return redirect(reverse("login"))
+    template = Template.objects.get(pk=pk)
+    if not request.COOKIES.get('template_%s_view' % pk):
+        pass
+        # template.view_num += 1
+        # template.save()
     context = {'template': Template.objects.get(pk=pk)}
-    return render(request, 'spiderTemplate/templateInfo.html', context)
+    response = render(request, 'spiderTemplate/templateInfo.html', context)
+    # response.set_cookie(pk, 'true', expires=datetime.today())
+    # response.set_cookie('template_%s_view' % pk, 'true', max_age=60)
+    return response
 
 
 def template_setting(request, pk):

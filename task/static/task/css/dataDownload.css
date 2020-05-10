@@ -18,3 +18,7 @@
   border: none !important;
   background-color: transparent !important;
 }
+
+#export-modal .btn-primary {
+  color: #fff !important;
+}
