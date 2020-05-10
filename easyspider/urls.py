@@ -2,12 +2,11 @@ from django.urls import path
 
 from easyspider import views
 
-app_name = 'easyspider'
 urlpatterns = [
-    path('site-template/create/', views.create_site_template, name='site-template-create'),
-    path('node/list/', views.NodeListView.as_view(), name='list-node'),
-    path('node/modify/', views.modify_node, name='modify-node'),
-    path('node/set-status/<int:node_id>/<int:status>/', views.set_node_status, name='set-node-status'),
-    path('node/create/', views.create_node, name='create-node'),
-    path('node/push/', views.push_node_template, name='push-node'),
+    path('node/list/', views.list_node, name='list_node'),
+    path('node/modify/<int:pk>/', views.modify_node, name='modify_node'),
+    path('node/create/', views.create_node, name='create_node'),
+    path('pushEggs/', views.push_all_eggs, name='push_eggs'),
+    path('template/list/', views.list_template, name='list_template'),
+    path('template/create/', views.create_template, name='create_template'),
 ]
