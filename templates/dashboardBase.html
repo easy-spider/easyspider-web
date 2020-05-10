@@ -201,7 +201,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                         href="#"
                                         class="nav-link "
                                     >
-                                        <i class="nav-icon fas fa-user-edit"></i>
+                                        <i class="nav-icon fas fa-tachometer-alt"></i>
                                         <p>
                                             模板管理
                                             <i class="right fas fa-angle-left"></i>
@@ -211,7 +211,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                         <li class="nav-item edit-item">
                                             <a class="nav-link" href="{% url 'create_template' %}">
                                                 <i
-                                                    class="far fa-circle nav-icon hidden"
+                                                    class="far fa-circle nav-icon"
                                                 ></i>
                                                 <p>
                                                     上传模板
@@ -221,7 +221,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                         <li class="nav-item edit-item">
                                             <a class="nav-link" href="{% url 'list_template' %}">
                                                 <i
-                                                    class="far fa-circle nav-icon hidden"
+                                                    class="far fa-circle nav-icon"
                                                 ></i>
                                                 <p>
                                                     管理现有模板
@@ -230,6 +230,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                         </li>
                                     </ul>
                                 </li>
+                            <li class="nav-item">
+                                <a
+                                    href="{% url 'list_node' %}"
+                                    class="nav-link "
+                                >
+                                    <i class="nav-icon fas fa-edit"></i>
+                                    <p>
+                                        节点管理
+                                    </p>
+                                </a>
+                            </li>
                             {% endif %}
 
                         </ul>
