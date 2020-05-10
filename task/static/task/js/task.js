@@ -1,4 +1,7 @@
-let taskTable = $("#task-table").DataTable({
+let taskTableEle = $("#task-table");
+let taskTableBodyEle = taskTableEle.find("tbody");
+
+let taskTable = taskTableEle.DataTable({
   dom: '<"toolbar">frtip',
   fnInitComplete: function(){
      $('div.toolbar').html('            <button\n' +
@@ -64,11 +67,11 @@ btnEle.on("click", function () {
       taskForm.submit(function () {
         let isValid = true;
         let form = this;
-        let rows_selected = taskTable.column(0).checkboxes.selected();
         // Iterate over all selected checkboxes
-        $.each(rows_selected, function(index, rowId){
-          // validation
-          let taskStatus =  taskTable.cell(rowId - 1, 2).data().trim();
+        let rows_selected = taskTableBodyEle.find("tr.selected");
+        rows_selected.each(function () {
+          let taskStatus = $(this).find("td:nth-of-type(3)").text().trim();
+
           if(taskStatus !== "已完成" && taskStatus !== "已终止") {
               Toast.fire({
                   icon: "error",
@@ -79,10 +82,8 @@ btnEle.on("click", function () {
           }
         });
         if(isValid) {
-            let selectRowsID = new Set();
-            $.each(rows_selected, function(index, rowId){
-                selectRowsID.add(rowId);
-                let taskID = $(taskTable.cell(rowId - 1, 1).data()).attr("data-id");
+            rows_selected.each(function () {
+                let taskID = $(this).attr("id");
                 // Create a hidden element
                 $(form).append(
                      $('<input>')
@@ -102,11 +103,7 @@ btnEle.on("click", function () {
                           icon: "success",
                           title: "&nbsp;任务删除成功",
                       });
-                      let index = 0;
-                      for(let item of selectRowsID) {
-                          taskTable.row(item - index - 1).remove().draw(false);
-                          index++;
-                      }
+                      taskTable.rows(".selected").remove().draw(false);
                       // reset button
                       btnEle.html("<i class='fas fa-sync'></i>&nbsp;刷新");
                   } else {
@@ -129,13 +126,14 @@ btnEle.on("click", function () {
 });
 
 $('#rename-task-modal').on('show.bs.modal', function(e) {
-    let taskID = $(e.relatedTarget).data('id');
+    let aEle = $(e.relatedTarget);
+    let taskID = aEle.data('id');
     let renameTaskForm = $("#rename-task-form");
     renameTaskForm.off("submit");
     renameTaskForm.submit(function () {
         // validation
         let form = this;
-        let inputEle = $(form).find("input");
+        let inputEle = $(form).find("input#task-name-input");
         let newTaskName = $(form).find("#task-name-input").val().trim();
         if(newTaskName.length === 0) {
             Toast.fire({
@@ -166,9 +164,8 @@ $('#rename-task-modal').on('show.bs.modal', function(e) {
                       title: "&nbsp;任务重命名成功",
                   });
                   // 修改任务名
-                  let ele = $("a[data-id=" + taskID + "][href=\"#rename-task-modal\"]");
-                  let updateNameStr = ele[0].outerHTML + newTaskName;
-                  ele.parent("td").html(updateNameStr);
+                  let updateNameStr = aEle[0].outerHTML + newTaskName;
+                  aEle.parent("td").html(updateNameStr);
                   // 隐去modal
                   $('#rename-task-modal').modal('hide');
                   taskTable.columns.adjust().draw();
@@ -189,7 +186,8 @@ $('#rename-task-modal').on('show.bs.modal', function(e) {
 });
 
 $('#cancel-task-modal').on('show.bs.modal', function(e) {
-    let taskID = $(e.relatedTarget).data('id');
+    let aEle = $(e.relatedTarget);
+    let taskID = aEle.data('id');
     let cancelTaskForm = $("#cancel-task-form");
     cancelTaskForm.off("submit");
     cancelTaskForm.submit(function () {
@@ -205,15 +203,14 @@ $('#cancel-task-modal').on('show.bs.modal', function(e) {
                       title: "&nbsp;任务已终止",
                   });
                   // 更新采集状态、操作、耗时、采集完成时间
-                  let ele = $("a[data-id=" + taskID + "][href=\"#cancel-task-modal\"]");
-                  let preEle = ele.prev("a");
+                  let preEle = aEle.prev("a");
                   preEle.find("i").attr("class", "far fa-play-circle hidden");
                   preEle.attr({
                       "href": "#restart-task-modal",
                       "data-id": "" + taskID,
                       "data-target": "#restart-task-modal"
                   });
-                  let parent = ele.parent("td");
+                  let parent = aEle.parent("td");
                   parent.removeClass();
                   parent.addClass("canceled");
                   let status = parent.prev("td");
@@ -224,7 +221,7 @@ $('#cancel-task-modal').on('show.bs.modal', function(e) {
                   parent.nextAll().eq(1).html("2分钟");
                   // 采集完成时间
                   parent.nextAll().eq(3).html("20/05/09 13:00");
-                  ele.remove();
+                  aEle.remove();
                   // 隐去modal
                   $('#cancel-task-modal').modal('hide');
                   taskTable.columns.adjust().draw();
@@ -244,7 +241,8 @@ $('#cancel-task-modal').on('show.bs.modal', function(e) {
 });
 
 $('#restart-task-modal').on('show.bs.modal', function(e) {
-    let taskID = $(e.relatedTarget).data('id');
+    let aEle = $(e.relatedTarget);
+    let taskID = aEle.data('id');
     let restartTaskForm = $("#restart-task-form");
     restartTaskForm.off("submit");
     restartTaskForm.submit(function () {
@@ -260,10 +258,9 @@ $('#restart-task-modal').on('show.bs.modal', function(e) {
                       title: "&nbsp;任务已重新开始",
                   });
                   // 更新采集状态、操作字符、进度条（为0）、执行次数+1、耗时和采集完成时间清空
-                  let ele = $("a[data-id=" + taskID + "][href=\"#restart-task-modal\"]");
-                  ele.attr({"href": "", "data-target": "", "data-id": taskID});
-                  ele.find("i").attr("class", "far fa-pause-circle hidden");
-                  let parent = ele.parent("td");
+                  aEle.attr({"href": "", "data-target": "", "data-id": taskID});
+                  aEle.find("i").attr("class", "far fa-pause-circle hidden");
+                  let parent = aEle.parent("td");
                                         parent.append("                          <a\n" +
                       "                            data-id=\"" + taskID + "\"\n" +
                       "                            href=\"#cancel-task-modal\"\n" +
@@ -312,13 +309,15 @@ $('#restart-task-modal').on('show.bs.modal', function(e) {
    });
 });
 
-$("#task-table tbody input[type=checkbox]").change(function () {
+taskTableBodyEle.find("input[type=checkbox]").change(function () {
   if ($(this).is(":checked")) {
+    $(this).parents("tr").addClass("selected");
     totalScore += 1;
     if (btnEle.text().trim() !== "删除") {
       btnEle.html("<i class='fas fa-trash'></i>&nbsp;删除");
     }
   } else {
+    $(this).parents("tr").removeClass("selected");
     totalScore -= 1;
     if (totalScore === 0) {
       btnEle.html("<i class='fas fa-sync'></i>&nbsp;刷新");
@@ -327,10 +326,13 @@ $("#task-table tbody input[type=checkbox]").change(function () {
 });
 
 $(".dataTables_scrollHeadInner input[type=checkbox]").change(function () {
+  let trEles = taskTableBodyEle.find("tr");
   if ($(this).is(":checked")) {
-    totalScore = $("#task-table tbody tr").length;
+    trEles.addClass("selected");
+    totalScore = trEles.length;
     btnEle.html("<i class='fas fa-trash'></i>&nbsp;删除");
   } else {
+    trEles.removeClass("selected");
     totalScore = 0;
     btnEle.html("<i class='fas fa-sync'></i>&nbsp;刷新");
   }
