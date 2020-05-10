@@ -417,19 +417,19 @@
     <div class="modal fade" id="rename-task-modal">
         <div class="modal-dialog">
             <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title">修改任务名</h4>
+                  <button
+                    type="button"
+                    class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
                 <form id="rename-task-form" action="{% url 'my_task' %}" method="POST">
                     {% csrf_token %}
-                    <div class="modal-header">
-                      <h4 class="modal-title">修改任务名</h4>
-                      <button
-                        type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                      >
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
                     <div class="modal-body">
                         <div class="form-group">
                             <label class="col-form-label" for="task-name-input"
@@ -540,7 +540,7 @@
         };
     </script>
     <script>
-        $("#task-table tbody tr td:nth-of-type(4) a").on("click", function () {
+        taskTableBodyEle.find("tr td:nth-of-type(4) a").on("click", function () {
             let ele = $(this).find("i");
             let parent = $(this).parent("td");
             let status = parent.prev("td");
