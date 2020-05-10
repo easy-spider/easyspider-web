@@ -19,10 +19,11 @@ class Task(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     template = models.ForeignKey(Template, on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
-    create_time = models.DateTimeField(auto_now_add=True)
+    create_time = models.DateTimeField(auto_now_add=True)  # 最近编辑时间
     finish_time = models.DateTimeField(null=True, blank=True)
     args = models.CharField(max_length=4095, null=True)  # JSON格式的模板参数
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='ready')
+    run_times = models.IntegerField(default=1)  # 运行次数
 
     def __str__(self):
         return self.name
@@ -36,7 +37,7 @@ class Task(models.Model):
         """
         name = name.strip()
         if not 3 <= len(name) <= 20:
-            raise ValueError('任务名长度应在3~20之间')
+            raise ValueError('任务名长度应在3~20个字符之间')
         elif self.user.task_set.filter(name=name).exists():
             raise ValueError('任务名称已存在')
         self.name = name

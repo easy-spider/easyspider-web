@@ -32,7 +32,7 @@ class TaskModelTests(TestCase):
         for name in ('t1', ' t1 ', '     ', 't' * 30):
             with self.assertRaises(ValueError) as cm:
                 task.set_name(name)
-            self.assertEqual('任务名长度应在3~20之间', cm.exception.args[0])
+            self.assertEqual('任务名长度应在3~20个字符之间', cm.exception.args[0])
 
     def test_name_already_exists(self):
         """任务名称已存在"""
@@ -88,7 +88,7 @@ class CreateTaskViewTests(TestCase):
         for name in ('t1', ' t1 ', '     ', 't' * 30):
             data['inputTaskName'] = name
             response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
-            self.assertEqual({'status': 'ERROR', 'message': '任务名长度应在3~20之间'}, response.json())
+            self.assertEqual({'status': 'ERROR', 'message': '任务名长度应在3~20个字符之间'}, response.json())
 
     def test_name_already_exists(self):
         """任务名称已存在"""
@@ -187,7 +187,7 @@ class RenameTaskViewTests(TestCase):
         for name in ('t1', ' t1 ', '     ', 't' * 30):
             data = {'inputTaskName': name}
             response = self.client.post(reverse('rename_task', args=(self.foo_task.id,)), data)
-            self.assertEqual({'status': 'ERROR', 'message': '任务名长度应在3~20之间'}, response.json())
+            self.assertEqual({'status': 'ERROR', 'message': '任务名长度应在3~20个字符之间'}, response.json())
 
     def test_name_already_exists(self):
         """任务名称已存在"""
