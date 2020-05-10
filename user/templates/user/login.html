@@ -69,7 +69,7 @@
         </div>
           <!-- /.col -->
           <div class="social-auth-links text-center mb-3">
-              <button type="submit" class="btn btn-primary btn-block">登录</button>
+              <button type="submit" class="btn btn-primary btn-block" onclick="fn()">登录</button>
           </div>
           <!-- /.col -->
       </form>
@@ -88,6 +88,27 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/js/adminlte.min.js"></script>
+<script type="text/javascript">
+var user = document.getElementById('username-input'),
+  pass = document.getElementById('password-input'),
+  check = document.getElementById('remember'),
+  localUser = localStorage.getItem('user') || ''; //获取到user的值并保存
+  localPass = localStorage.getItem('pass') || ''; //获取到pwd的值并保存
+  user.value = localUser;
+  pass.value = localPass;
+  if (localUser !== '' && localPass !== '') {
+    check.setAttribute('checked', '');
+  }
 
+function fn() {
+  if (check.checked) {
+    localStorage.setItem('user', user.value);
+    localStorage.setItem('pass', pass.value);
+  } else {
+    localStorage.setItem('user', '');
+    localStorage.setItem('pass', '');
+  }
+}
+</script>
 </body>
 </html>

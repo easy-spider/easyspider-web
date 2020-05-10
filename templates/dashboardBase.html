@@ -143,6 +143,45 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 <ul class="nav nav-treeview" id="recent-edit-list">
                                 </ul>
                             </li>
+
+
+                            {% if  request.user.is_superuser == 1 %}
+                                <li class="nav-item has-treeview">
+                                    <a
+                                        href="#"
+                                        class="nav-link "
+                                    >
+                                        <i class="nav-icon fas fa-user-edit"></i>
+                                        <p>
+                                            模板管理
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item edit-item">
+                                            <a class="nav-link" href="{% url 'create_template' %}">
+                                                <i
+                                                    class="far fa-circle nav-icon hidden"
+                                                ></i>
+                                                <p>
+                                                    上传模板
+                                                </p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item edit-item">
+                                            <a class="nav-link" href="{% url 'list_template' %}">
+                                                <i
+                                                    class="far fa-circle nav-icon hidden"
+                                                ></i>
+                                                <p>
+                                                    管理现有模板
+                                                </p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            {% endif %}
+
                         </ul>
                     </nav>
                     <!-- /.sidebar-menu -->

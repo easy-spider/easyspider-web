@@ -32,11 +32,13 @@ def register(request):
     if request.method == 'GET':
         return render(request, 'user/register.html')
     username = request.POST['username']
-    email = request.POST['email']
     password = request.POST['password']
+    email = request.POST['email']
+    # User.first_name用于存储昵称
+    nickname = request.POST['first_name']
     if User.objects.filter(username=username).exists():
         return render(request, 'user/register.html', {'error_message': '用户名已存在'})
-    User.objects.create_user(username, email, password)
+    User.objects.create_user(username, email, password, first_name=nickname)
     return redirect(reverse('index'))
 
 
@@ -48,9 +50,25 @@ def forgot_password(request):
     return render(request, 'user/forgot_password.html', {})
 
 
+@require_http_methods(['GET', 'POST'])
 def reset_password(request):
-    return render(request, 'user/reset_password.html', {})
+    if request.method == 'GET':
+        return render(request, 'user/reset_password.html')
+    if not request.user.is_authenticated:
+        return redirect(reverse('login'))
+    request.user.set_password(request.POST['password'])
+    request.user.save()
+    return redirect(reverse('index'))
 
 
+@require_http_methods(['GET', 'POST'])
 def user_profile(request):
-    return render(request, 'user/information.html', {})
+    """GET方法——个人信息页面；POST方法——修改个人信息"""
+    if not request.user.is_authenticated:
+        return redirect(reverse('login'))
+    if request.method == 'GET':
+        return render(request, 'user/information.html')
+    request.user.email = request.POST['email']
+    request.user.first_name = request.POST['first_name']
+    request.user.save()
+    return redirect(reverse('index'))

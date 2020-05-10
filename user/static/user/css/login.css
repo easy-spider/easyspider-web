@@ -15,7 +15,7 @@ img {
 }
 .login-logo{
     font-weight: normal!important;
-    font-size: 1.75rem;
+    font-size: 1.65rem;
     line-height: 1.2;
     margin-bottom: 0;
     margin-top: 0;
@@ -23,7 +23,7 @@ img {
     text-align: left;
 }
 .widget-user-desc{
-    
+    font-size: 0.95rem;
     margin-left: 150px;
     text-align: left;
 }
