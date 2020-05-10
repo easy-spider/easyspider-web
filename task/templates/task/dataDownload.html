@@ -182,7 +182,8 @@
     <div class="modal fade" id="clear-modal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form method="POST" action="{% url 'preview_data' 1 %}" id="clear-form">
+{#                <form method="POST" action="{% url 'preview_data' 1 %}" id="clear-form">#}
+                <form method="POST" action="#" id="clear-form">
                     {% csrf_token %}
                     <div class="modal-body">
                         <div class="card-comments">
@@ -361,7 +362,8 @@
                   way = ".xlsx"
                 }
                 $.ajax({
-                    url: "{% url 'preview_data' 1 %}?way=%s" % way,
+                    {#url: "{% url 'preview_data' 1 %}?way=%s" % way,#}
+                    url: '',
                     type: "GET",
                     cache: false,
                     success: function (data) {
