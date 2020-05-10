@@ -100,11 +100,11 @@
         recentEditList.find("li a").each(function () {
             let href = $(this).attr("href");
             let taskID = +href.slice(href.lastIndexOf("=") + 1);
-            if(taskID === {{ task.pk }}) {
-                $(this).parents("#recent-edit-list").prev("a").addClass("active");
-                $(this).addClass("active");
-                return false;
-            }
+            {#if(taskID === {{ task.pk }}) {#}
+            {#    $(this).parents("#recent-edit-list").prev("a").addClass("active");#}
+            {#    $(this).addClass("active");#}
+            {#    return false;#}
+            {# } #}
         });
     </script>
     <script src="{% static 'spiderTemplate/js/templateSetting.js' %}"></script>
