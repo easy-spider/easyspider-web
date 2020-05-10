@@ -132,7 +132,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             <li class="nav-item has-treeview">
                                 <a
                                     href="#"
-                                    class="nav-link {% block nav_edit_active %}{% endblock %}"
+                                    class="nav-link"
                                 >
                                     <i class="nav-icon fas fa-user-edit"></i>
                                     <p>
@@ -140,57 +140,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                         <i class="right fas fa-angle-left"></i>
                                     </p>
                                 </a>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item edit-item">
-                                        <a class="nav-link" href="#">
-                                            <i
-                                                class="far fa-circle nav-icon hidden"
-                                            ></i>
-                                            <p>
-                                                任务1
-                                            </p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item edit-item">
-                                        <a class="nav-link" href="#">
-                                            <i
-                                                class="far fa-circle nav-icon hidden"
-                                            ></i>
-                                            <p>
-                                                任务2
-                                            </p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item edit-item">
-                                        <a class="nav-link" href="#">
-                                            <i
-                                                class="far fa-circle nav-icon hidden"
-                                            ></i>
-                                            <p>
-                                                任务3
-                                            </p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item edit-item">
-                                        <a class="nav-link" href="#">
-                                            <i
-                                                class="far fa-circle nav-icon hidden"
-                                            ></i>
-                                            <p>
-                                                任务4
-                                            </p>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item edit-item">
-                                        <a class="nav-link" href="#">
-                                            <i
-                                                class="far fa-circle nav-icon hidden"
-                                            ></i>
-                                            <p>
-                                                任务5
-                                            </p>
-                                        </a>
-                                    </li>
+                                <ul class="nav nav-treeview" id="recent-edit-list">
                                 </ul>
                             </li>
 
@@ -290,6 +240,40 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9.10.12/dist/sweetalert2.min.js"></script>
         <!-- Custom JS -->
         <script src="{% static 'spiderTemplate/js/base.js' %}"></script>
+        <script>
+            let recentEditList = $("#recent-edit-list");
+            if(recentEditList.find("li").length === 0) {
+                // ajax请求按最近编辑时间排序的top 5任务
+                $.ajax({
+                    url: "{% url 'get_recent_tasks' %}",
+                    type: "GET",
+                    cache: false,
+                    success: function (data) {
+                        if(data["status"] === "SUCCESS") {
+                            let tasks = data["tasks"];
+                            console.log(tasks);
+                            {#for(let i = 0; i < tasks.length; i++) {#}
+                            {#    recentEditList.append("<li class=\"nav-item edit-item\">\n" +#}
+                            {#    "<a class=\"nav-link\" href=\""+ {% url 'template_setting' 1 %} + "?taskID=" + tasks[i].pk + "\">\n" +#}
+                            {#    "                                            <i\n" +#}
+                            {#    "                                                class=\"far fa-circle nav-icon hidden\"\n" +#}
+                            {#    "                                            ></i>\n" +#}
+                            {#    "                                            <p>\n" +#}
+                            {#    "                                                " + tasks[i].name +"\n" +#}
+                            {#    "                                            </p>\n" +#}
+                            {#    "                                        </a>\n" +#}
+                            {#    "                                    </li>");#}
+                            {# } #}
+                        } else {
+                            console.log(data['message']);
+                        }
+                    },
+                    error: function (xhr) {
+                        console.log(xhr);
+                    }
+                });
+            }
+        </script>
         {% block js_extend %} {% endblock %}
     </body>
 </html>

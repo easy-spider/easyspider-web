@@ -11,8 +11,8 @@
   box-shadow: none !important;
 }
 
-#refresh-delete {
-  margin-bottom: -50px;
+.toolbar {
+    float: left;
 }
 
 #task-table tbody tr td:nth-of-type(9) {
