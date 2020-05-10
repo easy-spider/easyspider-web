@@ -36,7 +36,7 @@ class Task(models.Model):
         """
         name = name.strip()
         if not 3 <= len(name) <= 20:
-            raise ValueError('任务名长度应在3~20之间')
+            raise ValueError('任务名长度应在3~20个字符之间')
         elif self.user.task_set.filter(name=name).exists():
             raise ValueError('任务名称已存在')
         self.name = name
