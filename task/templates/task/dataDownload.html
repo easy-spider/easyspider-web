@@ -350,10 +350,11 @@
         let blob = new Blob([json], {type: "application/json"});
         let url  = URL.createObjectURL(blob);
         let btn = $("#confirm-file-type-btn");
-        $("#export-modal").on('show.bs.modal', function (e) {
+        let exportModal = $("#export-modal");
+        exportModal.on('show.bs.modal', function (e) {
             btn.off("click");
             btn.on("click", function () {
-                let way = $("#export-modal").find("input[name=export-way]:checked").next().text().trim();
+                let way = exportModal.find("input[name=export-way]:checked").next().text().trim();
                 if(way === "JSON") {
                   way = ".json";
                 } else if (way === "CSV") {
@@ -363,7 +364,7 @@
                 }
                 $.ajax({
                     {#url: "{% url 'preview_data' 1 %}?way=%s" % way,#}
-                    url: '',
+                    url: "",
                     type: "GET",
                     cache: false,
                     success: function (data) {
