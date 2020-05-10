@@ -156,32 +156,37 @@ def clear_data(request, task_pk):
     return redirect(reverse('preview_data', args=(task_pk,)))
 
 
+# def preview_data(request, task_pk):
+#     if not request.user.is_authenticated:
+#         return redirect(reverse('login'))
+#     if request.method == "POST":
+#         # 根据for参数编写不同后端逻辑
+#         return JsonResponse({"status": "SUCCESS"})
+#     # get中也包含参数，关于download的
+#     return render(request, 'task/dataDownload.html', {})
+
+
 def preview_data(request, task_pk):
     if not request.user.is_authenticated:
         return redirect(reverse('login'))
-    # task = get_object_or_404(Task, pk=task_pk)
-    # if task.user_id != request.user.id:
-    #     return HttpResponseForbidden('Not your task')
-    #
-    # client = MongoClient(settings.MONGODB_URI)
-    # db = client['{}_{}'.format(task.template.site.name, task.template.name)]
-    # documents = []
-    # for job in task.job_set.all():
-    #     if len(documents) >= 15:
-    #         break
-    #     documents.extend(db['{}_{}'.format(task.id, job.uuid)].find())
-    # client.close()
-    #
-    # template_fields = list(task.template.field_set.all())
-    # field_list = [f.display_name for f in template_fields]
-    # sample_data = [[d[f.name] for f in template_fields] for d in documents[:15]]
-    # context = {'field_list': field_list, 'sample_data': sample_data}
-    # return render(request, 'task/dataDownload.html', context)
-    if request.method == "POST":
-        # 根据for参数编写不同后端逻辑
-        return JsonResponse({"status": "SUCCESS"})
-    # get中也包含参数，关于download的
-    return render(request, 'task/dataDownload.html', {})
+    task = get_object_or_404(Task, pk=task_pk)
+    if task.user_id != request.user.id:
+        return HttpResponseForbidden('Not your task')
+
+    client = MongoClient(settings.MONGODB_URI)
+    db = client['{}_{}'.format(task.template.site.name, task.template.name)]
+    documents = []
+    for job in task.job_set.all():
+        if len(documents) >= 15:
+            break
+        documents.extend(db['{}_{}'.format(task.id, job.uuid)].find())
+    client.close()
+
+    template_fields = list(task.template.field_set.all())
+    field_list = [f.display_name for f in template_fields]
+    sample_data = [[d[f.name] for f in template_fields] for d in documents[:15]]
+    context = {'field_list': field_list, 'sample_data': sample_data}
+    return render(request, 'task/dataDownload.html', context)
 
 
 def download_data(request, task_pk):
