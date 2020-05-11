@@ -1,13 +1,26 @@
-<!DOCTYPE html>
-<html lang="zh-hans">
-<head>
-    <meta charset="UTF-8">
-    <title>管理节点</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
-</head>
-<body>
-<div class="container">
-    <h1>管理节点</h1>
+{% extends 'dashboardBase.html' %}
+{% load static %}
+
+{% block title %}EasySpider | 管理节点{% endblock %}
+
+{% block css_extend %}
+    <link rel="stylesheet" href="{% static 'easyspider/css/templateUpload.css' %}" />
+{% endblock %}
+
+{% block page_title %}管理节点{% endblock %}
+
+{% block page_link %}
+    <li class="breadcrumb-item">
+        <a href="{% url 'starter' %}">首页</a>
+    </li>
+    <li class="breadcrumb-item active">
+        管理节点
+    </li>
+{% endblock %}
+
+{% block content %}
+
+  <div class="container">
     <div class="float-right">
         <div class="btn-group">
             <button type="button" class="btn btn-outline-primary" onclick="node_push(this)">
@@ -169,8 +182,9 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"></script>
+{% endblock %}
+
+{% block js_extend %}
 <script>
     function node_disable(o) {
         const node_id = $(o).data('id');
@@ -268,5 +282,4 @@
         });
     }
 </script>
-</body>
-</html>
+{% endblock %}
