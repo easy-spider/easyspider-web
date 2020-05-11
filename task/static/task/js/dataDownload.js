@@ -22,39 +22,6 @@ const Toast = Swal.mixin({
     timer: 3000,
 });
 
-$('#clear-modal').on('show.bs.modal', function(e) {
-    let clearForm = $("#clear-form");
-    clearForm.off("submit");
-    clearForm.submit(function () {
-      let form = this;
-      $.ajax({
-        url: $(form).attr("action"),
-        type: "POST",
-        data: $(form).serialize() + "&for=clearData",
-        cache: false,
-        success: function (data) {
-          if(data["status"] === "SUCCESS") {
-            Toast.fire({
-                icon: "success",
-                title: "&nbsp;数据已清空",
-            });
-            dataTable.clear().draw();
-            $('#clear-modal').modal('hide');
-          } else {
-              Toast.fire({
-                  icon: "error",
-                  title: "&nbsp;" + data["message"],
-              });
-          }
-        },
-        error: function (xhr) {
-          console.log(xhr);
-        }
-      });
-      return false;
-    });
-});
-
 $('#data-modal').on('show.bs.modal', function(e) {
   let dtEles = $(this).find("dt");
   let rowIndex = $(e.relatedTarget).data('id');

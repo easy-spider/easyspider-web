@@ -345,6 +345,41 @@
     <!-- Custom JS -->
     <script src="{% static 'task/js/dataDownload.js' %}"></script>
     <script>
+        $('#clear-modal').on('show.bs.modal', function(e) {
+            let clearForm = $("#clear-form");
+            clearForm.off("submit");
+            clearForm.submit(function () {
+              let form = this;
+              $.ajax({
+                url: $(form).attr("action"),
+                type: "POST",
+                data: $(form).serialize(),
+                {#data: $(form).serialize() + {{ task_id }} + "&for=clearData",#}
+                cache: false,
+                success: function (data) {
+                  if(data["status"] === "SUCCESS") {
+                    Toast.fire({
+                        icon: "success",
+                        title: "&nbsp;数据已清空",
+                    });
+                    dataTable.clear().draw();
+                    $('#clear-modal').modal('hide');
+                  } else {
+                      Toast.fire({
+                          icon: "error",
+                          title: "&nbsp;" + data["message"],
+                      });
+                  }
+                },
+                error: function (xhr) {
+                  console.log(xhr);
+                }
+              });
+              return false;
+            });
+        });
+    </script>
+    <script>
         let spiderData = [{"a": 1, "b": 2, "c": 3}, {"a": 4, "b": 5, "c": 6}];
         let json = JSON.stringify(spiderData);
         let blob = new Blob([json], {type: "application/json"});

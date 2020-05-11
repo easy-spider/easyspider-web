@@ -82,20 +82,20 @@ btnEle.on("click", function () {
           }
         });
         if(isValid) {
+            let post_data = {
+              'csrfmiddlewaretoken': $(form).find("input[name=csrfmiddlewaretoken]").val(),
+              'for': 'deleteTask'
+            };
+            let taskIDs = [];
             rows_selected.each(function () {
-                let taskID = $(this).attr("id");
-                // Create a hidden element
-                $(form).append(
-                     $('<input>')
-                        .attr('type', 'hidden')
-                        .attr('name', 'id')
-                        .val(taskID)
-                );
+                let taskID = parseInt($(this).attr("id"));
+                taskIDs.push(taskID);
             });
+            post_data["ids"] = JSON.stringify(taskIDs);
             $.ajax({
               url: $(form).attr("action"),
               type: "POST",
-              data: $(form).serialize() + "&for=deleteTask",
+              data: post_data,
               cache: false,
               success: function (data) {
                   if(data["status"] === "SUCCESS") {
@@ -117,8 +117,6 @@ btnEle.on("click", function () {
                   console.log(xhr);
               }
             });
-            // Remove added elements
-            $('input[name="id"]', form).remove();
         }
         return false;
       });
@@ -155,7 +153,7 @@ $('#rename-task-modal').on('show.bs.modal', function(e) {
         $.ajax({
             url: $(form).attr("action"),
             type: "POST",
-            data: $(form).serialize() + "&id=" + taskID + "&for=renameTask",
+            data: $(form).serialize() + "&newTaskName=" + newTaskName + "&id=" + taskID + "&for=renameTask",
             cache: false,
             success: function (data) {
               if(data["status"] === "SUCCESS") {
