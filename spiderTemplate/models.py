@@ -36,6 +36,8 @@ class Template(models.Model):
     split_param = models.CharField(max_length=255)  # 用哪个参数划分任务
     update_time = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     sample_data = models.TextField()  # 示例数据（HTML格式）
+    view_times = models.IntegerField(default=0)  # 浏览次数
+    download_times = models.IntegerField(default=0)  # 关联的任务下载数据次数
 
     def __str__(self):
         return self.display_name

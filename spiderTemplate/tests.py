@@ -53,13 +53,28 @@ class ParamModelTests(TestCase):
         self.assertEqual('/pic/template/param/site1/template1/param1/', param.pic())
 
 
+def create_test_data():
+    User.objects.create_user(username='zzy', password='123456', email='zzy@example.com')
+    site_types = [SiteType.objects.create(name=t, display_name=t) for t in 'ABC']
+    for i in range(1, 11):
+        site_name = 'S{}'.format(i)
+        site = Site.objects.create(
+            name=site_name, display_name=site_name, site_type=site_types[(i - 1) % 3],
+            egg='', update_time=datetime(2020, 5, i)
+        )
+        for j in range(1, 4):
+            template_name = 'T{},{}'.format(i, j)
+            Template.objects.create(
+                site=site, name=template_name, display_name=template_name,
+                introduction='', split_param='', sample_data='', view_times=(10 - i) * 10 + j
+            )
+
+
 class StarterViewTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        User.objects.create_user(username='zzy', password='123456', email='zzy@example.com')
-        for i in range(1, 11):
-            Site.objects.create(name='S' + str(i), display_name='S' + str(i), egg='')
+        create_test_data()
 
     def test_not_login(self):
         """未登录时重定向到登录页面"""
@@ -82,14 +97,7 @@ class SitesViewTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        User.objects.create_user(username='zzy', password='123456', email='zzy@example.com')
-        site_types = [SiteType.objects.create(name=t, display_name=t) for t in 'ABC']
-        for i in range(10):
-            name = 'S' + str(i + 1)
-            Site.objects.create(
-                name=name, display_name=name, site_type=site_types[i % 3], egg='',
-                update_time=datetime(2020, 5, i + 1)
-            )
+        create_test_data()
 
     def test_not_login(self):
         """未登录时重定向到登录页面"""
@@ -100,12 +108,12 @@ class SitesViewTests(TestCase):
         """无参数跳转到该页面"""
         self.client.login(username='zzy', password='123456')
         response = self.client.get(reverse('template_first'))
-        self.assertEqual('hot', response.context['type'])
+        self.assertEqual('all', response.context['type'])
         self.assertEqual('', response.context['search'])
         self.assertEqual('hot', response.context['order'])
         self.assertEqual(
-            {'S' + str(i) for i in range(1, 9)},
-            {str(s) for s in response.context['sites']}
+            ['S{}'.format(i) for i in range(1, 11)],
+            [str(s) for s in response.context['sites']]
         )
 
     def test_search(self):
@@ -115,7 +123,7 @@ class SitesViewTests(TestCase):
         self.assertEqual('', response.context['type'])
         self.assertEqual('S1', response.context['search'])
         self.assertEqual('hot', response.context['order'])
-        self.assertEqual({'S1', 'S10'}, {str(s) for s in response.context['sites']})
+        self.assertEqual(['S1', 'S10'], [str(s) for s in response.context['sites']])
 
     def test_search_order_update_time(self):
         """按网站名称搜索，search+order参数，order=update_time"""
@@ -133,7 +141,7 @@ class SitesViewTests(TestCase):
         self.assertEqual('A', response.context['type'])
         self.assertEqual('', response.context['search'])
         self.assertEqual('hot', response.context['order'])
-        self.assertEqual({'S1', 'S4', 'S7', 'S10'}, {str(s) for s in response.context['sites']})
+        self.assertEqual(['S1', 'S4', 'S7', 'S10'], [str(s) for s in response.context['sites']])
 
     def test_type_order_update_time(self):
         """按类型筛选，type+order参数，order=update_time"""
@@ -149,16 +157,7 @@ class TemplatesViewTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        User.objects.create_user(username='zzy', password='123456', email='zzy@example.com')
-        for i in range(1, 3):
-            site_name = 'S' + str(i)
-            site = Site.objects.create(id=i, name=site_name, display_name=site_name, egg='')
-            for j in range(1, 3):
-                template_name = 'T{:d}{:d}'.format(i, j)
-                Template.objects.create(
-                    site=site, name=template_name, display_name=template_name,
-                    introduction='', split_param='', sample_data=''
-                )
+        create_test_data()
 
     def test_not_login(self):
         """未登录时重定向到登录页面"""
@@ -168,10 +167,11 @@ class TemplatesViewTests(TestCase):
     def test_ok(self):
         """正常访问"""
         self.client.login(username='zzy', password='123456')
-        response = self.client.get(reverse('template_second', args=(1,)))
+        site = Site.objects.get(name='S1')
+        response = self.client.get(reverse('template_second', args=(site.id,)))
         self.assertEqual('S1', response.context['site_name'])
         self.assertQuerysetEqual(
             response.context['template_list'],
-            ['<Template: T11>', '<Template: T12>'],
+            ['<Template: T1,3>', '<Template: T1,2>', '<Template: T1,1>'],
             ordered=False
         )
