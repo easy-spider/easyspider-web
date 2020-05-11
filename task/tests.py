@@ -1,9 +1,12 @@
 import json
+from uuid import uuid4
 
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
+from scheduler.models import Job
+from scheduler.views import JobStatus
 from spiderTemplate.models import Site, Template, Param
 from task.models import Task
 
@@ -210,37 +213,45 @@ class ChangeTaskStatusViewTests(TestCase):
     def setUpTestData(cls):
         cls.user = User.objects.create_user(username='zzy', password='123456', email='')
         template = create_test_data()
-        cls.ready_task = Task.objects.create(user=cls.user, template=template,
-                                             name='task1', status='ready')
-        cls.running_task = Task.objects.create(user=cls.user, template=template,
-                                               name='task2', status='running')
-        cls.paused_task = Task.objects.create(user=cls.user, template=template,
-                                              name='task3', status='paused')
-        cls.finished_task = Task.objects.create(user=cls.user, template=template,
-                                                name='task4', status='finished')
-        cls.canceled_task = Task.objects.create(user=cls.user, template=template,
-                                                name='task5', status='canceled')
-        user2 = User.objects.create_user(username='foo', password='123456', email='')
-        cls.other_task = Task.objects.create(user=user2, template=template, name='task6')
+        # 每种状态的任务关联的作业可能存在的状态
+        status_map = {
+            'ready': [JobStatus.CREATED, JobStatus.PENDING],
+            'running': [JobStatus.CREATED, JobStatus.PENDING, JobStatus.RUNNING,
+                        JobStatus.FINISHED],
+            'paused': [JobStatus.CREATED, JobStatus.RUNNING, JobStatus.FINISHED],
+            'finished': [JobStatus.FINISHED],
+            'canceled': [JobStatus.FINISHED]
+        }
+        for i, task_status in enumerate(status_map):
+            task = Task.objects.create(
+                user=cls.user, template=template,
+                name='task{}'.format(i + 1), status=task_status
+            )
+            for job_status in status_map[task_status]:
+                Job.objects.create(uuid=uuid4(), task=task, status=job_status)
+        cls.user2 = User.objects.create_user(username='foo', password='123456', email='')
+        Task.objects.create(user=cls.user2, template=template, name='task6')
 
     def test_not_login(self):
         """未登录时重定向到登录页面"""
+        any_task = Task.objects.all()[0]
         for view_name in ('pause_task', 'resume_task', 'cancel_task'):
-            response = self.client.get(reverse(view_name, args=(self.ready_task.id,)))
+            response = self.client.post(reverse(view_name, args=(any_task.id,)))
             self.assertRedirects(response, reverse('login'))
 
     def test_not_found(self):
         """任务id不存在"""
         self.client.login(username='zzy', password='123456')
         for view_name in ('pause_task', 'resume_task', 'cancel_task'):
-            response = self.client.get(reverse(view_name, args=(9999,)))
+            response = self.client.post(reverse(view_name, args=(9999,)))
             self.assertEqual(404, response.status_code)
 
     def test_not_your_task(self):
         """任务id不属于当前用户"""
         self.client.login(username='zzy', password='123456')
+        other_task = self.user2.task_set.get()
         for view_name in ('pause_task', 'resume_task', 'cancel_task'):
-            response = self.client.get(reverse(view_name, args=(self.other_task.id,)))
+            response = self.client.post(reverse(view_name, args=(other_task.id,)))
             self.assertEqual(403, response.status_code)
             self.assertEqual(b'Not your task', response.content)
 
@@ -248,49 +259,151 @@ class ChangeTaskStatusViewTests(TestCase):
         """操作不符合状态转移图"""
         self.client.login(username='zzy', password='123456')
 
-        for task in (self.ready_task, self.running_task):
-            response = self.client.get(reverse('resume_task', args=(task.id,)))
+        for s in ('ready', 'running'):
+            task = self.user.task_set.get(status=s)
+            response = self.client.post(reverse('resume_task', args=(task.id,)))
             self.assertEqual(403, response.status_code)
             self.assertEqual(b'Operation not allowed', response.content)
 
-        response = self.client.get(reverse('pause_task', args=(self.paused_task.id,)))
+        task = self.user.task_set.get(status='paused')
+        response = self.client.post(reverse('pause_task', args=(task.id,)))
         self.assertEqual(403, response.status_code)
         self.assertEqual(b'Operation not allowed', response.content)
 
-        for task in (self.finished_task, self.canceled_task):
+        for s in ('finished', 'canceled'):
+            task = self.user.task_set.get(status=s)
             for view_name in ('pause_task', 'resume_task', 'cancel_task'):
-                response = self.client.get(reverse(view_name, args=(task.id,)))
+                response = self.client.post(reverse(view_name, args=(task.id,)))
                 self.assertEqual(403, response.status_code)
                 self.assertEqual(b'Operation not allowed', response.content)
 
+    def test_pause(self):
+        """ready和running状态的任务可暂停，所有PENDING状态的作业改为CREATED"""
+        self.client.login(username='zzy', password='123456')
+        for s in ('ready', 'running'):
+            task = self.user.task_set.get(status=s)
+            response = self.client.post(reverse('pause_task', args=(task.id,)))
+            self.assertEqual({'status': 'SUCCESS'}, response.json())
+            task = Task.objects.get(pk=task.id)
+            self.assertEqual('paused', task.status)
+            self.assertFalse(task.job_set.filter(status=JobStatus.PENDING).exists())
 
-class TaskDataViewTests(TestCase):
+    def test_resume(self):
+        """paused状态的任务可继续，作业状态没有改变"""
+        self.client.login(username='zzy', password='123456')
+        task = self.user.task_set.get(status='paused')
+        response = self.client.post(reverse('resume_task', args=(task.id,)))
+        self.assertEqual({'status': 'SUCCESS'}, response.json())
+        task = Task.objects.get(pk=task.id)
+        self.assertEqual('running', task.status)
+
+    def test_cancel(self):
+        """ready, running和paused状态的任务可终止，所有作业状态改为FINISHED"""
+        self.client.login(username='zzy', password='123456')
+        for s in ('ready', 'running', 'paused'):
+            task = self.user.task_set.get(status=s)
+            response = self.client.post(reverse('cancel_task', args=(task.id,)))
+            self.assertEqual({'status': 'SUCCESS'}, response.json())
+            task = Task.objects.get(pk=task.id)
+            self.assertEqual('canceled', task.status)
+            self.assertFalse(task.job_set.exclude(status=JobStatus.FINISHED).exists())
+
+
+class DeleteTaskViewTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_user(username='zzy', password='123456', email='')
         template = create_test_data()
-        cls.my_task = Task.objects.create(user=cls.user, template=template, name='task1')
-        user2 = User.objects.create_user(username='foo', password='123456', email='')
-        cls.other_task = Task.objects.create(user=user2, template=template, name='task2')
+        for i, s in enumerate(Task.STATUS_CHOICES):
+            task = Task.objects.create(
+                user=cls.user, template=template,
+                name='task{}'.format(i + 1), status=s[0]
+            )
+            Job.objects.create(uuid=uuid4(), task=task)
+        cls.user2 = User.objects.create_user(username='foo', password='123456', email='')
+        Task.objects.create(user=cls.user2, template=template, name='task6')
 
     def test_not_login(self):
         """未登录时重定向到登录页面"""
-        for view_name in ('clear_data', 'preview_data', 'download_data'):
-            response = self.client.get(reverse(view_name, args=(self.my_task.id,)))
-            self.assertRedirects(response, reverse('login'))
+        any_task = Task.objects.all()[0]
+        response = self.client.post(reverse('delete_task', args=(any_task.id,)))
+        self.assertRedirects(response, reverse('login'))
 
     def test_not_found(self):
         """任务id不存在"""
         self.client.login(username='zzy', password='123456')
-        for view_name in ('clear_data', 'preview_data', 'download_data'):
-            response = self.client.get(reverse(view_name, args=(9999,)))
-            self.assertEqual(404, response.status_code)
+        response = self.client.post(reverse('delete_task', args=(9999,)))
+        self.assertEqual(404, response.status_code)
 
     def test_not_your_task(self):
         """任务id不属于当前用户"""
         self.client.login(username='zzy', password='123456')
-        for view_name in ('clear_data', 'preview_data', 'download_data'):
-            response = self.client.get(reverse(view_name, args=(self.other_task.id,)))
+        other_task = self.user2.task_set.get()
+        response = self.client.post(reverse('delete_task', args=(other_task.id,)))
+        self.assertEqual(403, response.status_code)
+        self.assertEqual(b'Not your task', response.content)
+
+    def test_operation_not_allowed(self):
+        """不是finished和canceled状态的任务不能删除"""
+        self.client.login(username='zzy', password='123456')
+
+        for s in ('ready', 'running', 'paused'):
+            task = self.user.task_set.get(status=s)
+            response = self.client.post(reverse('delete_task', args=(task.id,)))
             self.assertEqual(403, response.status_code)
-            self.assertEqual(b'Not your task', response.content)
+            self.assertEqual(b'Operation not allowed', response.content)
+
+    def test_ok(self):
+        self.client.login(username='zzy', password='123456')
+        for s in ('finished', 'canceled'):
+            task = self.user.task_set.get(status=s)
+            response = self.client.post(reverse('delete_task', args=(task.id,)))
+            self.assertEqual({'status': 'SUCCESS'}, response.json())
+            self.assertFalse(Task.objects.filter(pk=task.id).exists())
+            self.assertFalse(Job.objects.filter(task_id=task.id).exists())
+
+
+class ClearDataViewTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='zzy', password='123456', email='')
+        template = create_test_data()
+        for i, s in enumerate(Task.STATUS_CHOICES):
+            Task.objects.create(
+                user=cls.user, template=template,
+                name='task{}'.format(i + 1), status=s[0]
+            )
+        cls.user2 = User.objects.create_user(username='foo', password='123456', email='')
+        Task.objects.create(user=cls.user2, template=template, name='task6')
+
+    def test_not_login(self):
+        """未登录时重定向到登录页面"""
+        any_task = Task.objects.all()[0]
+        response = self.client.post(reverse('clear_data', args=(any_task.id,)))
+        self.assertRedirects(response, reverse('login'))
+
+    def test_not_found(self):
+        """任务id不存在"""
+        self.client.login(username='zzy', password='123456')
+        response = self.client.post(reverse('clear_data', args=(9999,)))
+        self.assertEqual(404, response.status_code)
+
+    def test_not_your_task(self):
+        """任务id不属于当前用户"""
+        self.client.login(username='zzy', password='123456')
+        other_task = self.user2.task_set.get()
+        response = self.client.post(reverse('clear_data', args=(other_task.id,)))
+        self.assertEqual(403, response.status_code)
+        self.assertEqual(b'Not your task', response.content)
+
+    def test_operation_not_allowed(self):
+        """不是finished和canceled状态的任务不能清除数据"""
+        self.client.login(username='zzy', password='123456')
+
+        for s in ('ready', 'running', 'paused'):
+            task = self.user.task_set.get(status=s)
+            response = self.client.post(reverse('clear_data', args=(task.id,)))
+            self.assertEqual(403, response.status_code)
+            self.assertEqual(b'Operation not allowed', response.content)

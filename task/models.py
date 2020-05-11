@@ -31,7 +31,7 @@ class Task(models.Model):
     def set_name(self, name):
         """设置任务名称，删除首尾空白符
 
-        验证：检查长度在3~20之间；同一个用户关联的任务名称没有重复
+        验证：检查长度在3~20个字符之间；同一个用户关联的任务名称没有重复
 
         :exception ValueError: 如果名称长度不在规定的范围内；或同任务名称已存在
         """
@@ -74,3 +74,7 @@ class Task(models.Model):
     def progress(self):
         """以字符串形式返回完成进度百分比（如"70%"）"""
         return '{:.0%}'.format(self.job_set.filter(status=3).count() / self.job_set.count())
+
+    def duration(self):
+        """以字符串形式返回运行耗时，未完成的返回空字符串"""
+        return str(self.finish_time - self.create_time) if self.finish_time else ''
