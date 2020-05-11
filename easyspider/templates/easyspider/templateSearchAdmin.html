@@ -45,39 +45,39 @@
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>名称</th>
-                            <th>介绍</th>
+                            <th>英文名称</th>
+                            <th>中文名称</th>
+                            <th>所属网站</th>
+                            <th>修改日期</th>
                             <th></th>
                             <th></th>
                         </tr>
                         </thead>
                         <tbody>
-
                         {% for template in template_list %}
+                            <tr>
+                                <td>{{template.id}}</td>
+                                <td>{{template.name}}</td>
+                                <td>{{template.display_name}}</td>
+                                <td>{{template.site}}</td>
+                                <td>{{template.update_time}}</td>
+                                <td>
+                                    {% if not template.task_set.exists %}
+                                        <button class="btn btn-block btn-primary" type="button">修改</button>
+                                    {% elif template.task_set.exists %}
+                                        <button class="btn btn-block btn-primary disabled" type="button">修改</button>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if not template.task_set.exists %}
+                                        <button class="btn btn-block btn-danger" type="button">删除</button>
+                                    {% elif template.task_set.exists %}
+                                        <button class="btn btn-block btn-danger disabled" type="button">删除</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
 
                         {% endfor %}
-                        <tr>
-                            <td>5</td>
-                            <td>豆瓣热门电影</td>
-                            <td>此模板用于采集豆瓣电影类目下的热门电影信息</td>
-                            <td>
-                                <button class="btn btn-primary" type="button">修改</button>
-                            </td>
-                            <td>
-                                <button class="btn btn-danger" type="button">删除</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>6</td>
-                            <td>豆瓣图书</td>
-                            <td>此模板用于采集豆瓣图书类目下的图书信息</td>
-                            <td>
-                                 <button class="btn btn-primary" type="button">修改</button>
-                            </td>
-                            <td>
-                                <button class="btn btn-danger" type="button">删除</button>
-                            </td>
-                        </tr>
                         </tbody>
                     </table>
                     </div>
