@@ -34,65 +34,67 @@
                 </ul>
                 </div><!-- /.card-header -->
                 <div class="card-body">
-                <form>
+                <form action="{% url 'create_template' %}" method="post" onsubmit="return validate();">
                 <div class="tab-content">
                     <div class="active tab-pane" id="activity">
-                        <form class="form-horizontal">
                         <div class="form-group row">
-                            <label for="inputName" class="col-sm-2 col-form-label">模板英文名称</label>
+                            <label for="inputName" class="col-sm-2 col-form-label">所属网站</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="inputName" placeholder="模板英文名称">
+                                <select class="custom-select" name="site_name">
+                                    {% for site in site_list %}
+                                        <option value="{{site.name}}">{{site.display_name}}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
                         <div class="form-group row">
-                        <label for="inputName" class="col-sm-2 col-form-label">模板中文名称</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputName" placeholder="模板中文名称">
-                        </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="inputName" class="col-sm-2 col-form-label">模板类型</label>
+                            <label for="inputName" class="col-sm-2 col-form-label">英文名称</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="inputName" placeholder="模板类型">
+                                <input type="text" class="form-control"  placeholder="对应Spider名字" name="name">
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="inputExperience" class="col-sm-2 col-form-label">模板介绍</label>
+                            <label for="inputName" class="col-sm-2 col-form-label">中文名称</label>
                             <div class="col-sm-10">
-                                <textarea class="form-control" id="inputExperience" placeholder="模板介绍"></textarea>
+                                <input type="text" class="form-control" placeholder="展示的名字" name="display_name">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputExperience" class="col-sm-2 col-form-label">模板简介</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" placeholder="HTML格式"></textarea>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label for="inputExperience" class="col-sm-2 col-form-label">示例数据</label>
                             <div class="col-sm-10">
-                                <textarea class="form-control" id="inputExperience" placeholder="示例数据"></textarea>
+                                <textarea class="form-control" id="inputExperience" placeholder="HTML格式"></textarea>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="inputName" class="col-sm-2 col-form-label">split_param</label>
+                            <label for="inputName" class="col-sm-2 col-form-label">划分参数</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="inputName" placeholder="split_param">
+                                <input type="text" class="form-control" id="inputName" placeholder="用哪个参数划分任务（应为数字类型）">
                             </div>
                         </div>
                         <div class="form-group row">
-                          <label for="inputExperience" class="col-sm-2 col-form-label">上传爬虫图片</label>
+                          <label for="inputExperience" class="col-sm-2 col-form-label">模板图标</label>
                           <div class="col-sm-10">
                             <div class="custom-file">
                                 <div class="input-group-append">
                                     <input type="file" class="custom-file-input" id="file-1" onchange="handleFile1()">
                                     <div class="input-group-text menu">预览图片<img src="" height="400" id='img-1'></div>
                                 </div>
-                                <label class="custom-file-label" for="exampleInputFile" id='fileName-1'>添加图片</label>
+                                <label class="custom-file-label"  id='fileName-1'>jpg文件</label>
                             </div>
                           </div>
                         </div>
                         <div class="form-group row">
-                          <label for="inputExperience" class="col-sm-2 col-form-label">上传egg</label>
+                          <label for="inputExperience" class="col-sm-2 col-form-label">egg文件</label>
                           <div class="col-sm-10">
                             <div class="custom-file">
                               <input type="file" class="custom-file-input" id="file-2" onchange="handleFile2()">
-                              <label class= "custom-file-label" for="exampleInputFile" id='fileName-2'>选择文件</label>
+                              <label class= "custom-file-label" id='fileName-2'>选择文件</label>
                             </div>
                           </div>
                         </div>
@@ -101,12 +103,11 @@
                                 <button type="submit" class="btn btn-danger">上传模板</button>
                             </div>
                         </div>
-                    </form>
                     <!-- /.card -->
                     </div>
                     <div class="tab-pane" id="settings"><div class="card-body">
                         <button class='btn btn-success' type="button" onclick="add1()">新增采集字段</button>
-                        <table id="example2" class="table table-bordered table-hover">
+                        <table  class="table table-bordered table-hover">
                           <thead>
                           <tr>
                             <th>字段英文名称</th>
@@ -125,7 +126,7 @@
                         <div class="card-body">
                         <button class='btn btn-success' type="button" onclick="add2()">新增模板参数</button>
 
-                        <table id="example2" class="table table-bordered table-hover">
+                        <table  class="table table-bordered table-hover">
                           <thead>
                           <tr>
                             <th>参数英文名称</th>
@@ -158,18 +159,19 @@
     <script src="{% static 'easyspider/js/templateUpload.js' %}"></script>
     <script src="{% static 'easyspider/js/bs-custom-file-input.min.js' %}"></script>
     <script>
-                var fileInput = document.getElementById('file-1'),
-                previewImg = document.getElementById('img-1');
-                fileInput.addEventListener('change', function () {
-                var file = this.files[0];
-                var reader = new FileReader();
-                // 监听reader对象的的onload事件，当图片加载完成时，把base64编码賦值给预览图片
-                reader.addEventListener("load", function () {
-                    previewImg.src = reader.result;
-                }, false);
-                // 调用reader.readAsDataURL()方法，把图片转成base64
-                reader.readAsDataURL(file);
+        var fileInput = document.getElementById('file-1'),
+        previewImg = document.getElementById('img-1');
+        fileInput.addEventListener(
+            'change', function () {
+            var file = this.files[0];
+            var reader = new FileReader();
+            // 监听reader对象的的onload事件，当图片加载完成时，把base64编码賦值给预览图片
+            reader.addEventListener("load", function () {
+                previewImg.src = reader.result;
             }, false);
-        </script>
+            // 调用reader.readAsDataURL()方法，把图片转成base64
+            reader.readAsDataURL(file);}, false
+        );
+    </script>
 {% endblock %}
 
