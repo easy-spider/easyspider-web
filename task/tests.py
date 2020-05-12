@@ -259,34 +259,28 @@ class ChangeTaskStatusViewTests(TestCase):
         """操作不符合状态转移图"""
         self.client.login(username='zzy', password='123456')
 
-        for s in ('ready', 'running'):
-            task = self.user.task_set.get(status=s)
-            response = self.client.post(reverse('resume_task', args=(task.id,)))
-            self.assertEqual(403, response.status_code)
-            self.assertEqual(b'Operation not allowed', response.content)
-
-        task = self.user.task_set.get(status='paused')
-        response = self.client.post(reverse('pause_task', args=(task.id,)))
-        self.assertEqual(403, response.status_code)
-        self.assertEqual(b'Operation not allowed', response.content)
-
-        for s in ('finished', 'canceled'):
-            task = self.user.task_set.get(status=s)
-            for view_name in ('pause_task', 'resume_task', 'cancel_task'):
+        # {view_name: [allowed_status]}
+        status_map = {
+            'pause_task': ['ready', 'paused', 'finished', 'canceled'],
+            'resume_task': ['ready', 'running', 'finished', 'canceled'],
+            'cancel_task': ['finished', 'canceled']
+        }
+        for view_name in status_map:
+            for s in status_map[view_name]:
+                task = self.user.task_set.get(status=s)
                 response = self.client.post(reverse(view_name, args=(task.id,)))
                 self.assertEqual(403, response.status_code)
                 self.assertEqual(b'Operation not allowed', response.content)
 
     def test_pause(self):
-        """ready和running状态的任务可暂停，所有PENDING状态的作业改为CREATED"""
+        """running状态的任务可暂停，所有PENDING状态的作业改为CREATED"""
         self.client.login(username='zzy', password='123456')
-        for s in ('ready', 'running'):
-            task = self.user.task_set.get(status=s)
-            response = self.client.post(reverse('pause_task', args=(task.id,)))
-            self.assertEqual({'status': 'SUCCESS'}, response.json())
-            task = Task.objects.get(pk=task.id)
-            self.assertEqual('paused', task.status)
-            self.assertFalse(task.job_set.filter(status=JobStatus.PENDING).exists())
+        task = self.user.task_set.get(status='running')
+        response = self.client.post(reverse('pause_task', args=(task.id,)))
+        self.assertEqual({'status': 'SUCCESS'}, response.json())
+        task = Task.objects.get(pk=task.id)
+        self.assertEqual('paused', task.status)
+        self.assertFalse(task.job_set.filter(status=JobStatus.PENDING).exists())
 
     def test_resume(self):
         """paused状态的任务可继续，作业状态没有改变"""
