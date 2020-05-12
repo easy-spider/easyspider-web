@@ -122,6 +122,7 @@ $('#cancel-task-modal').on('show.bs.modal', function(e) {
     let cancelTaskForm = $("#cancel-task-form");
     cancelTaskForm.off("submit");
     cancelTaskForm.submit(function () {
+        console.log($(this).serialize());
         $.ajax({
             url: $(this).attr("action").split("/").slice(0,-2).concat(taskID).join("/") + "/",
             type: "POST",

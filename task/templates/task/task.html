@@ -73,9 +73,6 @@
                             </td>
                             <td class="{{ task.status }}">
                               {% if task.status == 'ready' %}
-                                  <a href="" data-toggle="modal" data-target="" data-id="{{ task.pk }}">
-                                    <i class="far fa-pause-circle hidden"></i>
-                                  </a>
                                   <a
                                         data-id="{{ task.pk }}"
                                         href="#cancel-task-modal"
@@ -478,64 +475,36 @@
             } else if(ele.hasClass("fa-play-circle")) {
                 let statusText = status.text().trim();
                 if(statusText !== "已完成" && statusText !== "已终止") {
-                    // 进度条为0则置为等待运行，否则置为运行中
+                    // 置为运行中
                     let progress = parent.nextAll("td").eq(4).find(".progress").attr("title");
                     ele.attr("class", "far fa-pause-circle hidden");
                     parent.removeClass();
                     status.removeClass();
-                    if(progress === "0%") {
-                        parent.addClass("ready");
-                        status.addClass("ready");
-                        status.html("等待运行");
-                        $.ajax({
-                            url: "",
-                            type: "POST",
-                            data: post_data,
-                            cache: false,
-                            success: function (data) {
-                              if(data["status"] === "SUCCESS") {
-                                  Toast.fire({
-                                      icon: "success",
-                                      title: "&nbsp;任务正在排队",
-                                  });
-                              } else {
-                                  Toast.fire({
-                                      icon: "error",
-                                      title: "&nbsp;" + data["message"],
-                                  });
-                              }
-                            },
-                            error: function (xhr) {
-                              console.log(xhr);
-                            }
-                        });
-                    } else {
-                        parent.addClass("running");
-                        status.addClass("running");
-                        status.html("运行中");
-                        $.ajax({
-                            url: '',
-                            type: "POST",
-                            data: post_data,
-                            cache: false,
-                            success: function (data) {
-                              if(data["status"] === "SUCCESS") {
-                                  Toast.fire({
-                                      icon: "success",
-                                      title: "&nbsp;任务将从暂停位置开始继续运行",
-                                  });
-                              } else {
-                                  Toast.fire({
-                                      icon: "error",
-                                      title: "&nbsp;" + data["message"],
-                                  });
-                              }
-                            },
-                            error: function (xhr) {
-                              console.log(xhr);
-                            }
-                        });
-                    }
+                    parent.addClass("running");
+                    status.addClass("running");
+                    status.html("运行中");
+                    $.ajax({
+                        url: '{% url "resume_task" 1 %}'.split("/").slice(0, -2).concat(taskID).join("/") + "/",
+                        type: "POST",
+                        data: post_data,
+                        cache: false,
+                        success: function (data) {
+                          if(data["status"] === "SUCCESS") {
+                              Toast.fire({
+                                  icon: "success",
+                                  title: "&nbsp;任务将从暂停位置开始继续运行",
+                              });
+                          } else {
+                              Toast.fire({
+                                  icon: "error",
+                                  title: "&nbsp;" + data["message"],
+                              });
+                          }
+                        },
+                        error: function (xhr) {
+                          console.log(xhr);
+                        }
+                    });
                 }
             }
             taskTable.columns.adjust().draw();
