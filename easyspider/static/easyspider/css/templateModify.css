@@ -1,3 +1,6 @@
+.col-sm-10{
+    padding-top: calc(.375rem + 1px);
+}
 .custom-file-label::after{
     content:"浏览"!important;
 }
@@ -19,11 +22,14 @@
 .menu:hover img
 {
     display:block;
-    position: absolute; 
-    right: 50px; 
-    top: 50px;
+    position: absolute;
+    right: 120px;
     z-index: 3;
 }
 .input-group-text{
     width: 110px!important;
 }
+.form-group {
+    margin-bottom: 0.5rem!important;
+}
+
