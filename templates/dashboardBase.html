@@ -129,8 +129,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     </p>
                                 </a>
                             </li>
-                            <li class="nav-item has-treeview">
+                            <li class="nav-item has-treeview" id="recent-edit-li">
+                                <script>
+                                    (function () {
+                                      if (Boolean(sessionStorage.getItem('recent-edit-open'))) {
+                                        let li = document.getElementById("recent-edit-li");
+                                        li.className = li.className + ' menu-open';
+                                      }
+                                    })();
+                                </script>
                                 <a
+                                    id="recent-edit-link"
                                     href="#"
                                     class="nav-link"
                                 >
@@ -248,6 +257,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <!-- SweetAlert2 -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9.10.12/dist/sweetalert2.min.js"></script>
         <!-- Custom JS -->
+        <script>
+            $('#recent-edit-link').click(function(event) {
+              event.preventDefault();
+              if (Boolean(sessionStorage.getItem('recent-edit-open'))) {
+                sessionStorage.setItem('recent-edit-open', '');
+              } else {
+                sessionStorage.setItem('recent-edit-open', '1');
+              }
+            });
+        </script>
         <script src="{% static 'spiderTemplate/js/base.js' %}"></script>
         <script>
             let recentEditList = $("#recent-edit-list");
@@ -260,19 +279,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     success: function (data) {
                         if(data["status"] === "SUCCESS") {
                             let tasks = data["tasks"];
-                            console.log(tasks);
-                            {#for(let i = 0; i < tasks.length; i++) {#}
-                            {#    recentEditList.append("<li class=\"nav-item edit-item\">\n" +#}
-                            {#    "<a class=\"nav-link\" href=\""+ {% url 'template_setting' 1 %} + "?taskID=" + tasks[i].pk + "\">\n" +#}
-                            {#    "                                            <i\n" +#}
-                            {#    "                                                class=\"far fa-circle nav-icon hidden\"\n" +#}
-                            {#    "                                            ></i>\n" +#}
-                            {#    "                                            <p>\n" +#}
-                            {#    "                                                " + tasks[i].name +"\n" +#}
-                            {#    "                                            </p>\n" +#}
-                            {#    "                                        </a>\n" +#}
-                            {#    "                                    </li>");#}
-                            {# } #}
+                            for(let i = 0; i < tasks.length; i++) {
+                                let taskID = tasks[i].id;
+                                recentEditList.append("<li class=\"nav-item edit-item\">\n" +
+                                "<a class=\"nav-link\" href=\""+ {% url 'template_setting' 1 %} + "?taskID=" + taskID + "\">\n" +
+                                "                                            <i\n" +
+                                "                                                class=\"far fa-circle nav-icon hidden\"\n" +
+                                "                                            ></i>\n" +
+                                "                                            <p>\n" +
+                                "                                                " + tasks[i].name +"\n" +
+                                "                                            </p>\n" +
+                                "                                        </a>\n" +
+                                "                                    </li>");
+                             }
                         } else {
                             console.log(data['message']);
                         }

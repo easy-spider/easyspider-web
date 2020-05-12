@@ -29,11 +29,11 @@
                 <ul class="nav nav-pills p-2" id="template-type">
                     <li class="nav-item">
                         <a class="nav-link
-                            {% if type == 'hot' %}
+                            {% if type == 'all' %}
                                 active
                             {% endif %}"
-                           href="{% url 'template_first' %}?type=hot&order={{ order }}">
-                            热门
+                           href="{% url 'template_first' %}?type=all&order={{ order }}">
+                            全部
                         </a>
                     </li>
                     {% for site_type in site_types %}

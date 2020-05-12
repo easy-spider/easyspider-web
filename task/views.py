@@ -50,7 +50,11 @@ def create_task(request, template_pk):
         for i in range(split_arg):
             task_arg[template.split_param] = i + 1
             Job.objects.create(uuid=uuid.uuid4(), task=task, args=json.dumps(task_arg))
-        return JsonResponse({'status': 'SUCCESS'})
+        recent_tasks = Task.objects.order_by('-create_time')[:5]
+        return JsonResponse({
+            'status': 'SUCCESS',
+            'tasks': [{'id': t.id, 'name': t.name} for t in recent_tasks]
+        })
 
 
 def restart_task(request, task_pk):
@@ -230,7 +234,7 @@ def preview_data(request, task_pk):
     field_list = [f.display_name for f in template_fields]
     sample_data = [[d[f.name] for f in template_fields] for d in documents[:15]]
     context = {
-        'task_id': task.id, 'field_list': field_list,
+        'task': task, 'field_list': field_list,
         'sample_data': sample_data, 'full_data': documents
     }
     return render(request, 'task/dataDownload.html', context)
