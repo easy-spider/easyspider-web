@@ -1,10 +1,12 @@
-from enum import IntEnum, Enum
+from enum import IntEnum
 
 from django.forms import model_to_dict
 from django.http import HttpResponseForbidden, JsonResponse, HttpResponse, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404, get_list_or_404
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from scheduler.models import Node, Job
+from task import consumers
 from task.models import Task
 
 
@@ -96,18 +98,32 @@ def set_job_status(request, job_id, status):
         if task.status == 'ready':
             task.status = 'running'
             task.save()
+            consumers.send_group_msg(task.user_id, task.id, {
+                'progress': task.progress(),
+                'status': task.status,
+                'status_display_name': task.display_status()
+            })
     elif status == JobStatus.FINISHED:
         # check other jobs with the same task
-        other_jobs = get_list_or_404(Job, task_id=task.id)
-        all_finished = True
-        for j in other_jobs:
-            if j.status != JobStatus.FINISHED:
-                all_finished = False
-                break
+        unfinished = task.job_set.exclude(status=JobStatus.FINISHED).exists()
         # if all finished, mark the task finished
-        if all_finished:
+        if not unfinished:
             task.status = 'finished'
+            task.finish_time = timezone.now()
             task.save()
+            consumers.send_group_msg(task.user_id, task.id, {
+                'progress': task.progress(),
+                'status': task.status,
+                'status_display_name': task.display_status(),
+                'finish_time': task.finish_time.strftime('%y/%m/%d %H:%M'),
+                'duration': task.duration()
+            })
+        else:
+            consumers.send_group_msg(task.user_id, task.id, {
+                'progress': task.progress(),
+                'status': task.status,
+                'status_display_name': task.display_status()
+            })
     return HttpResponse(status=204)
 
 
