@@ -229,7 +229,7 @@ class RenameTaskViewTests(TestCase):
         self.client.login(username='foo', password='123456')
         data = {'inputTaskName': ' foo_task3\t\r\n'}
         response = self.client.post(reverse('rename_task', args=(self.foo_task.id,)), data)
-        self.assertEqual({'status': 'SUCCESS'}, response.json())
+        self.assertEqual('SUCCESS', response.json()['status'])
         self.assertEqual('foo_task3', Task.objects.get(pk=self.foo_task.id).name)
 
 
@@ -379,7 +379,7 @@ class DeleteTaskViewTests(TestCase):
         for s in ('finished', 'canceled'):
             task = self.user.task_set.get(status=s)
             response = self.client.post(reverse('delete_task', args=(task.id,)))
-            self.assertEqual({'status': 'SUCCESS'}, response.json())
+            self.assertEqual('SUCCESS', response.json()['status'])
             self.assertFalse(Task.objects.filter(pk=task.id).exists())
             self.assertFalse(Job.objects.filter(task_id=task.id).exists())
 
