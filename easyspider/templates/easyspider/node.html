@@ -58,7 +58,10 @@
                         <td>在线</td>
                         <td>
                             <div class="btn-group btn-group-sm" role="group">
-                                <button type="button" class="btn btn-danger" onclick="node_disable(this)"
+                                <button type="button" class="btn btn-primary" onclick="node_inspect(this)"
+                                        data-id="{{ node.id }}">检视
+                                </button>
+                                <button type="button" class="btn btn-warning" onclick="node_disable(this)"
                                         data-id="{{ node.id }}">禁用
                                 </button>
                                 <button type="button" class="btn btn-secondary" onclick="node_modify(this)"
@@ -67,6 +70,9 @@
                                         data-port="{{ node.port }}"
                                         data-username="{{ node.username }}"
                                         data-password="{{ node.password }}">编辑
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="node_delete(this)"
+                                        data-id="{{ node.id }}">删除
                                 </button>
                             </div>
                         </td>
@@ -84,12 +90,18 @@
                                         data-username="{{ node.username }}"
                                         data-password="{{ node.password }}">编辑
                                 </button>
+                                <button type="button" class="btn btn-danger" onclick="node_delete(this)"
+                                        data-id="{{ node.id }}">删除
+                                </button>
                             </div>
                         </td>
                     {% elif node.status == 2 %}
                         <td>禁用</td>
                         <td>
                             <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-primary" onclick="node_inspect(this)"
+                                        data-id="{{ node.id }}">检视
+                                </button>
                                 <button type="button" class="btn btn-success" onclick="node_enable(this)"
                                         data-id="{{ node.id }}">启用
                                 </button>
@@ -99,6 +111,9 @@
                                         data-port="{{ node.port }}"
                                         data-username="{{ node.username }}"
                                         data-password="{{ node.password }}">编辑
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="node_delete(this)"
+                                        data-id="{{ node.id }}">删除
                                 </button>
                             </div>
                         </td>
@@ -230,6 +245,7 @@
             data: form.serialize(),
             success: function (data) {
                 alert("修改节点成功");
+                form[0].reset();
                 window.location.reload();
             },
             error: function () {
@@ -281,5 +297,49 @@
             }
         });
     }
+
+    function node_delete(o) {
+        $(o).attr("disabled", "disabled");
+        let node_id = $(o).data("id");
+        $.ajax({
+            url: "../delete/" + node_id + "/",
+            method: "GET",
+            success: function (data) {
+                alert("删除成功");
+                window.location.reload();
+            },
+            error: function () {
+                alert("删除失败");
+            },
+            complete: function () {
+                $(o).removeAttr("disabled");
+            }
+        });
+    }
+
+    function node_inspect(o) {
+        $(o).attr("disabled", "disabled");
+        let node_id = $(o).data("id");
+        $.ajax({
+            url: "../inspect/" + node_id + "/",
+            method: "GET",
+            success: function (data) {
+                let message = "节点主机名：" + data.node_name +
+                        "\n状态：" + data.status +
+                        "\n等待运行任务：" + data.pending +
+                        "\n正在运行任务：" + data.running +
+                        "\n完成运行任务：" + data.finished;
+                alert(message);
+            },
+            error: function () {
+                alert("检视失败");
+                window.location.reload();
+            },
+            complete: function () {
+                $(o).removeAttr("disabled");
+            }
+        });
+    }
+
 </script>
 {% endblock %}
