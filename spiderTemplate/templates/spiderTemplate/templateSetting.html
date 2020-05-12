@@ -37,8 +37,8 @@
             id="arguments-card"
         >
             <!-- form start -->
-            <form role="form" action="{% if task %}
-                                        {% url 'restart_task' task.pk %}
+            <form role="form" action="{% if template_setting_task %}
+                                        {% url 'restart_task' template_setting_task.pk %}
                                       {% else %}
                                         {% url 'create_task' template.pk %}
                                       {% endif %}" method="post" id="setting-form">
@@ -54,7 +54,7 @@
                             class="form-control"
                             placeholder="请输入任务名"
                             name="inputTaskName"
-                            value="{% if task %}{{ task.name }}{% endif %}"
+                            value="{% if template_setting_task %}{{ template_setting_task.name }}{% endif %}"
                             required
                         />
                     </div>
@@ -71,7 +71,7 @@
                                     class="form-control"
                                     placeholder="请输入{{ param.display_name }}"
                                     name="{{ param.name }}"
-                                    value="{% if task %}{{ task.args_dict|get_dict_value:param.name }}{% endif %}"
+                                    value="{% if template_setting_task %}{{ template_setting_task.args_dict|get_dict_value:param.name }}{% endif %}"
                                     required
                                 />
                             {% else %}
@@ -81,7 +81,7 @@
                                     placeholder="请输入{{ param.display_name }}"
                                     name="{{ param.name }}"
                                     required
-                                >{{ task.args_dict|get_dict_value:param.name }}</textarea>
+                                >{{ template_setting_task.args_dict|get_dict_value:param.name }}</textarea>
                             {% endif %}
                     {% endfor %}
                     </div>
@@ -102,20 +102,6 @@
 {% endblock %}
 
 {% block js_extend %}
-    <script>
-        // set active for task
-        {% if task %}
-            recentEditList.find("li a").each(function () {
-                let href = $(this).attr("href");
-                let taskID = +href.slice(href.lastIndexOf("=") + 1);
-                    if(taskID === {{ task.pk }}) {
-                        $(this).parents("#recent-edit-list").prev("a").addClass("active");
-                        $(this).addClass("active");
-                        return false;
-                    }
-            });
-        {% endif %}
-    </script>
     <script src="{% static 'spiderTemplate/js/templateSetting.js' %}"></script>
     <script>
         $("#setting-form").submit(function () {
@@ -153,8 +139,8 @@
             });
 
             // 任务状态验证
-            {% if task %}
-                {% if task.status != 'finished' and task.status != 'canceled' %}
+            {% if template_setting_task %}
+                {% if template_setting_task.status != 'finished' and template_setting_task.status != 'canceled' %}
                     Toast.fire({
                         icon: "error",
                         title: "&nbsp;非已完成或已终止的任务无法重新启动",
@@ -175,8 +161,42 @@
                         });
                         // get top 5 tasks
                         let tasks = data["tasks"];
-                         console.log(tasks);
-                        sessionStorage.setItem('recent-edit-update', tasks);
+                        if (tasks) {
+                            let recentEditList = $("#recent-edit-list");
+                            $("#recent-edit-link").addClass("active");
+                            // remove cur tasks
+                            recentEditList.empty();
+                            // 重新填充 这里将第一个任务置为active即可
+                            for(let i = 0; i < tasks.length; i++) {
+                                let taskID = tasks[i]['id'];
+                                let templateID = tasks[i]['template_id'];
+                                let url = "{% url 'template_setting' 1 %}".split("/").slice(0, -2).concat(templateID).join("/") + "/";
+                                if(i === 0) {
+                                    recentEditList.append("<li class=\"nav-item edit-item\">\n" +
+                                    "<a class=\"nav-link active\" href=\""+ url + "?taskID=" + taskID + "\">\n" +
+                                    "                                            <i\n" +
+                                    "                                                class=\"far fa-circle nav-icon hidden\"\n" +
+                                    "                                            ></i>\n" +
+                                    "                                            <p>\n" +
+                                    "                                                " + tasks[i]['name'] +"\n" +
+                                    "                                            </p>\n" +
+                                    "                                        </a>\n" +
+                                    "                                    </li>");
+                                } else {
+                                    recentEditList.append("<li class=\"nav-item edit-item\">\n" +
+                                    "<a class=\"nav-link\" href=\""+ url + "?taskID=" + taskID + "\">\n" +
+                                    "                                            <i\n" +
+                                    "                                                class=\"far fa-circle nav-icon hidden\"\n" +
+                                    "                                            ></i>\n" +
+                                    "                                            <p>\n" +
+                                    "                                                " + tasks[i]['name'] +"\n" +
+                                    "                                            </p>\n" +
+                                    "                                        </a>\n" +
+                                    "                                    </li>");
+                                }
+                             }
+                            sessionStorage.setItem('recent-edit-update', JSON.stringify(tasks));
+                        }
                     } else {
                         Toast.fire({
                             icon: "error",

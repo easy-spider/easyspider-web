@@ -22,3 +22,7 @@
 #export-modal .btn-primary {
   color: #fff !important;
 }
+
+#data-table td {
+  vertical-align: middle !important;
+}
