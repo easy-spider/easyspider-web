@@ -443,7 +443,6 @@
             let parent = $(this).parent("td");
             let status = parent.prev("td");
             let taskID = $(this).attr("data-id");
-            let taskIDNum = parseInt(taskID);
             let post_data = {
                 'csrfmiddlewaretoken': '{{ csrf_token }}'
             };
@@ -455,7 +454,7 @@
                 status.addClass("paused");
                 status.html("已暂停");
                 $.ajax({
-                    url: "{% url 'pause_task' taskIDNum %}",
+                    url: "{% url 'pause_task' 1 %}".split("/").slice(0,-2).concat(taskID).join("/") + "/",
                     type: "POST",
                     data: post_data,
                     cache: false,

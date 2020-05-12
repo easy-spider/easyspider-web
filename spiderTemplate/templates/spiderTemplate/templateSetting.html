@@ -71,7 +71,7 @@
                                     class="form-control"
                                     placeholder="请输入{{ param.display_name }}"
                                     name="{{ param.name }}"
-                                    value="{% if task %}{{ task.args_dict | get_dict_value: param.name }}{% endif %}"
+                                    value="{% if task %}{{ task.args_dict|get_dict_value:param.name }}{% endif %}"
                                     required
                                 />
                             {% else %}
@@ -81,7 +81,7 @@
                                     placeholder="请输入{{ param.display_name }}"
                                     name="{{ param.name }}"
                                     required
-                                >{{ task.args_dict | get_dict_value: param.name }}</textarea>
+                                >{{ task.args_dict|get_dict_value:param.name }}</textarea>
                             {% endif %}
                     {% endfor %}
                     </div>
@@ -183,7 +183,7 @@
                             let taskID = tasks[i].id;
                             if(i === 0) {
                                 recentEditList.append("<li class=\"nav-item edit-item\">\n" +
-                                "<a class=\"nav-link active\" href=\""+ {% url 'template_setting' taskID %} + "?taskID=" + taskID + "\">\n" +
+                                "<a class=\"nav-link active\" href=\""+ {% url 'template_setting' 1 %} + "?taskID=" + taskID + "\">\n" +
                                 "                                            <i\n" +
                                 "                                                class=\"far fa-circle nav-icon hidden\"\n" +
                                 "                                            ></i>\n" +
@@ -194,7 +194,7 @@
                                 "                                    </li>");
                             } else {
                                 recentEditList.append("<li class=\"nav-item edit-item\">\n" +
-                                "<a class=\"nav-link\" href=\""+ {% url 'template_setting' taskID %} + "?taskID=" + taskID + "\">\n" +
+                                "<a class=\"nav-link\" href=\""+ {% url 'template_setting' 1 %} + "?taskID=" + taskID + "\">\n" +
                                 "                                            <i\n" +
                                 "                                                class=\"far fa-circle nav-icon hidden\"\n" +
                                 "                                            ></i>\n" +
