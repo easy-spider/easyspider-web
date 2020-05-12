@@ -34,7 +34,7 @@
                 </ul>
                 </div><!-- /.card-header -->
                 <div class="card-body">
-                <form action="{% url 'create_template' %}" method="post" onsubmit="return validate();">
+                <form onsubmit="return validate();">
                 <div class="tab-content">
                     <div class="active tab-pane" id="activity">
                         <div class="form-group row">
@@ -131,8 +131,11 @@
                           <tr>
                             <th>参数英文名称</th>
                             <th>参数中文名称</th>
-                            <th>输入标签</th>
-                            <th>参数类型</th>
+                            <th>input_label</th>
+                            <th>input_type</th>
+                            <th>最小值</th>
+                            <th>最大值</th>
+                            <th>长度</th>
                             <th>预览截图</th>
                             <th>操作</th>
                           </tr>
