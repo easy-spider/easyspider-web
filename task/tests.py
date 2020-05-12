@@ -118,7 +118,7 @@ class CreateTaskViewTests(TestCase):
         self.client.login(username='zzy', password='123456')
         data = {'inputTaskName': 'task1', 'p1': 'abc', 'p2': '18'}
         response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
-        self.assertEqual({'status': 'SUCCESS'}, response.json())
+        self.assertEqual('SUCCESS', response.json()['status'])
 
         task = Task.objects.filter(user=self.user, template=self.template).first()
         self.assertEqual('task1', task.name)

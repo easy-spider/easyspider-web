@@ -73,7 +73,10 @@ class Task(models.Model):
 
     def progress(self):
         """以字符串形式返回完成进度百分比（如"70%"）"""
-        return '{:.0%}'.format(self.job_set.filter(status=3).count() / self.job_set.count())
+        if self.job_set.exists():
+            return '{:.0%}'.format(self.job_set.filter(status=3).count() / self.job_set.count())
+        else:
+            return '0%'
 
     def duration(self):
         """以字符串形式返回运行耗时，未完成的返回空字符串"""
