@@ -45,6 +45,9 @@ class Template(models.Model):
     def logo(self):
         return reverse('pic:template-logo', args=(self.site.name, self.name))
 
+    def can_delete(self):
+        return self.task_set.exclude(status__in=['finished', 'canceled']).exists()
+
 
 class Field(models.Model):
     """采集字段实体类"""

@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 from enum import IntEnum
@@ -8,10 +9,15 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
+from pymongo import MongoClient
+from pymongo.errors import PyMongoError
 
+from EasySpiderWeb import settings
 from pic.views import save_pic
 from scheduler.models import Node
 from spiderTemplate.models import Site, Template, Field, Param
+
+logger = logging.getLogger('easyspider_view')
 
 
 class NodeStatus(IntEnum):
@@ -215,3 +221,50 @@ def create_template(request):
             'error_message': e.args[0]
         }
         return render(request, 'easyspider/templateUpload.html', context)
+
+
+@require_http_methods(['GET', 'POST'])
+def modify_template(request, pk):
+    """GET方法——修改模板页面；POST方法——提交修改模板表单"""
+    if not request.user.is_superuser:
+        return HttpResponseForbidden('you are not admin')
+    template = get_object_or_404(Template, pk=pk)
+    if request.method == 'GET':
+        context = {'template': template}
+        return render(request, 'easyspider/templateModify.html', context)
+
+    site = template.site
+    # egg文件
+    egg_path = f'egg/{site.name}.egg'
+    upload_egg = request.FILES['egg']
+    with open(egg_path, 'wb+') as local_egg:
+        for chunk in upload_egg.chunks():
+            local_egg.write(chunk)
+    push_egg(site.name, egg_path)
+
+    # 更新模板集合
+    site.egg = egg_path
+    site.update_time = timezone.now()
+    site.save()
+    return redirect(reverse('list_template'))
+
+
+@require_http_methods(['POST'])
+def delete_template(request, pk):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden('you are not admin')
+    template = get_object_or_404(Template, pk=pk)
+    if not template.can_delete():
+        return HttpResponseForbidden('this template cannot be deleted now')
+
+    try:
+        client = MongoClient(settings.MONGODB_URI)
+        client.drop_database('{}_{}'.format(template.site.name, template.name))
+        client.close()
+    except PyMongoError:
+        logger.exception('MongoDB删除数据库失败')
+
+    for task in template.task_set.all():
+        task.job_set.all().delete()
+        task.delete()
+    return redirect(reverse('list_template'))
