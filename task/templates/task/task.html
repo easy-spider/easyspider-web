@@ -454,7 +454,7 @@
                 status.addClass("paused");
                 status.html("已暂停");
                 $.ajax({
-                    url: "{% url 'pause_task' 1 %}".split("/").slice(0,-2).concat(taskID).join("/") + "/",
+                    url: "{% url 'pause_task' 1 %}".split("/").slice(0, -2).concat(taskID).join("/") + "/",
                     type: "POST",
                     data: post_data,
                     cache: false,
