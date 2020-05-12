@@ -48,108 +48,33 @@
                         <tr>
                             <th>#</th>
                             <th>详情</th>
-                            <th>关键词</th>
-                            <th>页码</th>
-                            <th>影名</th>
-                            <th>语言</th>
-                            <th>片长</th>
-                            <th>评分</th>
-                            <th>评价人数</th>
+                            {% for field in field_list %}
+                                <th>{{ field }}</th>
+                            {% endfor %}
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>
-                                <button
-                                    data-id="1"
-                                    type="button"
-                                    class="btn btn-default"
-                                    data-toggle="modal"
-                                    data-target="#data-modal"
-                                >
-                                    <i
-                                        class="fas fa-ellipsis-h"
-                                    ></i>
-                                </button>
-                            </td>
-                            <td>战狼</td>
-                            <td>1</td>
-                            <td>战狼2(2017)</td>
-                            <td>汉语普通话/英语</td>
-                            <td>123分钟</td>
-                            <td>7.1</td>
-                            <td>724332</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>
-                                <button
-                                    data-id="2"
-                                    type="button"
-                                    class="btn btn-default"
-                                    data-toggle="modal"
-                                    data-target="#data-modal"
-                                >
-                                    <i
-                                        class="fas fa-ellipsis-h"
-                                    ></i>
-                                </button>
-                            </td>
-                            <td>战狼</td>
-                            <td>1</td>
-                            <td>战狼(2015)</td>
-                            <td>汉语普通话/英语</td>
-                            <td>90分钟</td>
-                            <td>6.9</td>
-                            <td>214894</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>
-                                <button
-                                    data-id="3"
-                                    type="button"
-                                    class="btn btn-default"
-                                    data-toggle="modal"
-                                    data-target="#data-modal"
-                                >
-                                    <i
-                                        class="fas fa-ellipsis-h"
-                                    ></i>
-                                </button>
-                            </td>
-                            <td>战狼</td>
-                            <td>1</td>
-                            <td>贝奥武夫 Beowulf‎(2007)</td>
-                            <td>英语/古英语</td>
-                            <td>115分钟</td>
-                            <td>6.7</td>
-                            <td>26448</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>
-                                <button
-                                    data-id="4"
-                                    type="button"
-                                    class="btn btn-default"
-                                    data-toggle="modal"
-                                    data-target="#data-modal"
-                                >
-                                    <i
-                                        class="fas fa-ellipsis-h"
-                                    ></i>
-                                </button>
-                            </td>
-                            <td>战狼</td>
-                            <td>1</td>
-                            <td>斯巴达300勇士300‎(2006)</td>
-                            <td>英语</td>
-                            <td>117分钟</td>
-                            <td>7.8</td>
-                            <td>126192</td>
-                        </tr>
+                        {% for row_data in sample_data %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <button
+                                        data-id="{{ forloop.counter }}"
+                                        type="button"
+                                        class="btn btn-default"
+                                        data-toggle="modal"
+                                        data-target="#data-modal"
+                                    >
+                                        <i
+                                            class="fas fa-ellipsis-h"
+                                        ></i>
+                                    </button>
+                                </td>
+                                {% for td_data in row_data %}
+                                    <td>{{ td_data | truncatechars_html:"15" }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -182,8 +107,7 @@
     <div class="modal fade" id="clear-modal">
         <div class="modal-dialog">
             <div class="modal-content">
-{#                <form method="POST" action="{% url 'preview_data' 1 %}" id="clear-form">#}
-                <form method="POST" action="#" id="clear-form">
+                <form method="POST" action="{% url 'clear_data' task.pk %}" id="clear-form">
                     {% csrf_token %}
                     <div class="modal-body">
                         <div class="card-comments">
@@ -230,7 +154,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h6 class="modal-title">
-                        导出本地数据（任务名）
+                        导出本地数据（{{ task.name }}）
                     </h6>
                     <button
                         type="button"
@@ -316,13 +240,9 @@
                 </div>
                 <div class="modal-body">
                     <dl>
-                        <dt>关键词</dt>
-                        <dt>页码</dt>
-                        <dt>影名</dt>
-                        <dt>语言</dt>
-                        <dt>片长</dt>
-                        <dt>评分</dt>
-                        <dt>评价人数</dt>
+                        {% for field in field_list %}
+                            <dt>{{ field }}</dt>
+                        {% endfor %}
                     </dl>
                 </div>
             </div>
@@ -354,7 +274,6 @@
                 url: $(form).attr("action"),
                 type: "POST",
                 data: $(form).serialize(),
-                {#data: $(form).serialize() + {{ task_id }} + "&for=clearData",#}
                 cache: false,
                 success: function (data) {
                   if(data["status"] === "SUCCESS") {
@@ -380,8 +299,7 @@
         });
     </script>
     <script>
-        let spiderData = [{"a": 1, "b": 2, "c": 3}, {"a": 4, "b": 5, "c": 6}];
-        let json = JSON.stringify(spiderData);
+        let json = JSON.stringify({{ full_data }});
         let blob = new Blob([json], {type: "application/json"});
         let url  = URL.createObjectURL(blob);
         let btn = $("#confirm-file-type-btn");
@@ -398,8 +316,7 @@
                   way = ".xlsx"
                 }
                 $.ajax({
-                    {#url: "{% url 'preview_data' 1 %}?way=%s" % way,#}
-                    url: "",
+                    url: "{% url 'download_data' task.pk %}",
                     type: "GET",
                     cache: false,
                     success: function (data) {
@@ -413,14 +330,14 @@
                     title: "&nbsp;数据下载成功",
                 });
                 if(way === ".json") {
-                    btn.attr({"href": url, "download": "test" + way});
+                    btn.attr({"href": url, "download": {{ task.name }} + way});
                 }
                 else {
                     btn.removeAttr("href");
                     let wb = XLSX.utils.book_new();
                     let ws = XLSX.utils.json_to_sheet(spiderData);
                     XLSX.utils.book_append_sheet(wb, ws, way === '.xlsx'? 'Sheet1': '');
-                    XLSX.writeFile(wb, 'test' + way);
+                    XLSX.writeFile(wb, {{ task.name }} + way);
                 }
             });
         });
