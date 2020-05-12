@@ -1,4 +1,5 @@
 import json
+from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -93,4 +94,8 @@ class Task(models.Model):
 
     def duration(self):
         """以字符串形式返回运行耗时，未完成的返回空字符串"""
-        return str(self.finish_time - self.create_time) if self.finish_time else ''
+        if self.finish_time:
+            d = self.finish_time - self.create_time
+            return str(timedelta(seconds=int(d.total_seconds())))
+        else:
+            return ''
