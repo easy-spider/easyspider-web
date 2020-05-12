@@ -12,4 +12,6 @@ urlpatterns = [
     path('node/push/', views.push_all_eggs, name='push_eggs'),
     path('template/list/', views.list_template, name='list_template'),
     path('template/create/', views.create_template, name='create_template'),
+    path('template/modify/<int:pk>/', views.modify_template, name='modify_template'),
+    path('template/delete/<int:pk>/', views.delete_template, name='delete_template'),
 ]
