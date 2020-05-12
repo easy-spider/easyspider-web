@@ -38,7 +38,7 @@ class Task(models.Model):
         name = name.strip()
         if not 3 <= len(name) <= 20:
             raise ValueError('任务名长度应在3~20个字符之间')
-        elif self.user.task_set.filter(name=name).exists():
+        elif self.user.task_set.exclude(pk=self.id).filter(name=name).exists():
             raise ValueError('任务名称已存在')
         self.name = name
 
@@ -47,18 +47,31 @@ class Task(models.Model):
 
         :param arg_dict: {'param_name': 'value_str'}
         :return: 模板划分参数的值
+        :exception ValueError: 如果参数值超过范围（数字类型）或长度超过限制（字符串类型）
         """
         template_params = {p.name: p for p in self.template.param_set.all()}
         args = {}
-        split_arg = None
+        split_arg = 1
         for param_name in arg_dict:
             if param_name not in template_params:
                 continue
             param = template_params[param_name]
             if param.input_label == 'textarea' or param.input_type == 'text':
-                args[param_name] = arg_dict[param_name]
+                v = arg_dict[param_name]
+                if len(v) > param.length_limit:
+                    raise ValueError('{}的长度不能超过{}'.format(
+                        param.display_name, param.length_limit
+                    ))
+                args[param_name] = v
             elif param.input_type == 'number':
-                split_arg = args[param_name] = int(arg_dict[param_name])
+                v = int(arg_dict[param_name])
+                if not param.number_min <= v <= param.number_max:
+                    raise ValueError('{}的值应在{}~{}之间'.format(
+                        param.display_name, param.number_min, param.number_max
+                    ))
+                args[param_name] = v
+                if param.name == self.template.split_param:
+                    split_arg = v
         self.args = json.dumps(args, ensure_ascii=False)
         return split_arg
 

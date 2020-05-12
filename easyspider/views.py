@@ -179,12 +179,18 @@ def create_template(request):
             if m:
                 n = m.group(1)
                 param_name = request.POST[k]
-                Param.objects.create(
+                param = Param(
                     template=template, name=param_name,
                     display_name=request.POST['param_display_name' + n],
                     input_label=request.POST['param_input_label' + n],
                     input_type=request.POST['param_input_type' + n]
                 )
+                if param.input_label == 'textarea' or param.input_type == 'text':
+                    param.length_limit = int(request.POST['param_length_limit' + n])
+                elif param.input_type == 'number':
+                    param.number_max = int(request.POST['param_number_max' + n])
+                    param.number_min = int(request.POST['param_number_min' + n])
+                param.save()
                 save_pic(
                     request.FILES['param_pic' + n],
                     os.path.join(site_name, template_name, 'param', param_name)
