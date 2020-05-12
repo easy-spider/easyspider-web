@@ -3,7 +3,7 @@ import re
 from enum import IntEnum
 
 import requests
-from django.http import HttpResponseForbidden, HttpResponse
+from django.http import HttpResponseForbidden, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -28,11 +28,11 @@ def list_node(request):
 
 
 @require_http_methods(['POST'])
-def modify_node(request, pk):
+def modify_node(request):
     """修改节点信息"""
     if not request.user.is_superuser:
         return HttpResponseForbidden('you are not admin')
-    node = get_object_or_404(Node, pk=pk)
+    node = get_object_or_404(Node, pk=request.POST['id'])
     node.ip = request.POST['ip']
     node.port = request.POST['port']
     node.username = request.POST['username']
@@ -54,6 +54,42 @@ def create_node(request):
         status=NodeStatus.DISABLED
     )
     return redirect(reverse('list_node'))
+
+
+def delete_node(request, pk):
+    """删除节点"""
+    if not request.user.is_superuser:
+        return HttpResponseForbidden('you are not admin')
+    node = get_object_or_404(Node, pk=pk)
+    node.delete()
+    return HttpResponse(status=204)
+
+
+def inspect_node(request, pk):
+    """查看服务器运行状态"""
+    if not request.user.is_superuser:
+        return HttpResponseForbidden('you are not admin')
+    node = get_object_or_404(Node, pk=pk)
+    try:
+        url = f'http://{node.ip}:{node.port}/daemonstatus.json'
+        r = requests.get(url, auth=(node.username, node.password)).json()
+        return JsonResponse(r)
+    except requests.exceptions.RequestException as _e:
+        node.status = NodeStatus.OFFLINE
+        node.save()
+    return HttpResponseBadRequest()
+
+
+def set_node_status(request, node_id, status):
+    """设置节点状态"""
+    if not request.user.is_superuser:
+        return HttpResponseForbidden('you are not admin')
+    node = get_object_or_404(Node, pk=node_id)
+    if status not in [NodeStatus.ONLINE, NodeStatus.OFFLINE, NodeStatus.DISABLED]:
+        return HttpResponseBadRequest()
+    node.status = status
+    node.save()
+    return HttpResponse(status=204)
 
 
 def push_egg(project_name: str, egg_path: str):
@@ -83,6 +119,8 @@ def push_all_eggs(request):
     if not request.user.is_superuser:
         return HttpResponseForbidden('you are not admin')
     for site in Site.objects.all():
+        if not os.path.exists(site.egg):
+            continue
         push_egg(site.name, site.egg)
     return HttpResponse(status=204)
 
