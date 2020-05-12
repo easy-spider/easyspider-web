@@ -13,6 +13,7 @@ from pymongo.errors import PyMongoError
 from requests import RequestException
 
 from EasySpiderWeb import settings
+from EasySpiderWeb.views import get_recent_tasks
 from scheduler.models import Job
 from scheduler.views import JobStatus
 from spiderTemplate.models import Template
@@ -44,21 +45,21 @@ def create_task(request, template_pk):
             {'status': 'ERROR', 'message': '错误的值：{}，请输入1~99'.format(split_arg)},
             json_dumps_params={'ensure_ascii': False}
         )
-    else:
-        task.save()
-        task_arg = task.args_dict()
-        for i in range(split_arg):
-            task_arg[template.split_param] = i + 1
-            Job.objects.create(uuid=uuid.uuid4(), task=task, args=json.dumps(task_arg))
-        recent_tasks = Task.objects.order_by('-create_time')[:5]
-        return JsonResponse({
-            'status': 'SUCCESS',
-            'tasks': [{'id': t.id, 'name': t.name} for t in recent_tasks]
-        })
+
+    task.save()
+    task_arg = task.args_dict()
+    for i in range(split_arg):
+        task_arg[template.split_param] = i + 1
+        Job.objects.create(uuid=uuid.uuid4(), task=task, args=json.dumps(task_arg))
+    return get_recent_tasks(request)
 
 
+@require_http_methods(['POST'])
 def restart_task(request, task_pk):
-    """提交重新运行任务表单"""
+    """提交重新运行任务表单
+
+    如果有GET参数noChange则不修改任务名和模板参数
+    """
     if not request.user.is_authenticated:
         return redirect(reverse('login'))
     task = get_object_or_404(Task, pk=task_pk)
@@ -68,38 +69,38 @@ def restart_task(request, task_pk):
         return HttpResponseForbidden('Operation not allowed')
 
     template = task.template
-    try:
-        task.set_name(request.POST['inputTaskName'])
-    except ValueError as e:
-        return JsonResponse(
-            {'status': 'ERROR', 'message': e.args[0]},
-            json_dumps_params={'ensure_ascii': False}
-        )
+    if 'noChange' not in request.POST:
+        try:
+            task.set_name(request.POST['inputTaskName'])
+        except ValueError as e:
+            return JsonResponse(
+                {'status': 'ERROR', 'message': e.args[0]},
+                json_dumps_params={'ensure_ascii': False}
+            )
 
-    split_arg = task.set_args(
-        {param.name: request.POST[param.name] for param in template.param_set.all()}
-    )
-    if not 1 <= split_arg <= 99:
-        return JsonResponse(
-            {'status': 'ERROR', 'message': '错误的值：{}，请输入1~99'.format(split_arg)},
-            json_dumps_params={'ensure_ascii': False}
+        split_arg = task.set_args(
+            {param.name: request.POST[param.name] for param in template.param_set.all()}
         )
+        if not 1 <= split_arg <= 99:
+            return JsonResponse(
+                {'status': 'ERROR', 'message': '错误的值：{}，请输入1~99'.format(split_arg)},
+                json_dumps_params={'ensure_ascii': False}
+            )
     else:
-        task.create_time = timezone.now()
-        task.finish_time = None
-        task.status = 'ready'
-        task.run_times += 1
-        task.save()
-        task.job_set.all().delete()
-        task_arg = task.args_dict()
-        for i in range(split_arg):
-            task_arg[template.split_param] = i + 1
-            Job.objects.create(uuid=uuid.uuid4(), task=task, args=json.dumps(task_arg))
-        recent_tasks = Task.objects.order_by('-create_time')[:5]
-        return JsonResponse({
-            'status': 'SUCCESS',
-            'tasks': [{'id': t.id, 'name': t.name} for t in recent_tasks]
-        })
+        split_arg = task.args_dict()[template.split_param]
+
+    task.create_time = timezone.now()
+    task.finish_time = None
+    task.status = 'ready'
+    task.run_times += 1
+    task.save()
+    task.job_set.all().delete()
+    clear_data(request, task_pk)
+    task_arg = task.args_dict()
+    for i in range(split_arg):
+        task_arg[template.split_param] = i + 1
+        Job.objects.create(uuid=uuid.uuid4(), task=task, args=json.dumps(task_arg))
+    return get_recent_tasks(request)
 
 
 def task_list(request):
@@ -142,7 +143,7 @@ def cancel_job(job):
 
 # {current_status: [allowed_status]}
 ALLOWED_OPERATION = {
-    'ready': ['paused', 'canceled'],
+    'ready': ['canceled'],
     'running': ['paused', 'canceled'],
     'paused': ['running', 'canceled']
 }
@@ -188,8 +189,8 @@ def clear_data(request, task_pk):
     try:
         client = MongoClient(settings.MONGODB_URI)
         db = client['{}_{}'.format(task.template.site.name, task.template.name)]
-        for job in task.job_set.all():
-            db.drop_collection('{}_{}'.format(task.id, job.uuid))
+        for c in db.list_collection_names(filter={'name': {'$regex': '{:d}_.*'.format(task.id)}}):
+            db.drop_collection(c)
         client.close()
         return JsonResponse({'status': 'SUCCESS'})
     except PyMongoError:

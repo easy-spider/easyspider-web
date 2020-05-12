@@ -19,5 +19,5 @@ def get_recent_tasks(request):
     recent_tasks = Task.objects.order_by('-create_time')[:5]
     return JsonResponse({
         'status': 'SUCCESS',
-        'tasks': [{'id': t.id, 'name': t.name} for t in recent_tasks]
+        'tasks': [{'id': t.id, 'name': t.name, 'template_id': t.template_id} for t in recent_tasks]
     })
