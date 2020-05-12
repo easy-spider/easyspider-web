@@ -28,24 +28,18 @@ def create_task(request, template_pk):
     if not request.user.is_authenticated:
         return redirect(reverse('login'))
     template = get_object_or_404(Template, pk=template_pk)
+
     task = Task(user=request.user, template=template)
     try:
         task.set_name(request.POST['inputTaskName'])
+        split_arg = task.set_args(
+            {param.name: request.POST[param.name] for param in template.param_set.all()}
+        )
     except ValueError as e:
         return JsonResponse(
             {'status': 'ERROR', 'message': e.args[0]},
             json_dumps_params={'ensure_ascii': False}
         )
-
-    split_arg = task.set_args(
-        {param.name: request.POST[param.name] for param in template.param_set.all()}
-    )
-    if not 1 <= split_arg <= 99:
-        return JsonResponse(
-            {'status': 'ERROR', 'message': '错误的值：{}，请输入1~99'.format(split_arg)},
-            json_dumps_params={'ensure_ascii': False}
-        )
-
     task.save()
     task_arg = task.args_dict()
     for i in range(split_arg):
@@ -70,32 +64,28 @@ def restart_task(request, task_pk):
 
     template = task.template
     if 'noChange' not in request.POST:
+        # 从编辑页面提交表单
         try:
             task.set_name(request.POST['inputTaskName'])
+            split_arg = task.set_args(
+                {param.name: request.POST[param.name] for param in template.param_set.all()}
+            )
         except ValueError as e:
             return JsonResponse(
                 {'status': 'ERROR', 'message': e.args[0]},
                 json_dumps_params={'ensure_ascii': False}
             )
-
-        split_arg = task.set_args(
-            {param.name: request.POST[param.name] for param in template.param_set.all()}
-        )
-        if not 1 <= split_arg <= 99:
-            return JsonResponse(
-                {'status': 'ERROR', 'message': '错误的值：{}，请输入1~99'.format(split_arg)},
-                json_dumps_params={'ensure_ascii': False}
-            )
     else:
+        # 直接在任务列表中重新运行
         split_arg = task.args_dict()[template.split_param]
 
+    task.job_set.all().delete()
+    clear_data(request, task_pk)
     task.create_time = timezone.now()
     task.finish_time = None
     task.status = 'ready'
     task.run_times += 1
     task.save()
-    task.job_set.all().delete()
-    clear_data(request, task_pk)
     task_arg = task.args_dict()
     for i in range(split_arg):
         task_arg[template.split_param] = i + 1
@@ -120,7 +110,7 @@ def rename_task(request, task_pk):
     try:
         task.set_name(request.POST['inputTaskName'])
         task.save()
-        return JsonResponse({'status': 'SUCCESS'})
+        return get_recent_tasks(request)
     except ValueError as e:
         return JsonResponse(
             {'status': 'ERROR', 'message': e.args[0]},
@@ -214,7 +204,7 @@ def batch_delete_task(request):
         r = delete_task(request, i)
         if not isinstance(r, JsonResponse) or json.loads(r.content.decode())['status'] != 'SUCCESS':
             return r
-    return JsonResponse({'status': 'SUCCESS'})
+    return get_recent_tasks(request)
 
 
 def preview_data(request, task_pk):
@@ -224,19 +214,21 @@ def preview_data(request, task_pk):
     if task.user_id != request.user.id:
         return HttpResponseForbidden('Not your task')
 
+    template = task.template
+    fields = list(template.field_set.all())
     client = MongoClient(settings.MONGODB_URI)
-    db = client['{}_{}'.format(task.template.site.name, task.template.name)]
+    db = client['{}_{}'.format(template.site.name, template.name)]
     documents = []
     for job in task.job_set.all():
-        documents.extend(db['{}_{}'.format(task.id, job.uuid)].find(projection={'_id': False}))
+        for d in db['{}_{}'.format(task.id, job.uuid)].find(projection={'_id': False}):
+            documents.append({f.display_name: d[f.name] for f in fields})
     client.close()
 
-    template_fields = list(task.template.field_set.all())
-    field_list = [f.display_name for f in template_fields]
-    sample_data = [[d[f.name] for f in template_fields] for d in documents[:15]]
     context = {
-        'task': task, 'field_list': field_list,
-        'sample_data': sample_data, 'full_data': documents
+        'task': task,
+        'field_list': [f.display_name for f in fields],
+        'sample_data': [[d[f.display_name] for f in fields] for d in documents[:15]],
+        'full_data': documents
     }
     return render(request, 'task/dataDownload.html', context)
 

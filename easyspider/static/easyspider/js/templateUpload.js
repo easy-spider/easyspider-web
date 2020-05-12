@@ -36,13 +36,10 @@ function add1() {
     input1.type='text';
     input1.setAttribute('class','form-control');
     input1.setAttribute('name','field_name##'.replace(/##/g,index));
-    input1.placeholder='字段英文名';
 
     input3.type='text';
     input3.setAttribute('class','form-control');
     input3.setAttribute('name','field_display_name##'.replace(/##/g,index));
-    input3.placeholder='字段中文名';
-
 
     input2.type='file';
     input2.setAttribute('class','custom-file-input');
@@ -165,27 +162,25 @@ function add2() {
     input1.type='text';
     input1.setAttribute('class','form-control');
     input1.setAttribute('name','param_name##'.replace(/##/g,index));
-    input1.placeholder='参数英文名';
 
-    input_min.type='text';
+    input_min.setAttribute('type', 'number');
     input_min.setAttribute('class','form-control');
     input_min.setAttribute('name','param_number_min##'.replace(/##/g,index));
 
-    input_max.type='text';
+    input_max.setAttribute('type', 'number');
     input_max.setAttribute('class','form-control');
     input_max.setAttribute('name','param_number_max##'.replace(/##/g,index));
 
     input_min.setAttribute('disabled',true);
     input_max.setAttribute('disabled',true);
 
-    input_lenth.type='text';
+    input_lenth.setAttribute('type', 'number');
     input_lenth.setAttribute('class','form-control');
     input_lenth.setAttribute('name','param_length_limit##'.replace(/##/g,index));
 
     input3.type='text';
     input3.setAttribute('class','form-control');
     input3.setAttribute('name','param_display_name##'.replace(/##/g,index));
-    input3.placeholder='参数中文名';
 
     input2.type='file';
     input2.setAttribute('class','custom-file-input');
@@ -293,7 +288,9 @@ function add2() {
     div.append(label);
 
     td1.append(input1);
+    td1.style.width='100px';
     td2.append(input3);
+    td2.style.width='100px';
     td5.append(input_label_div);
     td5.style.width='160px';
     td6.append(input_type_div);

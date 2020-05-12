@@ -17,8 +17,14 @@ def create_test_data():
         site=site, name='T1', display_name='T1',
         introduction='', split_param='p2', sample_data=''
     )
-    Param.objects.create(template=template, name='p1', display_name='p1', input_type='text')
-    Param.objects.create(template=template, name='p2', display_name='p2', input_type='number')
+    Param.objects.create(
+        template=template, name='p1', display_name='p1',
+        input_type='text', length_limit=10
+    )
+    Param.objects.create(
+        template=template, name='p2', display_name='p2',
+        input_type='number', number_min=100, number_max=999
+    )
     return template
 
 
@@ -44,11 +50,25 @@ class TaskModelTests(TestCase):
         with self.assertRaises(ValueError) as cm:
             task.set_name(' task1\t\r\n')
         self.assertEqual('任务名称已存在', cm.exception.args[0])
+        # 重新运行任务时如果未修改任务名称则不应报错（名称与自己重复）
+        task = self.user.task_set.get()
+        task.set_name(' task1 ')
+        self.assertEqual('task1', task.name)
 
     def test_set_name(self):
         task = Task(user=self.user, template=self.template)
         task.set_name('  task1\t\r\n')
         self.assertEqual('task1', task.name)
+
+    def test_invalid_arg(self):
+        task = Task.objects.create(user=self.user, template=self.template, name='task1')
+        with self.assertRaises(ValueError) as cm:
+            task.set_args({'p1': 'a' * 20, 'p2': '123'})
+        self.assertEqual('p1的长度不能超过10', cm.exception.args[0])
+        for p2 in (8, 99, 1000, 2000):
+            with self.assertRaises(ValueError) as cm:
+                task.set_args({'p1': 'abc', 'p2': p2})
+            self.assertEqual('p2的值应在100~999之间', cm.exception.args[0])
 
     def test_set_args(self):
         task = Task.objects.create(user=self.user, template=self.template, name='task1')
@@ -101,22 +121,28 @@ class CreateTaskViewTests(TestCase):
         response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
         self.assertEqual({'status': 'ERROR', 'message': '任务名称已存在'}, response.json())
 
-    def test_split_arg_invalid(self):
-        """划分参数的值不在规定的范围内"""
+    def test_invalid_arg(self):
         self.client.login(username='zzy', password='123456')
-        data = {'inputTaskName': 'task1', 'p1': 'abc'}
-        for p2 in (-5, 0, 100, 9999):
+        data = {'inputTaskName': 'task1', 'p1': 'a' * 20, 'p2': '123'}
+        response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
+        self.assertEqual(
+            {'status': 'ERROR', 'message': 'p1的长度不能超过10'},
+            response.json()
+        )
+
+        data['p1'] = 'abc'
+        for p2 in (8, 99, 1000, 2000):
             data['p2'] = p2
             response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
             self.assertEqual(
-                {'status': 'ERROR', 'message': '错误的值：{}，请输入1~99'.format(p2)},
+                {'status': 'ERROR', 'message': 'p2的值应在100~999之间'},
                 response.json()
             )
 
     def test_ok(self):
         """成功创建task和job"""
         self.client.login(username='zzy', password='123456')
-        data = {'inputTaskName': 'task1', 'p1': 'abc', 'p2': '18'}
+        data = {'inputTaskName': 'task1', 'p1': 'abc', 'p2': '123'}
         response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
         self.assertEqual('SUCCESS', response.json()['status'])
 
@@ -124,7 +150,7 @@ class CreateTaskViewTests(TestCase):
         self.assertEqual('task1', task.name)
         jobs = task.job_set.all()
         self.assertEqual({'abc'}, {json.loads(j.args)['p1'] for j in jobs})
-        self.assertEqual(set(range(1, 19)), {json.loads(j.args)['p2'] for j in jobs})
+        self.assertEqual(set(range(1, 124)), {json.loads(j.args)['p2'] for j in jobs})
 
 
 class TaskListViewTests(TestCase):
@@ -203,7 +229,7 @@ class RenameTaskViewTests(TestCase):
         self.client.login(username='foo', password='123456')
         data = {'inputTaskName': ' foo_task3\t\r\n'}
         response = self.client.post(reverse('rename_task', args=(self.foo_task.id,)), data)
-        self.assertEqual({'status': 'SUCCESS'}, response.json())
+        self.assertEqual('SUCCESS', response.json()['status'])
         self.assertEqual('foo_task3', Task.objects.get(pk=self.foo_task.id).name)
 
 
@@ -353,7 +379,7 @@ class DeleteTaskViewTests(TestCase):
         for s in ('finished', 'canceled'):
             task = self.user.task_set.get(status=s)
             response = self.client.post(reverse('delete_task', args=(task.id,)))
-            self.assertEqual({'status': 'SUCCESS'}, response.json())
+            self.assertEqual('SUCCESS', response.json()['status'])
             self.assertFalse(Task.objects.filter(pk=task.id).exists())
             self.assertFalse(Job.objects.filter(task_id=task.id).exists())
 
