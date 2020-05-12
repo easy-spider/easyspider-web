@@ -168,7 +168,6 @@
                 data: $(this).serialize(),
                 cache: false,
                 success: function (data) {
-                    // console.log(data);
                     if(data["status"] === "SUCCESS") {
                         Toast.fire({
                             icon: "success",
@@ -176,35 +175,8 @@
                         });
                         // get top 5 tasks
                         let tasks = data["tasks"];
-                        // remove cur tasks
-                        recentEditList.empty();
-                        // 重新填充 这里将第一个任务置为active即可
-                        for(let i = 0; i < tasks.length; i++) {
-                            let taskID = tasks[i].id;
-                            if(i === 0) {
-                                recentEditList.append("<li class=\"nav-item edit-item\">\n" +
-                                "<a class=\"nav-link active\" href=\""+ {% url 'template_setting' 1 %} + "?taskID=" + taskID + "\">\n" +
-                                "                                            <i\n" +
-                                "                                                class=\"far fa-circle nav-icon hidden\"\n" +
-                                "                                            ></i>\n" +
-                                "                                            <p>\n" +
-                                "                                                " + tasks[i].name +"\n" +
-                                "                                            </p>\n" +
-                                "                                        </a>\n" +
-                                "                                    </li>");
-                            } else {
-                                recentEditList.append("<li class=\"nav-item edit-item\">\n" +
-                                "<a class=\"nav-link\" href=\""+ {% url 'template_setting' 1 %} + "?taskID=" + taskID + "\">\n" +
-                                "                                            <i\n" +
-                                "                                                class=\"far fa-circle nav-icon hidden\"\n" +
-                                "                                            ></i>\n" +
-                                "                                            <p>\n" +
-                                "                                                " + tasks[i].name +"\n" +
-                                "                                            </p>\n" +
-                                "                                        </a>\n" +
-                                "                                    </li>");
-                            }
-                         }
+                         console.log(tasks);
+                        sessionStorage.setItem('recent-edit-update', tasks);
                     } else {
                         Toast.fire({
                             icon: "error",
