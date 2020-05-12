@@ -71,7 +71,7 @@
                                     </button>
                                 </td>
                                 {% for td_data in row_data %}
-                                    <td>{{ td_data | safe | truncatechars_html:"15" }}</td>
+                                    <td><span class="sr-only">{{ td_data | safe }}</span>{{ td_data | safe | truncatechars_html:"15" }}</td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
