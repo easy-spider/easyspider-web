@@ -49,7 +49,7 @@
                             <th>#</th>
                             <th>详情</th>
                             {% for field in field_list %}
-                                <th>{{ field }}</th>
+                                <th>{{ field | safe }}</th>
                             {% endfor %}
                         </tr>
                     </thead>
@@ -71,7 +71,7 @@
                                     </button>
                                 </td>
                                 {% for td_data in row_data %}
-                                    <td>{{ td_data | truncatechars_html:"15" }}</td>
+                                    <td>{{ td_data | safe | truncatechars_html:"15" }}</td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
@@ -299,7 +299,7 @@
         });
     </script>
     <script>
-        let json = JSON.stringify({{ full_data }});
+        let json = JSON.stringify({{ full_data|safe }});
         let blob = new Blob([json], {type: "application/json"});
         let url  = URL.createObjectURL(blob);
         let btn = $("#confirm-file-type-btn");
@@ -330,14 +330,14 @@
                     title: "&nbsp;数据下载成功",
                 });
                 if(way === ".json") {
-                    btn.attr({"href": url, "download": {{ task.name }} + way});
+                    btn.attr({"href": url, "download": "{{ task.name }}" + way});
                 }
                 else {
                     btn.removeAttr("href");
                     let wb = XLSX.utils.book_new();
-                    let ws = XLSX.utils.json_to_sheet(spiderData);
+                    let ws = XLSX.utils.json_to_sheet({{ full_data|safe }});
                     XLSX.utils.book_append_sheet(wb, ws, way === '.xlsx'? 'Sheet1': '');
-                    XLSX.writeFile(wb, {{ task.name }} + way);
+                    XLSX.writeFile(wb, "{{ task.name }}" + way);
                 }
             });
         });

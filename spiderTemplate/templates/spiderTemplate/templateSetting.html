@@ -168,7 +168,6 @@
                 data: $(this).serialize(),
                 cache: false,
                 success: function (data) {
-                    // console.log(data);
                     if(data["status"] === "SUCCESS") {
                         Toast.fire({
                             icon: "success",
@@ -176,6 +175,7 @@
                         });
                         // get top 5 tasks
                         let tasks = data["tasks"];
+                         console.log(tasks);
                         sessionStorage.setItem('recent-edit-update', tasks);
                     } else {
                         Toast.fire({

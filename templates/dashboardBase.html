@@ -319,6 +319,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         success: function (data) {
                             if(data["status"] === "SUCCESS") {
                                 let tasks = data["tasks"];
+                                console.log("hi");
                                 for(let i = 0; i < tasks.length; i++) {
                                     let taskID = tasks[i]['id'];
                                     let templateID = tasks[i]['template_id'];

@@ -440,6 +440,7 @@
             let parent = $(this).parent("td");
             let status = parent.prev("td");
             let taskID = $(this).attr("data-id");
+            console.log("taskID: %s" % taskID);
             let post_data = {
                 'csrfmiddlewaretoken': '{{ csrf_token }}'
             };
