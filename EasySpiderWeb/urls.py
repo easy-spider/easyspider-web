@@ -19,7 +19,6 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name="index"),
-    path('recentTasks/', views.get_recent_tasks, name="get_recent_tasks"),
     path('admin/', admin.site.urls),
     path('administrator/', include('administrator.urls')),
     path('user/', include('user.urls')),

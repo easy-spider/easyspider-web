@@ -13,13 +13,30 @@ from pymongo.errors import PyMongoError
 from requests import RequestException
 
 from EasySpiderWeb import settings
-from EasySpiderWeb.views import get_recent_tasks
 from scheduler.models import Job
 from scheduler.views import JobStatus
 from spiderTemplate.models import Template
 from task.models import Task
 
 logger = logging.getLogger('task_view')
+
+
+def task_list(request):
+    if not request.user.is_authenticated:
+        return redirect(reverse('login'))
+    context = {'task_list': request.user.task_set.all()}
+    return render(request, 'task/task.html', context)
+
+
+def get_recent_tasks(request):
+    """最近编辑任务Top 5"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'ERROR', 'message': '未登录'})
+    recent_tasks = request.user.task_set.order_by('-create_time')[:5]
+    return JsonResponse({
+        'status': 'SUCCESS',
+        'tasks': [{'id': t.id, 'name': t.name, 'template_id': t.template_id} for t in recent_tasks]
+    })
 
 
 @require_http_methods(['POST'])
@@ -90,14 +107,9 @@ def restart_task(request, task_pk):
     for i in range(split_arg):
         task_arg[template.split_param] = i + 1
         Job.objects.create(uuid=uuid.uuid4(), task=task, args=json.dumps(task_arg))
-    return get_recent_tasks(request)
-
-
-def task_list(request):
-    if not request.user.is_authenticated:
-        return redirect(reverse('login'))
-    context = {'task_list': request.user.task_set.all()}
-    return render(request, 'task/task.html', context)
+    r = get_recent_tasks(request)
+    r['create_time'] = task.create_time.strftime('%y/%m/%d %H:%M')
+    return r
 
 
 @require_http_methods(['POST'])
@@ -110,7 +122,9 @@ def rename_task(request, task_pk):
     try:
         task.set_name(request.POST['inputTaskName'])
         task.save()
-        return get_recent_tasks(request)
+        r = get_recent_tasks(request)
+        r['create_time'] = task.create_time.strftime('%y/%m/%d %H:%M')
+        return r
     except ValueError as e:
         return JsonResponse(
             {'status': 'ERROR', 'message': e.args[0]},
@@ -220,14 +234,15 @@ def preview_data(request, task_pk):
     db = client['{}_{}'.format(template.site.name, template.name)]
     documents = []
     for job in task.job_set.all():
-        for d in db['{}_{}'.format(task.id, job.uuid)].find(projection={'_id': False}):
-            documents.append({f.display_name: d[f.name] for f in fields})
+        if len(documents) >= 15:
+            break
+        documents.extend(db['{}_{}'.format(task.id, job.uuid)].find())
     client.close()
 
     context = {
         'task': task,
         'field_list': [f.display_name for f in fields],
-        'sample_data': [[d[f.display_name] for f in fields] for d in documents[:15]]
+        'sample_data': [[d[f.name] for f in fields] for d in documents[:15]]
     }
     return render(request, 'task/dataDownload.html', context)
 
