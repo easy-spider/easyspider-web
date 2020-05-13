@@ -43,3 +43,7 @@
 #task-table .paused i {
   color: #faa316;
 }
+
+#task-table td {
+  vertical-align: middle !important;
+}

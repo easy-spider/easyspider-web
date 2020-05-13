@@ -94,7 +94,7 @@
                                     <i class="far fa-stop-circle hidden"></i>
                                   </a>
                               {% elif task.status == 'running' %}
-                                  <a href="" data-toggle="modal" data-target="" data-id="">
+                                  <a href="" data-toggle="modal" data-target="" data-id="{{ task.pk }}">
                                     <i class="far fa-pause-circle hidden"></i>
                                   </a>
                                   <a
@@ -369,6 +369,193 @@
         };
     </script>
     <script>
+        $('#rename-task-modal').on('show.bs.modal', function(e) {
+            let aEle = $(e.relatedTarget);
+            let taskID = aEle.data('id');
+            let renameTaskForm = $("#rename-task-form");
+            let renameBtn = renameTaskForm.find("button[type=submit]");
+            renameTaskForm.off("submit");
+            renameTaskForm.submit(function () {
+                renameBtn.attr("disabled", "disabled");
+                // validation
+                let form = this;
+                let inputEle = $(form).find("input#task-name-input");
+                let newTaskName = $(form).find("#task-name-input").val().trim();
+                if(newTaskName.length === 0) {
+                    Toast.fire({
+                        icon: "error",
+                        title: "&nbsp;任务名不能为空",
+                    });
+                    inputEle.val("");
+                    renameBtn.removeAttr("disabled");
+                    return false;
+                } else {
+                    if(newTaskName.length < 3 || newTaskName.length > 20) {
+                        Toast.fire({
+                            icon: "error",
+                            title: "&nbsp;任务名长度应在3~20个字符之间",
+                        });
+                        inputEle.val("");
+                        renameBtn.removeAttr("disabled");
+                        return false;
+                    }
+                }
+                $.ajax({
+                    url: $(form).attr("action").split("/").slice(0,-2).concat(taskID).join("/") + "/",
+                    type: "POST",
+                    data: $(form).serialize() + "&inputTaskName=" + newTaskName,
+                    cache: false,
+                    success: function (data) {
+                      if(data["status"] === "SUCCESS") {
+                          renameBtn.removeAttr("disabled");
+                          Toast.fire({
+                              icon: "success",
+                              title: "&nbsp;任务重命名成功",
+                          });
+                          // 更新sidebar
+                          let tasks = data["tasks"];
+                          if (tasks) {
+                            let recentEditList = $("#recent-edit-list");
+                            // remove cur tasks
+                            recentEditList.empty();
+                            // 重新填充
+                            for(let i = 0; i < tasks.length; i++) {
+                                let recentTaskID = tasks[i]['id'];
+                                let templateID = tasks[i]['template_id'];
+                                let url = "{% url 'template_setting' 1 %}".split("/").slice(0, -2).concat(templateID).join("/") + "/";
+                                recentEditList.append("<li class=\"nav-item edit-item\">\n" +
+                                "<a class=\"nav-link\" href=\""+ url + "?taskID=" + recentTaskID + "\">\n" +
+                                "                                            <i\n" +
+                                "                                                class=\"far fa-circle nav-icon hidden\"\n" +
+                                "                                            ></i>\n" +
+                                "                                            <p>\n" +
+                                "                                                " + tasks[i]['name'] +"\n" +
+                                "                                            </p>\n" +
+                                "                                        </a>\n" +
+                                "                                    </li>");
+                            }
+                            sessionStorage.setItem('recent-edit-update', JSON.stringify(tasks));
+                          }
+                          // 修改任务名
+                          let updateNameStr = aEle[0].outerHTML + newTaskName;
+                          aEle.parent("td").html(updateNameStr);
+                          // 隐去modal
+                          $('#rename-task-modal').modal('hide');
+                          taskTable.columns.adjust().draw();
+                      } else {
+                          renameBtn.removeAttr("disabled");
+                          Toast.fire({
+                              icon: "error",
+                              title: "&nbsp;" + data["message"],
+                          });
+                      }
+                    },
+                    error: function (xhr) {
+                      renameBtn.removeAttr("disabled");
+                      console.log(xhr);
+                    }
+                });
+                inputEle.val("");
+                return false;
+            });
+        });
+
+        $('#restart-task-modal').on('show.bs.modal', function(e) {
+            let aEle = $(e.relatedTarget);
+            let taskID = aEle.data('id');
+            let restartTaskForm = $("#restart-task-form");
+            let restartBtn = restartTaskForm.find("button[type=submit]");
+            restartTaskForm.off("submit");
+            restartTaskForm.submit(function () {
+                restartBtn.attr("disabled", "disabled");
+                $.ajax({
+                    url: $(this).attr("action").split("/").slice(0,-2).concat(taskID).join("/") + "/",
+                    type: "POST",
+                    data: $(this).serialize() + "&noChange",
+                    cache: false,
+                    success: function (data) {
+                      if(data["status"] === "SUCCESS") {
+                          restartBtn.removeAttr("disabled");
+                          Toast.fire({
+                              icon: "success",
+                              title: "&nbsp;任务已重新开始",
+                          });
+                          // update sidebar
+                          let tasks = data["tasks"];
+                          if (tasks) {
+                            let recentEditList = $("#recent-edit-list");
+                            // remove cur tasks
+                            recentEditList.empty();
+                            // 重新填充
+                            for(let i = 0; i < tasks.length; i++) {
+                                let recentTaskID = tasks[i]['id'];
+                                let templateID = tasks[i]['template_id'];
+                                let url = "{% url 'template_setting' 1 %}".split("/").slice(0, -2).concat(templateID).join("/") + "/";
+                                recentEditList.append("<li class=\"nav-item edit-item\">\n" +
+                                "<a class=\"nav-link\" href=\""+ url + "?taskID=" + recentTaskID + "\">\n" +
+                                "                                            <i\n" +
+                                "                                                class=\"far fa-circle nav-icon hidden\"\n" +
+                                "                                            ></i>\n" +
+                                "                                            <p>\n" +
+                                "                                                " + tasks[i]['name'] +"\n" +
+                                "                                            </p>\n" +
+                                "                                        </a>\n" +
+                                "                                    </li>");
+                            }
+                            sessionStorage.setItem('recent-edit-update', JSON.stringify(tasks));
+                          }
+                          // 更新采集状态、操作字符、进度条（为0）、执行次数+1、耗时和采集完成时间清空
+                          let parent = aEle.parent("td");
+                                                parent.append("                          <a\n" +
+                              "                            data-id=\"" + taskID + "\"\n" +
+                              "                            href=\"#cancel-task-modal\"\n" +
+                              "                            data-toggle=\"modal\"\n" +
+                              "                            data-target=\"#cancel-task-modal\"\n" +
+                              "                          >\n" +
+                              "                            <i class=\"far fa-stop-circle hidden\"></i>\n" +
+                              "                          </a>");
+                          parent.removeClass();
+                          parent.addClass("ready");
+                          let status = parent.prev("td");
+                          status.removeClass();
+                          status.addClass("ready");
+                          status.html("等待运行");
+                          // 清空耗时
+                          parent.nextAll().eq(1).html("");
+                          // 执行次数+1
+                          let countEle = parent.nextAll().eq(2);
+                          countEle.html(+countEle.html().trim() + 1);
+                          // 清空采集完成时间
+                          parent.nextAll().eq(3).html("");
+                          // 进度条重置为0
+                          tdEle = parent
+                              .nextAll()
+                              .eq(4)
+                              .find(".progress")
+                              .attr("title", "0%")
+                              .find(".progress-bar")
+                              .css("width", "0%");
+                          aEle.remove();
+                          // 隐去modal
+                          $('#restart-task-modal').modal('hide');
+                          taskTable.columns.adjust().draw();
+                      } else {
+                          restartBtn.removeAttr("disabled");
+                          Toast.fire({
+                              icon: "error",
+                              title: "&nbsp;" + data["message"],
+                          });
+                      }
+                    },
+                    error: function (xhr) {
+                      restartBtn.removeAttr("disabled");
+                      console.log(xhr);
+                    }
+                });
+                return false;
+           });
+        });
+
         btnEle.on("click", function () {
           if($(this).find("i").hasClass("fa-sync")) {
               location.reload();
@@ -376,8 +563,10 @@
               return false;
           } else {
               let taskForm = $("#task-form");
+              let delBtn = $(this);
               taskForm.off("submit");
               taskForm.submit(function () {
+                delBtn.attr("disabled", "disabled");
                 let isValid = true;
                 let form = this;
                 // Iterate over all selected checkboxes
@@ -391,6 +580,7 @@
                           title: "&nbsp;非已完成或已终止状态的任务不能删除",
                       });
                       isValid = false;
+                      delBtn.removeAttr("disabled");
                       return false;
                   }
                 });
@@ -411,6 +601,7 @@
                       cache: false,
                       success: function (data) {
                           if(data["status"] === "SUCCESS") {
+                              delBtn.removeAttr("disabled");
                               Toast.fire({
                                   icon: "success",
                                   title: "&nbsp;任务删除成功",
@@ -418,7 +609,32 @@
                               taskTable.rows(".selected").remove().draw(false);
                               // reset button
                               btnEle.html("<i class='fas fa-sync'></i>&nbsp;刷新");
+                              // update sidebar
+                              let tasks = data["tasks"];
+                              if (tasks) {
+                                let recentEditList = $("#recent-edit-list");
+                                // remove cur tasks
+                                recentEditList.empty();
+                                // 重新填充
+                                for(let i = 0; i < tasks.length; i++) {
+                                    let recentTaskID = tasks[i]['id'];
+                                    let templateID = tasks[i]['template_id'];
+                                    let url = "{% url 'template_setting' 1 %}".split("/").slice(0, -2).concat(templateID).join("/") + "/";
+                                    recentEditList.append("<li class=\"nav-item edit-item\">\n" +
+                                    "<a class=\"nav-link\" href=\""+ url + "?taskID=" + recentTaskID + "\">\n" +
+                                    "                                            <i\n" +
+                                    "                                                class=\"far fa-circle nav-icon hidden\"\n" +
+                                    "                                            ></i>\n" +
+                                    "                                            <p>\n" +
+                                    "                                                " + tasks[i]['name'] +"\n" +
+                                    "                                            </p>\n" +
+                                    "                                        </a>\n" +
+                                    "                                    </li>");
+                                }
+                                sessionStorage.setItem('recent-edit-update', JSON.stringify(tasks));
+                              }
                           } else {
+                              delBtn.removeAttr("disabled");
                               Toast.fire({
                                   icon: "error",
                                   title: "&nbsp;" + data["message"],
@@ -426,6 +642,7 @@
                           }
                       },
                       error: function (xhr) {
+                          delBtn.removeAttr("disabled");
                           console.log(xhr);
                       }
                     });
@@ -440,7 +657,6 @@
             let parent = $(this).parent("td");
             let status = parent.prev("td");
             let taskID = $(this).attr("data-id");
-            console.log("taskID: %s" % taskID);
             let post_data = {
                 'csrfmiddlewaretoken': '{{ csrf_token }}'
             };
