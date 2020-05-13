@@ -1,5 +1,6 @@
 {% extends 'dashboardBase.html' %}
 {% load static %}
+{% load spiderTemplate_extras %}
 
 {% block title %}EasySpider | 模板配置{% endblock %}
 
@@ -36,7 +37,11 @@
             id="arguments-card"
         >
             <!-- form start -->
-            <form role="form" action="{% url 'create_task' template.pk %}" method="post" id="setting-form">
+            <form role="form" action="{% if task %}
+                                        {% url 'restart_task' task.pk %}
+                                      {% else %}
+                                        {% url 'create_task' template.pk %}
+                                      {% endif %}" method="post" id="setting-form">
                 {% csrf_token %}
                 <div class="card-body">
                     <h5>基本信息</h5>
@@ -49,6 +54,7 @@
                             class="form-control"
                             placeholder="请输入任务名"
                             name="inputTaskName"
+                            value="{% if task %}{{ task.name }}{% endif %}"
                             required
                         />
                     </div>
@@ -65,6 +71,7 @@
                                     class="form-control"
                                     placeholder="请输入{{ param.display_name }}"
                                     name="{{ param.name }}"
+                                    value="{% if task %}{{ task.args_dict|get_dict_value:param.name }}{% endif %}"
                                     required
                                 />
                             {% else %}
@@ -74,7 +81,7 @@
                                     placeholder="请输入{{ param.display_name }}"
                                     name="{{ param.name }}"
                                     required
-                                ></textarea>
+                                >{{ task.args_dict|get_dict_value:param.name }}</textarea>
                             {% endif %}
                     {% endfor %}
                     </div>
@@ -97,15 +104,17 @@
 {% block js_extend %}
     <script>
         // set active for task
-        recentEditList.find("li a").each(function () {
-            let href = $(this).attr("href");
-            let taskID = +href.slice(href.lastIndexOf("=") + 1);
-            {#if(taskID === {{ task.pk }}) {#}
-            {#    $(this).parents("#recent-edit-list").prev("a").addClass("active");#}
-            {#    $(this).addClass("active");#}
-            {#    return false;#}
-            {# } #}
-        });
+        {% if task %}
+            recentEditList.find("li a").each(function () {
+                let href = $(this).attr("href");
+                let taskID = +href.slice(href.lastIndexOf("=") + 1);
+                    if(taskID === {{ task.pk }}) {
+                        $(this).parents("#recent-edit-list").prev("a").addClass("active");
+                        $(this).addClass("active");
+                        return false;
+                    }
+            });
+        {% endif %}
     </script>
     <script src="{% static 'spiderTemplate/js/templateSetting.js' %}"></script>
     <script>
@@ -133,14 +142,25 @@
             });
 
             $("input[type=number]").each(function () {
-                if($(this).val() < 0) {
+                let numberValue = $(this).val();
+                if(numberValue < 0 || numberValue > 100) {
                     Toast.fire({
                         icon: "error",
-                        title: "错误的值：" + $(this).val() + "，请输入1~99",
+                        title: "&nbsp;错误的值：" + $(this).val() + "，请输入1~99",
                     });
                     return false;
                 }
             });
+
+            // 任务状态验证
+            {% if task %}
+                {% if task.status != 'finished' and task.status != 'canceled' %}
+                    Toast.fire({
+                        icon: "error",
+                        title: "&nbsp;非已完成或已终止的任务无法重新启动",
+                    });
+                {% endif %}
+            {% endif %}
 
             $.ajax({
                 url: $(this).attr("action"),
@@ -148,7 +168,6 @@
                 data: $(this).serialize(),
                 cache: false,
                 success: function (data) {
-                    // console.log(data);
                     if(data["status"] === "SUCCESS") {
                         Toast.fire({
                             icon: "success",
@@ -156,21 +175,8 @@
                         });
                         // get top 5 tasks
                         let tasks = data["tasks"];
-                        // remove cur tasks
-                        recentEditList.empty();
-                        // 重新填充
-                        {#for(let i = 0; i < tasks.length; i++) {#}
-                        {#    recentEditList.append("<li class=\"nav-item edit-item\">\n" +#}
-                        {#    "<a class=\"nav-link\" href=\""+ {% url 'template_setting' 1 %} + "?taskID=" + tasks[i].pk + "\">\n" +#}
-                        {#    "                                            <i\n" +#}
-                        {#    "                                                class=\"far fa-circle nav-icon hidden\"\n" +#}
-                        {#    "                                            ></i>\n" +#}
-                        {#    "                                            <p>\n" +#}
-                        {#    "                                                " + tasks[i].name +"\n" +#}
-                        {#    "                                            </p>\n" +#}
-                        {#    "                                        </a>\n" +#}
-                        {#    "                                    </li>");#}
-                        {# } #}
+                         console.log(tasks);
+                        sessionStorage.setItem('recent-edit-update', tasks);
                     } else {
                         Toast.fire({
                             icon: "error",

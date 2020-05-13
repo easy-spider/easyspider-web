@@ -53,6 +53,7 @@ function add1() {
         var fileName = document.getElementById(label.id);
         if(file.value.slice(-4)!=='.jpg'){
             file.value='';
+            img.src="";
             fileName.innerHTML='添加图片';
             alert("请上传jpg格式的文件！");
             return;
@@ -74,7 +75,7 @@ function add1() {
     label.setAttribute('class','custom-file-label');
     label.for='exampleInputFile';
     label.id='fileName##'.replace(/##/g,index);
-    label.innerHTML='添加图片'
+    label.innerHTML='添加图片';
 
     button.setAttribute('class','btn btn-danger');
     button.type='button';
@@ -127,6 +128,9 @@ function add2() {
     var td4 = document.createElement('td');
     var td5 = document.createElement('td');
     var td6 = document.createElement('td');
+    var td7 = document.createElement('td');
+    var td8 = document.createElement('td');
+    var td9 = document.createElement('td');
     var input1=document.createElement('input');
     var input2=document.createElement('input');
     var input3=document.createElement('input');
@@ -144,6 +148,9 @@ function add2() {
     var img_div=document.createElement('div');
     var img=document.createElement('img');
     var input_div=document.createElement('div');
+    var input_min=document.createElement('input');
+    var input_max=document.createElement('input');
+    var input_lenth=document.createElement('input');
 
     img_div.setAttribute('class','input-group-text menu');
     img_div.innerHTML='预览图片';
@@ -160,12 +167,25 @@ function add2() {
     input1.setAttribute('name','param_name##'.replace(/##/g,index));
     input1.placeholder='参数英文名';
 
+    input_min.type='text';
+    input_min.setAttribute('class','form-control');
+    input_min.setAttribute('name','param_number_min##'.replace(/##/g,index));
+
+    input_max.type='text';
+    input_max.setAttribute('class','form-control');
+    input_max.setAttribute('name','param_number_max##'.replace(/##/g,index));
+
+    input_min.setAttribute('disabled',true);
+    input_max.setAttribute('disabled',true);
+
+    input_lenth.type='text';
+    input_lenth.setAttribute('class','form-control');
+    input_lenth.setAttribute('name','param_length_limit##'.replace(/##/g,index));
+
     input3.type='text';
     input3.setAttribute('class','form-control');
     input3.setAttribute('name','param_display_name##'.replace(/##/g,index));
     input3.placeholder='参数中文名';
-
-
 
     input2.type='file';
     input2.setAttribute('class','custom-file-input');
@@ -176,6 +196,7 @@ function add2() {
         var fileName = document.getElementById(label.id);
         if(file.value.slice(-4)!=='.jpg'){
             file.value='';
+            img.src="";
             fileName.innerHTML='添加图片';
             alert("请上传jpg格式的文件！");
             return;
@@ -205,8 +226,8 @@ function add2() {
     button.innerHTML='删除';
     button.setAttribute('onclick','deleteRow2("##")'.replace(/##/g,index));
 
-    input_label_div.setAttribute('class','form-group');
-    input_type_div.setAttribute('class','form-group');
+    input_label_div.setAttribute('class','');
+    input_type_div.setAttribute('class','');
     input_label_select.setAttribute('class','custom-select');
     input_type_select.setAttribute('class','custom-select');
     input_label_select.setAttribute('name','param_input_label##'.replace(/##/g,index));
@@ -216,9 +237,33 @@ function add2() {
         var select=input_label_select.value;
         if(select==='textarea'){
             input_type_select.setAttribute('disabled',true);
+            input_min.setAttribute('disabled',true);
+            input_max.setAttribute('disabled',true);
+            input_lenth.setAttribute('disabled',true);
         }
         else{
             input_type_select.removeAttribute('disabled');
+            var type=input_type_select.value;
+            if(type==='text'){
+                input_lenth.removeAttribute('disabled');
+            }
+            else{
+                input_min.removeAttribute('disabled');
+                input_max.removeAttribute('disabled');
+            }
+        }
+    };
+    input_type_select.onchange=function(){
+        var type=input_type_select.value;
+        if(type==='text'){
+            input_lenth.removeAttribute('disabled');
+            input_min.setAttribute('disabled',true);
+            input_max.setAttribute('disabled',true);
+        }
+        else{
+            input_min.removeAttribute('disabled');
+            input_max.removeAttribute('disabled');
+            input_lenth.setAttribute('disabled',true);
         }
     };
     option1.innerHTML='input';
@@ -250,10 +295,17 @@ function add2() {
     td1.append(input1);
     td2.append(input3);
     td5.append(input_label_div);
-    td5.style.width='170px';
+    td5.style.width='160px';
     td6.append(input_type_div);
-    td6.style.width='170px';
+    td6.style.width='160px';
+    td7.append(input_min);
+    td7.style.width='110px';
+    td8.append(input_max);
+    td8.style.width='110px';
+    td9.append(input_lenth);
+    td9.style.width='110px';
     td3.append(div);
+    td3.style.width='250px';
     td4.append(button);
     td4.style.width='120px';
     //添加内容到表格中
@@ -261,6 +313,9 @@ function add2() {
     tr.append(td2);
     tr.append(td5);
     tr.append(td6);
+    tr.append(td7);
+    tr.append(td8);
+    tr.append(td9);
     tr.append(td3);
     tr.append(td4);
     tbody.append(tr);
@@ -282,8 +337,10 @@ function deleteRow2(inde){
 function handleFile1(){
     var file = document.getElementById("file-1");
     var fileName = document.getElementById("fileName-1");
+    var img = document.getElementById("img-1");
     if(file.value.slice(-4)!=='.jpg'){
         file.value='';
+        img.setAttribute('src','');
         fileName.innerHTML='jpg文件';
         alert("请上传jpg格式的文件！");
         return;

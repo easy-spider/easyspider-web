@@ -26,3 +26,9 @@
 .input-group-text{
     width: 110px!important;
 }
+td{
+    vertical-align: inherit!important;
+}
+td.form-group {
+    margin-bottom: 0rem!important;
+}

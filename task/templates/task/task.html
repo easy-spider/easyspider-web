@@ -35,7 +35,7 @@
     <div class="row">
       <div class="card m-auto" id="task-card">
         <div class="card-body">
-            <form action="{% url 'my_task' %}" id="task-form" method="POST">
+            <form action="" id="task-form" method="POST">
                 {% csrf_token %}
                 <table
                     id="task-table"
@@ -56,275 +56,104 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr id="1">
-                        <td>1</td>
-                        <td>
-                          <a
-                            data-id="1"
-                            href="#rename-task-modal"
-                            data-toggle="modal"
-                            data-target="#rename-task-modal"
-                            ><i class="fas fa-pen hidden"></i>&nbsp;</a
-                          >豆瓣电影1
-                        </td>
-                        <td class="ready">
-                          等待运行
-                        </td>
-                        <td class="ready">
-                          <a href="" data-toggle="modal" data-target="" data-id="1">
-                            <i class="far fa-pause-circle hidden"></i>
-                          </a>
-                          <a
-                            data-id="1"
-                            href="#cancel-task-modal"
-                            data-toggle="modal"
-                            data-target="#cancel-task-modal"
-                          >
-                            <i class="far fa-stop-circle hidden"></i>
-                          </a>
-                        </td>
-                        <td>20/04/22 12:00</td>
-                        <td></td>
-                        <td>1</td>
-                        <td></td>
-                        <td>
-                          <div class="progress progress-xs" title="0%">
-                            <div
-                              class="progress-bar progress-bar-danger progress-bar-striped progress-bar-animated"
-                              style="width: 0%;"
-                            ></div>
-                          </div>
-                        </td>
-                        <td>
-                          <div class="dropdown">
-                            <a
-                              class="nav-link task-dropdown"
-                              data-toggle="dropdown"
-                              href="#"
-                            >
-                              <i class="fas fa-ellipsis-h"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                              <a class="dropdown-item" href="{% url 'template_setting' 1 %}?taskID=1">编辑</a>
-                              <a class="dropdown-item" href="#">查看采集数据</a>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr id="2">
-                        <td>2</td>
-                        <td>
-                          <a
-                            data-id="2"
-                            href="#rename-task-modal"
-                            data-toggle="modal"
-                            data-target="#rename-task-modal"
-                            ><i class="fas fa-pen hidden"></i>&nbsp;</a
-                          >豆瓣电影2
-                        </td>
-                        <td class="paused">
-                          已暂停
-                        </td>
-                        <td class="paused">
-                          <a href="" data-toggle="modal" data-target="" data-id="2">
-                            <i class="far fa-play-circle hidden"></i>
-                          </a>
-                          <a
-                            data-id="2"
-                            href="#cancel-task-modal"
-                            data-toggle="modal"
-                            data-target="#cancel-task-modal"
-                          >
-                            <i class="far fa-stop-circle hidden"></i>
-                          </a>
-                        </td>
-                        <td>20/04/22 13:00</td>
-                        <td></td>
-                        <td>1</td>
-                        <td></td>
-                        <td>
-                          <div class="progress progress-xs" title="55%">
-                            <div
-                              class="progress-bar progress-bar-danger progress-bar-striped progress-bar-animated"
-                              style="width: 55%;"
-                            ></div>
-                          </div>
-                        </td>
-                        <td>
-                          <div class="dropdown">
-                            <a
-                              class="nav-link task-dropdown"
-                              data-toggle="dropdown"
-                              href="#"
-                            >
-                              <i class="fas fa-ellipsis-h"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                              <a class="dropdown-item" href="{% url 'template_setting' 1 %}?taskID=2">编辑</a>
-                              <a class="dropdown-item" href="#">查看采集数据</a>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr id="3">
-                        <td>3</td>
-                        <td>
-                          <a
-                            data-id="3"
-                            href="#rename-task-modal"
-                            data-toggle="modal"
-                            data-target="#rename-task-modal"
-                            ><i class="fas fa-pen hidden"></i>&nbsp;</a
-                          >豆瓣电影3
-                        </td>
-                        <td class="running">
-                          运行中
-                        </td>
-                        <td class="running">
-                          <a href="" data-toggle="modal" data-target="">
-                            <i class="far fa-pause-circle hidden"></i>
-                          </a>
-                          <a
-                            data-id="3"
-                            href="#cancel-task-modal"
-                            data-toggle="modal"
-                            data-target="#cancel-task-modal"
-                          >
-                            <i class="far fa-stop-circle hidden"></i>
-                          </a>
-                        </td>
-                        <td>20/04/22 14:00</td>
-                        <td></td>
-                        <td>1</td>
-                        <td></td>
-                        <td>
-                          <div class="progress progress-xs" title="55%">
-                            <div
-                              class="progress-bar progress-bar-danger progress-bar-striped progress-bar-animated"
-                              style="width: 55%;"
-                            ></div>
-                          </div>
-                        </td>
-                        <td>
-                          <div class="dropdown">
-                            <a
-                              class="nav-link task-dropdown"
-                              data-toggle="dropdown"
-                              href="#"
-                            >
-                              <i class="fas fa-ellipsis-h"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                              <a class="dropdown-item" href="{% url 'template_setting' 1 %}?taskID=3">编辑</a>
-                              <a class="dropdown-item" href="#">查看采集数据</a>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr id="4">
-                        <td>4</td>
-                        <td>
-                          <a
-                            data-id="4"
-                            href="#rename-task-modal"
-                            data-toggle="modal"
-                            data-target="#rename-task-modal"
-                            ><i class="fas fa-pen hidden"></i>&nbsp;</a
-                          >豆瓣电影4
-                        </td>
-                        <td class="finished">
-                          已完成
-                        </td>
-                        <td class="finished">
-                          <a
-                            data-id="4"
-                            href="#restart-task-modal"
-                            data-toggle="modal"
-                            data-target="#restart-task-modal"
-                          >
-                            <i class="far fa-play-circle hidden"></i>
-                          </a>
-                        </td>
-                        <td>20/04/22 15:00</td>
-                        <td></td>
-                        <td>1</td>
-                        <td></td>
-                        <td>
-                          <div class="progress progress-xs" title="55%">
-                            <div
-                              class="progress-bar progress-bar-danger progress-bar-striped progress-bar-animated"
-                              style="width: 55%;"
-                            ></div>
-                          </div>
-                        </td>
-                        <td>
-                          <div class="dropdown">
-                            <a
-                              class="nav-link task-dropdown"
-                              data-toggle="dropdown"
-                              href="#"
-                            >
-                              <i class="fas fa-ellipsis-h"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                              <a class="dropdown-item" href="{% url 'template_setting' 1 %}?taskID=4">编辑</a>
-                              <a class="dropdown-item" href="#">查看采集数据</a>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr id="5">
-                        <td>5</td>
-                        <td>
-                          <a
-                            data-id="5"
-                            href="#rename-task-modal"
-                            data-toggle="modal"
-                            data-target="#rename-task-modal"
-                            ><i class="fas fa-pen hidden"></i>&nbsp;</a
-                          >豆瓣电影5
-                        </td>
-                        <td class="canceled">
-                          已终止
-                        </td>
-                        <td class="canceled">
-                          <a
-                            data-id="5"
-                            href="#restart-task-modal"
-                            data-toggle="modal"
-                            data-target="#restart-task-modal"
-                          >
-                            <i class="far fa-play-circle hidden"></i>
-                          </a>
-                        </td>
-                        <td>20/04/22 16:00</td>
-                        <td></td>
-                        <td>1</td>
-                        <td></td>
-                        <td>
-                          <div class="progress progress-xs" title="55%">
-                            <div
-                              class="progress-bar progress-bar-danger progress-bar-striped progress-bar-animated"
-                              style="width: 55%;"
-                            ></div>
-                          </div>
-                        </td>
-                        <td>
-                          <div class="dropdown">
-                            <a
-                              class="nav-link task-dropdown"
-                              data-toggle="dropdown"
-                              href="#"
-                            >
-                              <i class="fas fa-ellipsis-h"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right">
-                              <a class="dropdown-item" href="{% url 'template_setting' 1 %}?taskID=5">编辑</a>
-                              <a class="dropdown-item" href="#">查看采集数据</a>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
+                      {% for task in task_list %}
+                          <tr id="{{ task.pk }}">
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                              <a
+                                data-id="{{ task.pk }}"
+                                href="#rename-task-modal"
+                                data-toggle="modal"
+                                data-target="#rename-task-modal"
+                                ><i class="fas fa-pen hidden"></i>&nbsp;</a
+                              >{{ task.name }}
+                            </td>
+                            <td class="{{ task.status }}">
+                              {{ task.display_status }}
+                            </td>
+                            <td class="{{ task.status }}">
+                              {% if task.status == 'ready' %}
+                                  <a
+                                        data-id="{{ task.pk }}"
+                                        href="#cancel-task-modal"
+                                        data-toggle="modal"
+                                        data-target="#cancel-task-modal"
+                                      >
+                                        <i class="far fa-stop-circle hidden"></i>
+                                  </a>
+                              {% elif task.status == 'paused' %}
+                                  <a href="" data-toggle="modal" data-target="" data-id="{{ task.pk }}">
+                                    <i class="far fa-play-circle hidden"></i>
+                                  </a>
+                                  <a
+                                    data-id="{{ task.pk }}"
+                                    href="#cancel-task-modal"
+                                    data-toggle="modal"
+                                    data-target="#cancel-task-modal"
+                                  >
+                                    <i class="far fa-stop-circle hidden"></i>
+                                  </a>
+                              {% elif task.status == 'running' %}
+                                  <a href="" data-toggle="modal" data-target="" data-id="">
+                                    <i class="far fa-pause-circle hidden"></i>
+                                  </a>
+                                  <a
+                                    data-id="{{ task.pk }}"
+                                    href="#cancel-task-modal"
+                                    data-toggle="modal"
+                                    data-target="#cancel-task-modal"
+                                  >
+                                    <i class="far fa-stop-circle hidden"></i>
+                                  </a>
+                              {% elif task.status == 'finished' %}
+                                  <a
+                                    data-id="{{ task.pk }}"
+                                    href="#restart-task-modal"
+                                    data-toggle="modal"
+                                    data-target="#restart-task-modal"
+                                  >
+                                    <i class="far fa-play-circle hidden"></i>
+                                  </a>
+                              {% elif task.status == 'canceled' %}
+                                  <a
+                                    data-id="{{ task.pk }}"
+                                    href="#restart-task-modal"
+                                    data-toggle="modal"
+                                    data-target="#restart-task-modal"
+                                  >
+                                    <i class="far fa-play-circle hidden"></i>
+                                  </a>
+                              {% endif %}
+                            </td>
+                            <td>{{ task.create_time | date:"y/m/d H:i" }}</td>
+                            <td>{{ task.duration }}</td>
+                            <td>{{ task.run_times }}</td>
+                            <td>{{ task.finish_time | date:"y/m/d H:i" }}</td>
+                            <td>
+                              <div class="progress progress-xs" title="{{ task.progress }}">
+                                <div
+                                  class="progress-bar progress-bar-danger progress-bar-striped progress-bar-animated"
+                                  style="width: {{ task.progress }};"
+                                ></div>
+                              </div>
+                            </td>
+                            <td>
+                              <div class="dropdown">
+                                <a
+                                  class="nav-link task-dropdown"
+                                  data-toggle="dropdown"
+                                  href=""
+                                >
+                                  <i class="fas fa-ellipsis-h"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                  <a class="dropdown-item" href="{% url 'template_setting' task.template.pk %}?taskID={{ task.pk }}">编辑</a>
+                                  <a class="dropdown-item" href="{% url 'preview_data' task.pk %}">查看采集数据</a>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                      {% endfor %}
                     </tbody>
                 </table>
             </form>
@@ -337,7 +166,7 @@
     <div class="modal fade" id="cancel-task-modal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="{% url 'my_task' %}" method="POST" id="cancel-task-form">
+                <form action="{% url 'cancel_task' 1 %}" method="POST" id="cancel-task-form">
                     {% csrf_token %}
                     <div class="modal-body">
                         <div class="card-comments">
@@ -377,7 +206,7 @@
     <div class="modal fade" id="restart-task-modal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="restart-task-form" action="{% url 'my_task' %}" method="POST">
+                <form id="restart-task-form" action="{% url 'restart_task' 1 %}" method="POST">
                     {% csrf_token %}
                     <div class="modal-body">
                       <div class="card-comments">
@@ -428,7 +257,7 @@
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                <form id="rename-task-form" action="{% url 'my_task' %}" method="POST">
+                <form id="rename-task-form" action="{% url 'rename_task' 1 %}" method="POST">
                     {% csrf_token %}
                     <div class="modal-body">
                         <div class="form-group">
@@ -540,15 +369,80 @@
         };
     </script>
     <script>
+        btnEle.on("click", function () {
+          if($(this).find("i").hasClass("fa-sync")) {
+              location.reload();
+              taskTable.columns.adjust().draw();
+              return false;
+          } else {
+              let taskForm = $("#task-form");
+              taskForm.off("submit");
+              taskForm.submit(function () {
+                let isValid = true;
+                let form = this;
+                // Iterate over all selected checkboxes
+                let rows_selected = taskTableBodyEle.find("tr.selected");
+                rows_selected.each(function () {
+                  let taskStatus = $(this).find("td:nth-of-type(3)").text().trim();
+
+                  if(taskStatus !== "已完成" && taskStatus !== "已终止") {
+                      Toast.fire({
+                          icon: "error",
+                          title: "&nbsp;非已完成或已终止状态的任务不能删除",
+                      });
+                      isValid = false;
+                      return false;
+                  }
+                });
+                if(isValid) {
+                    let post_data = {
+                      'csrfmiddlewaretoken': $(form).find("input[name=csrfmiddlewaretoken]").val()
+                    };
+                    let taskIDs = [];
+                    rows_selected.each(function () {
+                        let taskID = parseInt($(this).attr("id"));
+                        taskIDs.push(taskID);
+                    });
+                    post_data["ids"] = JSON.stringify(taskIDs);
+                    $.ajax({
+                      url: '{% url 'batch_delete_task' %}',
+                      type: "POST",
+                      data: post_data,
+                      cache: false,
+                      success: function (data) {
+                          if(data["status"] === "SUCCESS") {
+                              Toast.fire({
+                                  icon: "success",
+                                  title: "&nbsp;任务删除成功",
+                              });
+                              taskTable.rows(".selected").remove().draw(false);
+                              // reset button
+                              btnEle.html("<i class='fas fa-sync'></i>&nbsp;刷新");
+                          } else {
+                              Toast.fire({
+                                  icon: "error",
+                                  title: "&nbsp;" + data["message"],
+                              });
+                          }
+                      },
+                      error: function (xhr) {
+                          console.log(xhr);
+                      }
+                    });
+                }
+                return false;
+              });
+          }
+        });
+
         taskTableBodyEle.find("tr td:nth-of-type(4) a").on("click", function () {
             let ele = $(this).find("i");
             let parent = $(this).parent("td");
             let status = parent.prev("td");
             let taskID = $(this).attr("data-id");
-            let url = $("task-form").attr("action");
+            console.log("taskID: %s" % taskID);
             let post_data = {
-                'csrfmiddlewaretoken': '{{ csrf_token }}',
-                'id': taskID
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
             };
             if(ele.hasClass("fa-pause-circle")) {
                 ele.attr("class", "far fa-play-circle hidden");
@@ -557,9 +451,8 @@
                 status.removeClass();
                 status.addClass("paused");
                 status.html("已暂停");
-                post_data["for"] = "pauseTask";
                 $.ajax({
-                    url: url,
+                    url: "{% url 'pause_task' 1 %}".split("/").slice(0, -2).concat(taskID).join("/") + "/",
                     type: "POST",
                     data: post_data,
                     cache: false,
@@ -583,66 +476,36 @@
             } else if(ele.hasClass("fa-play-circle")) {
                 let statusText = status.text().trim();
                 if(statusText !== "已完成" && statusText !== "已终止") {
-                    // 进度条为0则置为等待运行，否则置为运行中
+                    // 置为运行中
                     let progress = parent.nextAll("td").eq(4).find(".progress").attr("title");
                     ele.attr("class", "far fa-pause-circle hidden");
                     parent.removeClass();
                     status.removeClass();
-                    if(progress === "0%") {
-                        parent.addClass("ready");
-                        status.addClass("ready");
-                        status.html("等待运行");
-                        post_data["for"] = "readyTask";
-                        $.ajax({
-                            url: url,
-                            type: "POST",
-                            data: post_data,
-                            cache: false,
-                            success: function (data) {
-                              if(data["status"] === "SUCCESS") {
-                                  Toast.fire({
-                                      icon: "success",
-                                      title: "&nbsp;任务正在排队",
-                                  });
-                              } else {
-                                  Toast.fire({
-                                      icon: "error",
-                                      title: "&nbsp;" + data["message"],
-                                  });
-                              }
-                            },
-                            error: function (xhr) {
-                              console.log(xhr);
-                            }
-                        });
-                    } else {
-                        parent.addClass("running");
-                        status.addClass("running");
-                        status.html("运行中");
-                        post_data["for"] = "runningTask";
-                        $.ajax({
-                            url: url,
-                            type: "POST",
-                            data: post_data,
-                            cache: false,
-                            success: function (data) {
-                              if(data["status"] === "SUCCESS") {
-                                  Toast.fire({
-                                      icon: "success",
-                                      title: "&nbsp;任务将从暂停位置开始继续运行",
-                                  });
-                              } else {
-                                  Toast.fire({
-                                      icon: "error",
-                                      title: "&nbsp;" + data["message"],
-                                  });
-                              }
-                            },
-                            error: function (xhr) {
-                              console.log(xhr);
-                            }
-                        });
-                    }
+                    parent.addClass("running");
+                    status.addClass("running");
+                    status.html("运行中");
+                    $.ajax({
+                        url: '{% url "resume_task" 1 %}'.split("/").slice(0, -2).concat(taskID).join("/") + "/",
+                        type: "POST",
+                        data: post_data,
+                        cache: false,
+                        success: function (data) {
+                          if(data["status"] === "SUCCESS") {
+                              Toast.fire({
+                                  icon: "success",
+                                  title: "&nbsp;任务将从暂停位置开始继续运行",
+                              });
+                          } else {
+                              Toast.fire({
+                                  icon: "error",
+                                  title: "&nbsp;" + data["message"],
+                              });
+                          }
+                        },
+                        error: function (xhr) {
+                          console.log(xhr);
+                        }
+                    });
                 }
             }
             taskTable.columns.adjust().draw();

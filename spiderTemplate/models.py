@@ -45,6 +45,9 @@ class Template(models.Model):
     def logo(self):
         return reverse('pic:template-logo', args=(self.site.name, self.name))
 
+    def can_delete(self):
+        return self.task_set.exclude(status__in=['finished', 'canceled']).exists()
+
 
 class Field(models.Model):
     """采集字段实体类"""
@@ -79,6 +82,9 @@ class Param(models.Model):
     display_name = models.CharField(max_length=255)  # 展示名称（如“电影名称”）
     input_label = models.CharField(max_length=255, choices=INPUT_LABEL_CHOICES, default='input')
     input_type = models.CharField(max_length=255, choices=INPUT_TYPE_CHOICES, default='text')
+    number_min = models.IntegerField(default=1)  # input_type==number时的最小值
+    number_max = models.IntegerField(default=99)  # input_type==number时的最大值
+    length_limit = models.IntegerField(default=255)  # input_type==text时的长度限制
 
     def __str__(self):
         return '{} - {}'.format(self.template, self.display_name)

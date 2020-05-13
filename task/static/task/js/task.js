@@ -37,7 +37,7 @@ let taskTable = taskTableEle.DataTable({
   language: {
     search: "搜索:",
     sZeroRecords: "没有找到匹配的采集任务",
-    emptyTable: "暂无数据",
+    emptyTable: "暂无任务",
   },
 });
 
@@ -55,73 +55,6 @@ $(".dataTables_filter label").css({
 
 let totalScore = 0;
 let btnEle = $("#refresh-delete");
-
-btnEle.on("click", function () {
-  if($(this).find("i").hasClass("fa-sync")) {
-      location.reload();
-      taskTable.columns.adjust().draw();
-      return false;
-  } else {
-      let taskForm = $("#task-form");
-      taskForm.off("submit");
-      taskForm.submit(function () {
-        let isValid = true;
-        let form = this;
-        // Iterate over all selected checkboxes
-        let rows_selected = taskTableBodyEle.find("tr.selected");
-        rows_selected.each(function () {
-          let taskStatus = $(this).find("td:nth-of-type(3)").text().trim();
-
-          if(taskStatus !== "已完成" && taskStatus !== "已终止") {
-              Toast.fire({
-                  icon: "error",
-                  title: "&nbsp;非已完成或已终止状态的任务不能删除",
-              });
-              isValid = false;
-              return false;
-          }
-        });
-        if(isValid) {
-            let post_data = {
-              'csrfmiddlewaretoken': $(form).find("input[name=csrfmiddlewaretoken]").val(),
-              'for': 'deleteTask'
-            };
-            let taskIDs = [];
-            rows_selected.each(function () {
-                let taskID = parseInt($(this).attr("id"));
-                taskIDs.push(taskID);
-            });
-            post_data["ids"] = JSON.stringify(taskIDs);
-            $.ajax({
-              url: $(form).attr("action"),
-              type: "POST",
-              data: post_data,
-              cache: false,
-              success: function (data) {
-                  if(data["status"] === "SUCCESS") {
-                      Toast.fire({
-                          icon: "success",
-                          title: "&nbsp;任务删除成功",
-                      });
-                      taskTable.rows(".selected").remove().draw(false);
-                      // reset button
-                      btnEle.html("<i class='fas fa-sync'></i>&nbsp;刷新");
-                  } else {
-                      Toast.fire({
-                          icon: "error",
-                          title: "&nbsp;" + data["message"],
-                      });
-                  }
-              },
-              error: function (xhr) {
-                  console.log(xhr);
-              }
-            });
-        }
-        return false;
-      });
-  }
-});
 
 $('#rename-task-modal').on('show.bs.modal', function(e) {
     let aEle = $(e.relatedTarget);
@@ -151,9 +84,9 @@ $('#rename-task-modal').on('show.bs.modal', function(e) {
             }
         }
         $.ajax({
-            url: $(form).attr("action"),
+            url: $(form).attr("action").split("/").slice(0,-2).concat(taskID).join("/") + "/",
             type: "POST",
-            data: $(form).serialize() + "&newTaskName=" + newTaskName + "&id=" + taskID + "&for=renameTask",
+            data: $(form).serialize() + "&inputTaskName=" + newTaskName,
             cache: false,
             success: function (data) {
               if(data["status"] === "SUCCESS") {
@@ -189,10 +122,11 @@ $('#cancel-task-modal').on('show.bs.modal', function(e) {
     let cancelTaskForm = $("#cancel-task-form");
     cancelTaskForm.off("submit");
     cancelTaskForm.submit(function () {
+        console.log($(this).serialize());
         $.ajax({
-            url: $(this).attr("action"),
+            url: $(this).attr("action").split("/").slice(0,-2).concat(taskID).join("/") + "/",
             type: "POST",
-            data: $(this).serialize() + "&id=" + taskID + "&for=cancelTask",
+            data: $(this).serialize(),
             cache: false,
             success: function (data) {
               if(data["status"] === "SUCCESS") {
@@ -215,10 +149,6 @@ $('#cancel-task-modal').on('show.bs.modal', function(e) {
                   status.removeClass();
                   status.addClass("canceled");
                   status.html("已终止");
-                  // 耗时
-                  parent.nextAll().eq(1).html("2分钟");
-                  // 采集完成时间
-                  parent.nextAll().eq(3).html("20/05/09 13:00");
                   aEle.remove();
                   // 隐去modal
                   $('#cancel-task-modal').modal('hide');
@@ -245,9 +175,9 @@ $('#restart-task-modal').on('show.bs.modal', function(e) {
     restartTaskForm.off("submit");
     restartTaskForm.submit(function () {
         $.ajax({
-            url: $(this).attr("action"),
+            url: $(this).attr("action").split("/").slice(0,-2).concat(taskID).join("/") + "/",
             type: "POST",
-            data: $(this).serialize() + "&id=" + taskID + "&for=restartTask",
+            data: $(this).serialize() + "&noChange",
             cache: false,
             success: function (data) {
               if(data["status"] === "SUCCESS") {

@@ -32,14 +32,12 @@
 .login{
     padding-top: 20px;
     padding-left: 10%;
-    width: 13%;
     float: left;
 }
 
 .register{
     padding-top: 20px;
-    padding-left: 120px;
-    width: 13%;
+    padding-left: 50px;
     float: left;
 }
 
@@ -121,7 +119,7 @@ img {
     font-family: "Museo Sans";
     text-align: right;
     padding-top: 20px;
-    width:10%;
+    width:15%;
     float: left;
 }
 
