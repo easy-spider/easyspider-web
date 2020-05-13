@@ -4,7 +4,7 @@
 {% block title %}EasySpider | 管理现有模板{% endblock %}
 
 {% block css_extend %}
-    <link rel="stylesheet" href="{% static 'easyspider/css/templateUpload.css' %}" />
+    <link rel="stylesheet" href="{% static 'easyspider/css/templateSearchAdmin.css' %}" />
 {% endblock %}
 
 {% block page_title %}管理现有模板{% endblock %}
@@ -28,58 +28,48 @@
                 <div class="card">
                     <div class="card-header">
                     <h3 class="card-title">爬虫模板列表</h3>
-
-                    <div class="card-tools">
-                        <div class="input-group input-group-sm" style="width: 150px;">
-                        <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
-
-                        <div class="input-group-append">
-                            <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
-                        </div>
-                        </div>
-                    </div>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body table-responsive p-0">
-                    <table class="table table-hover text-nowrap">
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>英文名称</th>
-                            <th>中文名称</th>
-                            <th>所属网站</th>
-                            <th>修改日期</th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for template in template_list %}
+                    <form action="{% url 'delete_template'%}" method="post"  onsubmit="return validate();">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_id" id="delete_id">
+                        <table class="table text-nowrap">
+                            <thead>
                             <tr>
-                                <td>{{template.id}}</td>
-                                <td>{{template.name}}</td>
-                                <td>{{template.display_name}}</td>
-                                <td>{{template.site}}</td>
-                                <td>{{template.update_time}}</td>
-                                <td>
-                                    {% if not template.task_set.exists %}
-                                        <button class="btn btn-block btn-primary" type="button">修改</button>
-                                    {% elif template.task_set.exists %}
-                                        <button class="btn btn-block btn-primary disabled" type="button">修改</button>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if not template.task_set.exists %}
-                                        <button class="btn btn-block btn-danger" type="button">删除</button>
-                                    {% elif template.task_set.exists %}
-                                        <button class="btn btn-block btn-danger disabled" type="button">删除</button>
-                                    {% endif %}
-                                </td>
+                                <th>ID</th>
+                                <th>英文名称</th>
+                                <th>中文名称</th>
+                                <th>所属网站</th>
+                                <th>修改日期</th>
+                                <th></th>
+                                <th></th>
                             </tr>
+                            </thead>
+                            <tbody>
+                            {% for template in template_list %}
+                                <tr>
+                                    <td>{{template.id}}</td>
+                                    <td>{{template.name}}</td>
+                                    <td>{{template.display_name}}</td>
+                                    <td>{{template.site}}</td>
+                                    <td>{{template.update_time}}</td>
+                                    <td>
+                                        <a href="{% url 'modify_template' template.id%}" type="button" class="btn btn-block btn-primary">修改</a>
+                                    </td>
+                                    <td>
+                                        {% if template.can_delete %}
+                                            <button class="btn btn-block btn-danger" type="submit" onclick="deleteRow(this)" data-id="{{ template.id }}">删除</button>
+                                        {% else %}
+                                            <button class="btn btn-block btn-danger disabled" type="submit" onclick="deleteRow(this)" data-id="{{ template.id }}">删除</button>
+                                        {% endif %}
 
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </form>
                     </div>
                     <!-- /.card-body -->
                 </div>
@@ -92,5 +82,25 @@
 
 {% block js_extend %}
     <script src="{% static 'easyspider/js/bs-custom-file-input.min.js' %}"></script>
+    <script>
+        function deleteRow(o) {
+            document.getElementById("delete_id").value=$(o).data('id');
+            var input=document.getElementsByName('delete_id').value;
+        }
+    </script>
+    <script>
+        function validate() {
+            var flag=confirm("确认要删除这个模板吗?");
+            if(flag===true)
+            {
+                alert("删除成功！");
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    </script>
 {% endblock %}
 

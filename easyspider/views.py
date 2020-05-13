@@ -250,21 +250,21 @@ def modify_template(request, pk):
 
 
 @require_http_methods(['POST'])
-def delete_template(request, pk):
+def delete_template(request):
     if not request.user.is_superuser:
         return HttpResponseForbidden('you are not admin')
+    pk = request.POST['delete_id']
     template = get_object_or_404(Template, pk=pk)
     if not template.can_delete():
         return HttpResponseForbidden('this template cannot be deleted now')
-
     try:
         client = MongoClient(settings.MONGODB_URI)
         client.drop_database('{}_{}'.format(template.site.name, template.name))
         client.close()
     except PyMongoError:
         logger.exception('MongoDB删除数据库失败')
-
     for task in template.task_set.all():
         task.job_set.all().delete()
         task.delete()
+    template.delete()
     return redirect(reverse('list_template'))
