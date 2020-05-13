@@ -154,39 +154,57 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 <ul class="nav nav-treeview" id="recent-edit-list">
                                     <script>
                                         (function () {
+                                          let recentEditLink = $("#recent-edit-link");
+                                          let recentEditList = $("#recent-edit-list");
                                           let tasks = sessionStorage.getItem('recent-edit-update');
                                           if (tasks) {
-                                            let recentEditList = $("#recent-edit-list");
+                                            tasks = JSON.parse(tasks);
                                             // remove cur tasks
                                             recentEditList.empty();
-                                            // 重新填充 这里将第一个任务置为active即可
+                                            // 重新填充
                                             for(let i = 0; i < tasks.length; i++) {
                                                 let taskID = tasks[i]['id'];
                                                 let templateID = tasks[i]['template_id'];
                                                 let url = "{% url 'template_setting' 1 %}".split("/").slice(0, -2).concat(templateID).join("/") + "/";
-                                                if(i === 0) {
+                                                {% if template_setting_task %}
+                                                    if(taskID === {{ template_setting_task.pk }}) {
+                                                        if(!recentEditLink.hasClass("active")) {
+                                                            recentEditLink.addClass("active");
+                                                        }
+                                                        recentEditList.append("<li class=\"nav-item edit-item\">\n" +
+                                                        "<a class=\"nav-link active\" href=\""+ url + "?taskID=" + taskID + "\">\n" +
+                                                        "                                            <i\n" +
+                                                        "                                                class=\"far fa-circle nav-icon hidden\"\n" +
+                                                        "                                            ></i>\n" +
+                                                        "                                            <p>\n" +
+                                                        "                                                " + tasks[i]['name'] +"\n" +
+                                                        "                                            </p>\n" +
+                                                        "                                        </a>\n" +
+                                                        "                                    </li>");
+                                                    } else {
+                                                        recentEditList.append("<li class=\"nav-item edit-item\">\n" +
+                                                        "<a class=\"nav-link\" href=\""+ url + "?taskID=" + taskID + "\">\n" +
+                                                        "                                            <i\n" +
+                                                        "                                                class=\"far fa-circle nav-icon hidden\"\n" +
+                                                        "                                            ></i>\n" +
+                                                        "                                            <p>\n" +
+                                                        "                                                " + tasks[i]['name'] +"\n" +
+                                                        "                                            </p>\n" +
+                                                        "                                        </a>\n" +
+                                                        "                                    </li>");
+                                                    }
+                                                {% else %}
                                                     recentEditList.append("<li class=\"nav-item edit-item\">\n" +
-                                                    "<a class=\"nav-link active\" href=\""+ url + "?taskID=" + taskID + "\">\n" +
-                                                    "                                            <i\n" +
-                                                    "                                                class=\"far fa-circle nav-icon hidden\"\n" +
-                                                    "                                            ></i>\n" +
-                                                    "                                            <p>\n" +
-                                                    "                                                " + tasks[i]['name'] +"\n" +
-                                                    "                                            </p>\n" +
-                                                    "                                        </a>\n" +
-                                                    "                                    </li>");
-                                                } else {
-                                                    recentEditList.append("<li class=\"nav-item edit-item\">\n" +
-                                                    "<a class=\"nav-link\" href=\""+ url + "?taskID=" + taskID + "\">\n" +
-                                                    "                                            <i\n" +
-                                                    "                                                class=\"far fa-circle nav-icon hidden\"\n" +
-                                                    "                                            ></i>\n" +
-                                                    "                                            <p>\n" +
-                                                    "                                                " + tasks[i]['name'] +"\n" +
-                                                    "                                            </p>\n" +
-                                                    "                                        </a>\n" +
-                                                    "                                    </li>");
-                                                }
+                                                        "<a class=\"nav-link\" href=\""+ url + "?taskID=" + taskID + "\">\n" +
+                                                        "                                            <i\n" +
+                                                        "                                                class=\"far fa-circle nav-icon hidden\"\n" +
+                                                        "                                            ></i>\n" +
+                                                        "                                            <p>\n" +
+                                                        "                                                " + tasks[i]['name'] +"\n" +
+                                                        "                                            </p>\n" +
+                                                        "                                        </a>\n" +
+                                                        "                                    </li>");
+                                                {% endif %}
                                              }
                                           }
                                         })();
@@ -309,43 +327,42 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <script src="{% static 'spiderTemplate/js/base.js' %}"></script>
         <script>
             let recentEditList = $("#recent-edit-list");
-            if(recentEditList.find("li").length === 0) {
-                {% if user.task_set.count != 0 %}
-                    // ajax请求按最近编辑时间排序的top 5任务
-                    $.ajax({
-                        url: "{% url 'get_recent_tasks' %}",
-                        type: "GET",
-                        cache: false,
-                        success: function (data) {
-                            if(data["status"] === "SUCCESS") {
-                                let tasks = data["tasks"];
-                                console.log("hi");
-                                for(let i = 0; i < tasks.length; i++) {
-                                    let taskID = tasks[i]['id'];
-                                    let templateID = tasks[i]['template_id'];
-                                    let url = "{% url 'template_setting' 1 %}".split("/").slice(0, -2).concat(templateID).join("/") + "/";
-                                    recentEditList.append("<li class=\"nav-item edit-item\">\n" +
-                                    "<a class=\"nav-link\" href=\""+ url + "?taskID=" + taskID + "\">\n" +
-                                    "                                            <i\n" +
-                                    "                                                class=\"far fa-circle nav-icon hidden\"\n" +
-                                    "                                            ></i>\n" +
-                                    "                                            <p>\n" +
-                                    "                                                " + tasks[i]['name'] +"\n" +
-                                    "                                            </p>\n" +
-                                    "                                        </a>\n" +
-                                    "                                    </li>");
-                                 }
-                            } else {
-                                console.log(data['message']);
+            if (!Boolean(sessionStorage.getItem('getTop5'))) {
+                // ajax请求按最近编辑时间排序的top 5任务
+                $.ajax({
+                    url: "{% url 'get_recent_tasks' %}",
+                    type: "GET",
+                    cache: false,
+                    success: function (data) {
+                        if(data["status"] === "SUCCESS") {
+                            let tasks = data["tasks"];
+                            recentEditList.empty();
+                            for(let i = 0; i < tasks.length; i++) {
+                                let taskID = tasks[i]['id'];
+                                let templateID = tasks[i]['template_id'];
+                                let url = "{% url 'template_setting' 1 %}".split("/").slice(0, -2).concat(templateID).join("/") + "/";
+                                recentEditList.append("<li class=\"nav-item edit-item\">\n" +
+                                "<a class=\"nav-link\" href=\""+ url + "?taskID=" + taskID + "\">\n" +
+                                "                                            <i\n" +
+                                "                                                class=\"far fa-circle nav-icon hidden\"\n" +
+                                "                                            ></i>\n" +
+                                "                                            <p>\n" +
+                                "                                                " + tasks[i]['name'] +"\n" +
+                                "                                            </p>\n" +
+                                "                                        </a>\n" +
+                                "                                    </li>");
                             }
-                        },
-                        error: function (xhr) {
-                            console.log(xhr);
+                            sessionStorage.setItem('recent-edit-update', JSON.stringify(tasks));
+                            sessionStorage.setItem('getTop5', '1');
+                        } else {
+                            console.log(data['message']);
                         }
-                    });
-                {% endif %}
+                    },
+                    error: function (xhr) {
+                        console.log(xhr);
+                    }
+                });
             }
-
         </script>
         {% block js_extend %} {% endblock %}
     </body>

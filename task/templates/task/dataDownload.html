@@ -71,7 +71,7 @@
                                     </button>
                                 </td>
                                 {% for td_data in row_data %}
-                                    <td>{{ td_data | safe | truncatechars_html:"15" }}</td>
+                                    <td><span class="sr-only">{{ td_data | safe }}</span>{{ td_data | safe | truncatechars_html:"15" }}</td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
@@ -265,11 +265,23 @@
     <!-- Custom JS -->
     <script src="{% static 'task/js/dataDownload.js' %}"></script>
     <script>
-        $('#clear-modal').on('show.bs.modal', function(e) {
+        let clearModal = $('#clear-modal');
+        let clearBtn = clearModal.find("button[type=submit]");
+        clearModal.on('show.bs.modal', function(e) {
             let clearForm = $("#clear-form");
             clearForm.off("submit");
             clearForm.submit(function () {
               let form = this;
+              clearBtn.attr("disabled", "disabled");
+              // 判断一下是否数据已清空
+              if(!dataTable.data().any()) {
+                  Toast.fire({
+                        icon: "info",
+                        title: "&nbsp;数据已清空",
+                  });
+                  clearBtn.removeAttr("disabled");
+                  return false;
+              }
               $.ajax({
                 url: $(form).attr("action"),
                 type: "POST",
@@ -277,13 +289,15 @@
                 cache: false,
                 success: function (data) {
                   if(data["status"] === "SUCCESS") {
+                    clearBtn.removeAttr("disabled");
                     Toast.fire({
                         icon: "success",
-                        title: "&nbsp;数据已清空",
+                        title: "&nbsp;清空数据成功",
                     });
                     dataTable.clear().draw();
                     $('#clear-modal').modal('hide');
                   } else {
+                      clearBtn.removeAttr("disabled");
                       Toast.fire({
                           icon: "error",
                           title: "&nbsp;" + data["message"],
@@ -291,22 +305,45 @@
                   }
                 },
                 error: function (xhr) {
+                  clearBtn.removeAttr("disabled");
                   console.log(xhr);
                 }
               });
               return false;
             });
         });
-    </script>
-    <script>
-        let json = JSON.stringify({{ full_data|safe }});
-        let blob = new Blob([json], {type: "application/json"});
-        let url  = URL.createObjectURL(blob);
-        let btn = $("#confirm-file-type-btn");
+
+        let spiderData, json, blob, url;
         let exportModal = $("#export-modal");
+        let confirmBtn =$("#confirm-file-type-btn") ;
+        $("#export-data-btn").on("click", function () {
+            confirmBtn.addClass("disable");
+            $.ajax({
+                url: "{% url 'get_spider_data' task.pk %}",
+                type: "GET",
+                cache: false,
+                success: function (data) {
+                    if(data['status'] === "SUCCESS") {
+                        spiderData = data["full_data"];
+                        json = JSON.stringify(spiderData);
+                        blob = new Blob([json], {type: "application/json"});
+                        url  = URL.createObjectURL(blob);
+                        confirmBtn.removeClass("disable");
+                    } else {
+                        console.log(data["message"]);
+                        confirmBtn.removeClass("disable");
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                    confirmBtn.removeClass("disable");
+                }
+            });
+        });
+
         exportModal.on('show.bs.modal', function (e) {
-            btn.off("click");
-            btn.on("click", function () {
+            confirmBtn.off("click");
+            confirmBtn.on("click", function () {
                 let way = exportModal.find("input[name=export-way]:checked").next().text().trim();
                 if(way === "JSON") {
                   way = ".json";
@@ -330,12 +367,12 @@
                     title: "&nbsp;数据下载成功",
                 });
                 if(way === ".json") {
-                    btn.attr({"href": url, "download": "{{ task.name }}" + way});
+                    confirmBtn.attr({"href": url, "download": "{{ task.name }}" + way});
                 }
                 else {
-                    btn.removeAttr("href");
+                    confirmBtn.removeAttr("href");
                     let wb = XLSX.utils.book_new();
-                    let ws = XLSX.utils.json_to_sheet({{ full_data|safe }});
+                    let ws = XLSX.utils.json_to_sheet(spiderData);
                     XLSX.utils.book_append_sheet(wb, ws, way === '.xlsx'? 'Sheet1': '');
                     XLSX.writeFile(wb, "{{ task.name }}" + way);
                 }

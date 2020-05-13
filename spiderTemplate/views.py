@@ -89,5 +89,5 @@ def template_setting(request, pk):
         return redirect(reverse("login"))
     context = {'template': Template.objects.get(pk=pk)}
     if 'taskID' in request.GET:
-        context['task'] = Task.objects.get(pk=int(request.GET['taskID']))
+        context['template_setting_task'] = Task.objects.get(pk=int(request.GET['taskID']))
     return render(request, 'spiderTemplate/templateSetting.html', context)
