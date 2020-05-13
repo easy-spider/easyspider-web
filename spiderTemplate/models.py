@@ -46,7 +46,7 @@ class Template(models.Model):
         return reverse('pic:template-logo', args=(self.site.name, self.name))
 
     def can_delete(self):
-        return self.task_set.exclude(status__in=['finished', 'canceled']).exists()
+        return not self.task_set.exclude(status__in=['finished', 'canceled']).exists()
 
 
 class Field(models.Model):
