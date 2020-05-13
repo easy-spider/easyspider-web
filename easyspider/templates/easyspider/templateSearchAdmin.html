@@ -61,7 +61,7 @@
                                         {% if template.can_delete %}
                                             <button class="btn btn-block btn-danger" type="submit" onclick="deleteRow(this)" data-id="{{ template.id }}">删除</button>
                                         {% else %}
-                                            <button class="btn btn-block btn-danger disabled" type="submit" onclick="deleteRow(this)" data-id="{{ template.id }}">删除</button>
+                                            <a type="button" class="btn btn-block btn-danger disabled" >删除</a>
                                         {% endif %}
 
                                     </td>
