@@ -227,10 +227,27 @@ def preview_data(request, task_pk):
     context = {
         'task': task,
         'field_list': [f.display_name for f in fields],
-        'sample_data': [[d[f.display_name] for f in fields] for d in documents[:15]],
-        'full_data': documents
+        'sample_data': [[d[f.display_name] for f in fields] for d in documents[:15]]
     }
     return render(request, 'task/dataDownload.html', context)
+
+
+def get_spider_data(request, task_pk):
+    if not request.user.is_authenticated:
+        return redirect(reverse('login'))
+    task = get_object_or_404(Task, pk=task_pk)
+    if task.user_id != request.user.id:
+        return HttpResponseForbidden('Not your task')
+    template = task.template
+    fields = list(template.field_set.all())
+    client = MongoClient(settings.MONGODB_URI)
+    db = client['{}_{}'.format(template.site.name, template.name)]
+    documents = []
+    for job in task.job_set.all():
+        for d in db['{}_{}'.format(task.id, job.uuid)].find(projection={'_id': False}):
+            documents.append({f.display_name: d[f.name] for f in fields})
+    client.close()
+    return JsonResponse({"status": "SUCCESS", "full_data": documents})
 
 
 def download_data(request, task_pk):

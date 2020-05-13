@@ -19,5 +19,6 @@ urlpatterns = [
 
     path('clearData/<int:task_pk>/', views.clear_data, name='clear_data'),
     path('previewData/<int:task_pk>/', views.preview_data, name='preview_data'),
+    path('getSpiderData/<int:task_pk>/', views.get_spider_data, name='get_spider_data'),
     path('downloadData/<int:task_pk>/', views.download_data, name='download_data'),
 ]
