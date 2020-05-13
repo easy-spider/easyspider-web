@@ -1,6 +1,5 @@
 from django.urls import path
-
-from easyspider import views
+from . import views
 
 urlpatterns = [
     path('node/list/', views.list_node, name='list_node'),

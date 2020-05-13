@@ -17,7 +17,7 @@ from pic.views import save_pic
 from scheduler.models import Node
 from spiderTemplate.models import Site, Template, Field, Param
 
-logger = logging.getLogger('easyspider_view')
+logger = logging.getLogger('administrator_view')
 
 
 class NodeStatus(IntEnum):
@@ -30,7 +30,7 @@ def list_node(request):
     """列出所有节点"""
     if not request.user.is_superuser:
         return HttpResponseForbidden('you are not admin')
-    return render(request, 'easyspider/node.html', {'node_list': Node.objects.all()})
+    return render(request, 'administrator/node.html', {'node_list': Node.objects.all()})
 
 
 @require_http_methods(['POST'])
@@ -136,7 +136,7 @@ def list_template(request):
     if not request.user.is_superuser:
         return HttpResponseForbidden('you are not admin')
     context = {'template_list': Template.objects.all()}
-    return render(request, 'easyspider/templateSearchAdmin.html', context)
+    return render(request, 'administrator/templateSearchAdmin.html', context)
 
 
 @require_http_methods(['GET', 'POST'])
@@ -145,7 +145,7 @@ def create_template(request):
     if not request.user.is_superuser:
         return HttpResponseForbidden('you are not admin')
     if request.method == 'GET':
-        return render(request, 'easyspider/templateUpload.html', {'site_list': Site.objects.all()})
+        return render(request, 'administrator/templateUpload.html', {'site_list': Site.objects.all()})
 
     try:
         site_name = request.POST['site_name']
@@ -220,7 +220,7 @@ def create_template(request):
             'site_list': Site.objects.all(),
             'error_message': e.args[0]
         }
-        return render(request, 'easyspider/templateUpload.html', context)
+        return render(request, 'administrator/templateUpload.html', context)
 
 
 @require_http_methods(['GET', 'POST'])
@@ -231,7 +231,7 @@ def modify_template(request, pk):
     template = get_object_or_404(Template, pk=pk)
     if request.method == 'GET':
         context = {'template': template}
-        return render(request, 'easyspider/templateModify.html', context)
+        return render(request, 'administrator/templateModify.html', context)
 
     site = template.site
     # egg文件

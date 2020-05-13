@@ -4,7 +4,7 @@
 {% block title %}EasySpider | 管理现有模板{% endblock %}
 
 {% block css_extend %}
-    <link rel="stylesheet" href="{% static 'easyspider/css/templateSearchAdmin.css' %}" />
+    <link rel="stylesheet" href="{% static 'administrator/css/templateSearchAdmin.css' %}" />
 {% endblock %}
 
 {% block page_title %}管理现有模板{% endblock %}
@@ -81,7 +81,7 @@
 {% endblock %}
 
 {% block js_extend %}
-    <script src="{% static 'easyspider/js/bs-custom-file-input.min.js' %}"></script>
+    <script src="{% static 'administrator/js/bs-custom-file-input.min.js' %}"></script>
     <script>
         function deleteRow(o) {
             document.getElementById("delete_id").value=$(o).data('id');
