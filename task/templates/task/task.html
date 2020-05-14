@@ -166,38 +166,36 @@
     <div class="modal fade" id="cancel-task-modal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="{% url 'cancel_task' 1 %}" method="POST" id="cancel-task-form">
-                    {% csrf_token %}
-                    <div class="modal-body">
-                        <div class="card-comments">
-                            <div class="card-comment">
-                              <img
-                                class="img-circle img-sm"
-                                src="{% static 'img/warning.JPG' %}"
-                                alt="warning"
-                              />
-                              <div class="comment-text">
-                                <h5 class="username">确定</h5>
-                                <!-- /.username -->
-                                确定要终止吗？
-                              </div>
-                              <!-- /.comment-text -->
-                            </div>
+                <div class="modal-body">
+                    <div class="card-comments">
+                        <div class="card-comment">
+                          <img
+                            class="img-circle img-sm"
+                            src="{% static 'img/warning.JPG' %}"
+                            alt="warning"
+                          />
+                          <div class="comment-text">
+                            <h5 class="username">确定</h5>
+                            <!-- /.username -->
+                            确定要终止吗？
+                          </div>
+                          <!-- /.comment-text -->
                         </div>
                     </div>
-                    <div class="modal-footer justify-content-between">
-                      <button
-                        type="button"
-                        class="btn btn-default"
-                        data-dismiss="modal"
-                      >
-                        取消
-                      </button>
-                      <button type="submit" class="btn btn-primary">
-                        确定
-                      </button>
                 </div>
-                </form>
+                <div class="modal-footer justify-content-between">
+                  <button
+                    type="button"
+                    class="btn btn-default"
+                    data-dismiss="modal"
+                  >
+                    取消
+                  </button>
+                  <button type="button" class="btn btn-primary" id="cancel-btn">
+                    <span class="spinner-border spinner-border-sm loading" role="status" aria-hidden="true"></span>
+                    确定
+                  </button>
+            </div>
             </div>
             <!-- /.modal-content -->
             </div>
@@ -234,6 +232,7 @@
                         取消
                       </button>
                       <button type="submit" class="btn btn-primary">
+                        <span class="spinner-border spinner-border-sm loading" role="status" aria-hidden="true"></span>
                         确定
                       </button>
                     </div>
@@ -281,6 +280,7 @@
                         取消
                       </button>
                       <button type="submit" class="btn btn-primary">
+                          <span class="spinner-border spinner-border-sm loading" role="status" aria-hidden="true"></span>
                         确定
                       </button>
                     </div>
@@ -312,6 +312,7 @@
         taskSocket.onmessage = function(e) {
             let data = JSON.parse(e.data);
             let message = data['message'];
+            console.log(message);
             let taskID = message["task_id"];
             let status = "";
             if("status" in message) {
@@ -331,13 +332,11 @@
                 finishTime = message["finish_time"];
             }
             let tdEles = $("tr#" + taskID + " td");
-            // 修改状态
-            if(status !== "") {
-                tdEles.eq(2).html(statusDisplayName).removeClass().addClass(status);
-            }
             let ops = tdEles.eq(3);
-            if(status !== "") {
-                // 修改操作
+            let preStatus = tdEles.eq(2).text().trim();
+            // 修改状态和操作
+            if(status !== "" && preStatus !== statusDisplayName) {
+                tdEles.eq(2).html(statusDisplayName).removeClass().addClass(status);
                 ops.removeClass().addClass(status);
             }
             if (status === "finished") {
@@ -350,7 +349,7 @@
                     "                          >\n" +
                     "                            <i class=\"far fa-play-circle hidden\"></i>\n" +
                     "</a>");
-            } else if(status === "running") {
+            } else if(status === "running" && preStatus !== statusDisplayName) {
                 ops.empty();
                 ops.append("<a href=\"\" data-toggle=\"modal\" data-target=\"\" data-id=\"" + taskID + "\">\n" +
                     "                                    <i class=\"far fa-pause-circle hidden\"></i>\n" +
@@ -382,16 +381,82 @@
         };
     </script>
     <script>
+        $('#cancel-task-modal').on('show.bs.modal', function(e) {
+            let aEle = $(e.relatedTarget);
+            let taskID = aEle.data('id');
+            let cancelBtn = $(this).find("#cancel-btn");
+            let cancelBtnSpan = cancelBtn.find("span");
+            let links = aEle.parents("tr").find("a");
+            cancelBtn.off("click");
+            cancelBtn.on("click", function () {
+                cancelBtn.attr("disabled", "disabled");
+                cancelBtnSpan.removeClass("loading");
+                links.addClass("disable");
+                $.ajax({
+                    url: "{% url 'cancel_task' 1 %}".split("/").slice(0,-2).concat(taskID).join("/") + "/",
+                    type: "GET",
+                    cache: false,
+                    success: function (data) {
+                      if(data["status"] === "SUCCESS") {
+                          cancelBtn.removeAttr("disabled");
+                          links.removeClass("disable");
+                          cancelBtnSpan.addClass("loading");
+                          Toast.fire({
+                              icon: "success",
+                              title: "&nbsp;任务已终止",
+                          });
+                          // 更新采集状态、操作、耗时、采集完成时间
+                          let parent = aEle.parent("td");
+                          parent.html("                                  <a\n" +
+                              "                                    data-id=\"" + taskID + "\"\n" +
+                              "                                    href=\"#restart-task-modal\"\n" +
+                              "                                    data-toggle=\"modal\"\n" +
+                              "                                    data-target=\"#restart-task-modal\"\n" +
+                              "                                  >\n" +
+                              "                                    <i class=\"far fa-play-circle hidden\"></i>\n" +
+                              "                                  </a>");
+                          parent.removeClass();
+                          parent.addClass("canceled");
+                          let status = parent.prev("td");
+                          status.removeClass();
+                          status.addClass("canceled");
+                          status.html("已终止");
+                          // 隐去modal
+                          $('#cancel-task-modal').modal('hide');
+                          taskTable.columns.adjust().draw();
+                      } else {
+                          cancelBtn.removeAttr("disabled");
+                          links.removeClass("disable");
+                          cancelBtnSpan.addClass("loading");
+                          Toast.fire({
+                              icon: "error",
+                              title: "&nbsp;" + data["message"],
+                          });
+                      }
+                    },
+                    error: function (xhr) {
+                      cancelBtn.removeAttr("disabled");
+                      links.removeClass("disable");
+                      cancelBtnSpan.addClass("loading");
+                      console.log(xhr);
+                    }
+                });
+                return false;
+            });
+        });
+
         $('#rename-task-modal').on('show.bs.modal', function(e) {
             let aEle = $(e.relatedTarget);
             let taskID = aEle.data('id');
             let renameTaskForm = $("#rename-task-form");
             let renameBtn = renameTaskForm.find("button[type=submit]");
-            let links = taskTableBodyEle.find("a");
+            let renameBtnSpan = renameBtn.find("span");
+            let links = aEle.parents("tr").find("a");
             renameTaskForm.off("submit");
             renameTaskForm.submit(function () {
                 renameBtn.attr("disabled", "disabled");
                 links.addClass("disable");
+                renameBtnSpan.removeClass("loading");
                 // validation
                 let form = this;
                 let inputEle = $(form).find("input#task-name-input");
@@ -404,6 +469,7 @@
                     inputEle.val("");
                     renameBtn.removeAttr("disabled");
                     links.removeClass("disable");
+                    renameBtnSpan.addClass("loading");
                     return false;
                 } else {
                     if(newTaskName.length < 3 || newTaskName.length > 20) {
@@ -414,6 +480,7 @@
                         inputEle.val("");
                         renameBtn.removeAttr("disabled");
                         links.removeClass("disable");
+                        renameBtnSpan.addClass("loading");
                         return false;
                     }
                 }
@@ -426,6 +493,7 @@
                       if(data["status"] === "SUCCESS") {
                           renameBtn.removeAttr("disabled");
                           links.removeClass("disable");
+                          renameBtnSpan.addClass("loading");
                           Toast.fire({
                               icon: "success",
                               title: "&nbsp;任务重命名成功",
@@ -455,7 +523,7 @@
                             sessionStorage.setItem('recent-edit-update', JSON.stringify(tasks));
                           }
                           // 修改编辑时间
-                          let editTime = data["creat_time"];
+                          let editTime = data["create_time"];
                           let parent = aEle.parent("td");
                           parent.nextAll().eq(2).html(editTime);
                           // 修改任务名
@@ -466,6 +534,7 @@
                       } else {
                           links.removeClass("disable");
                           renameBtn.removeAttr("disabled");
+                          renameBtnSpan.addClass("loading");
                           Toast.fire({
                               icon: "error",
                               title: "&nbsp;" + data["message"],
@@ -475,6 +544,7 @@
                     error: function (xhr) {
                       links.removeClass("disable");
                       renameBtn.removeAttr("disabled");
+                      renameBtnSpan.addClass("loading");
                       console.log(xhr);
                     }
                 });
@@ -488,11 +558,13 @@
             let taskID = aEle.data('id');
             let restartTaskForm = $("#restart-task-form");
             let restartBtn = restartTaskForm.find("button[type=submit]");
-            let links = taskTableBodyEle.find("a");
+            let restartBtnSpan = restartBtn.find("span");
+            let links = aEle.parents("tr").find("a");
             restartTaskForm.off("submit");
             restartTaskForm.submit(function () {
                 links.addClass("disable");
                 restartBtn.attr("disabled", "disabled");
+                restartBtnSpan.removeClass("loading");
                 $.ajax({
                     url: $(this).attr("action").split("/").slice(0,-2).concat(taskID).join("/") + "/",
                     type: "POST",
@@ -502,6 +574,7 @@
                       if(data["status"] === "SUCCESS") {
                           links.removeClass("disable");
                           restartBtn.removeAttr("disabled");
+                          restartBtnSpan.addClass("loading");
                           Toast.fire({
                               icon: "success",
                               title: "&nbsp;任务已重新开始",
@@ -549,7 +622,6 @@
                           let nextTds = parent.nextAll();
                           // 更新编辑时间
                           let editTime = data['create_time'];
-                          console.log(editTime);
                           nextTds.eq(0).html(editTime);
                           // 清空耗时
                           nextTds.eq(1).html("");
@@ -571,6 +643,7 @@
                       } else {
                           links.removeClass("disable");
                           restartBtn.removeAttr("disabled");
+                          restartBtnSpan.addClass("loading");
                           Toast.fire({
                               icon: "error",
                               title: "&nbsp;" + data["message"],
@@ -580,6 +653,7 @@
                     error: function (xhr) {
                       links.removeClass("disable");
                       restartBtn.removeAttr("disabled");
+                      restartBtnSpan.addClass("loading");
                       console.log(xhr);
                     }
                 });
@@ -595,15 +669,17 @@
           } else {
               let taskForm = $("#task-form");
               let delBtn = $(this);
-              let links = taskTableBodyEle.find("a");
+              let delBtnSpan = delBtn.find("span");
+              let rows_selected = taskTableBodyEle.find("tr.selected");
+              let links = rows_selected.find("a");
               taskForm.off("submit");
               taskForm.submit(function () {
                 delBtn.attr("disabled", "disabled");
                 links.addClass("disable");
+                delBtnSpan.removeClass("loading");
                 let isValid = true;
                 let form = this;
                 // Iterate over all selected checkboxes
-                let rows_selected = taskTableBodyEle.find("tr.selected");
                 rows_selected.each(function () {
                   let taskStatus = $(this).find("td:nth-of-type(3)").text().trim();
 
@@ -615,6 +691,7 @@
                       isValid = false;
                       links.removeClass("disable");
                       delBtn.removeAttr("disabled");
+                      delBtnSpan.addClass("loading");
                       return false;
                   }
                 });
@@ -637,6 +714,7 @@
                           if(data["status"] === "SUCCESS") {
                               delBtn.removeAttr("disabled");
                               links.removeClass("disable");
+                              delBtnSpan.addClass("loading");
                               Toast.fire({
                                   icon: "success",
                                   title: "&nbsp;任务删除成功",
@@ -671,6 +749,7 @@
                           } else {
                               delBtn.removeAttr("disabled");
                               links.removeClass("disable");
+                              delBtnSpan.addClass("loading");
                               Toast.fire({
                                   icon: "error",
                                   title: "&nbsp;" + data["message"],
@@ -680,6 +759,7 @@
                       error: function (xhr) {
                           delBtn.removeAttr("disabled");
                           links.removeClass("disable");
+                          delBtnSpan.addClass("loading");
                           console.log(xhr);
                       }
                     });
@@ -694,9 +774,6 @@
             let parent = $(this).parent("td");
             let status = parent.prev("td");
             let taskID = $(this).attr("data-id");
-            let post_data = {
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-            };
             if(ele.hasClass("fa-pause-circle")) {
                 ele.attr("class", "far fa-play-circle hidden");
                 parent.removeClass();
@@ -706,8 +783,7 @@
                 status.html("已暂停");
                 $.ajax({
                     url: "{% url 'pause_task' 1 %}".split("/").slice(0, -2).concat(taskID).join("/") + "/",
-                    type: "POST",
-                    data: post_data,
+                    type: "GET",
                     cache: false,
                     success: function (data) {
                       if(data["status"] === "SUCCESS") {
@@ -739,8 +815,7 @@
                     status.html("运行中");
                     $.ajax({
                         url: '{% url "resume_task" 1 %}'.split("/").slice(0, -2).concat(taskID).join("/") + "/",
-                        type: "POST",
-                        data: post_data,
+                        type: "GET",
                         cache: false,
                         success: function (data) {
                           if(data["status"] === "SUCCESS") {

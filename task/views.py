@@ -164,7 +164,6 @@ ALLOWED_OPERATION = {
 }
 
 
-@require_http_methods(['POST'])
 def change_task_status(request, task_pk, status):
     """修改任务状态"""
     if not request.user.is_authenticated:
