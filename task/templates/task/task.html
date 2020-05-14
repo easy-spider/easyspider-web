@@ -522,10 +522,7 @@
                             }
                             sessionStorage.setItem('recent-edit-update', JSON.stringify(tasks));
                           }
-                          // 修改编辑时间
-                          let editTime = data["create_time"];
                           let parent = aEle.parent("td");
-                          parent.nextAll().eq(2).html(editTime);
                           // 修改任务名
                           parent.html(aEle[0].outerHTML + escapeHtml(newTaskName));
                           // 隐去modal
