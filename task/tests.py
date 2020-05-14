@@ -111,7 +111,9 @@ class CreateTaskViewTests(TestCase):
         for name in ('t1', ' t1 ', '     ', 't' * 30):
             data['inputTaskName'] = name
             response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
-            self.assertEqual({'status': 'ERROR', 'message': '任务名长度应在3~20个字符之间'}, response.json())
+            d = response.json()
+            self.assertEqual('ERROR', d['status'])
+            self.assertEqual('任务名长度应在3~20个字符之间', d['message'])
 
     def test_name_already_exists(self):
         """任务名称已存在"""
@@ -119,32 +121,34 @@ class CreateTaskViewTests(TestCase):
         Task.objects.create(user=self.user, template=self.template, name='task1')
         data = {'inputTaskName': ' task1\t\r\n', 'p1': 'abc', 'p2': '42'}
         response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
-        self.assertEqual({'status': 'ERROR', 'message': '任务名称已存在'}, response.json())
+        d = response.json()
+        self.assertEqual('ERROR', d['status'])
+        self.assertEqual('任务名称已存在', d['message'])
 
     def test_invalid_arg(self):
         self.client.login(username='zzy', password='123456')
         data = {'inputTaskName': 'task1', 'p1': 'a' * 20, 'p2': '123'}
         response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
-        self.assertEqual(
-            {'status': 'ERROR', 'message': 'p1的长度不能超过10'},
-            response.json()
-        )
+        d = response.json()
+        self.assertEqual('ERROR', d['status'])
+        self.assertEqual('p1的长度不能超过10', d['message'])
 
         data['p1'] = 'abc'
         for p2 in (8, 99, 1000, 2000):
             data['p2'] = p2
             response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
-            self.assertEqual(
-                {'status': 'ERROR', 'message': 'p2的值应在100~999之间'},
-                response.json()
-            )
+            d = response.json()
+            self.assertEqual('ERROR', d['status'])
+            self.assertEqual('p2的值应在100~999之间', d['message'])
 
     def test_ok(self):
         """成功创建task和job"""
         self.client.login(username='zzy', password='123456')
         data = {'inputTaskName': 'task1', 'p1': 'abc', 'p2': '123'}
         response = self.client.post(reverse('create_task', args=(self.template.id,)), data)
-        self.assertEqual('SUCCESS', response.json()['status'])
+        d = response.json()
+        self.assertEqual('SUCCESS', d['status'])
+        self.assertIn('tasks', d)
 
         task = Task.objects.filter(user=self.user, template=self.template).first()
         self.assertEqual('task1', task.name)
@@ -216,20 +220,27 @@ class RenameTaskViewTests(TestCase):
         for name in ('t1', ' t1 ', '     ', 't' * 30):
             data = {'inputTaskName': name}
             response = self.client.post(reverse('rename_task', args=(self.foo_task.id,)), data)
-            self.assertEqual({'status': 'ERROR', 'message': '任务名长度应在3~20个字符之间'}, response.json())
+            d = response.json()
+            self.assertEqual('ERROR', d['status'])
+            self.assertEqual('任务名长度应在3~20个字符之间', d['message'])
 
     def test_name_already_exists(self):
         """任务名称已存在"""
         self.client.login(username='foo', password='123456')
         data = {'inputTaskName': 'foo_task2'}
         response = self.client.post(reverse('rename_task', args=(self.foo_task.id,)), data)
-        self.assertEqual({'status': 'ERROR', 'message': '任务名称已存在'}, response.json())
+        d = response.json()
+        self.assertEqual('ERROR', d['status'])
+        self.assertEqual('任务名称已存在', d['message'])
 
     def test_ok(self):
         self.client.login(username='foo', password='123456')
         data = {'inputTaskName': ' foo_task3\t\r\n'}
         response = self.client.post(reverse('rename_task', args=(self.foo_task.id,)), data)
-        self.assertEqual('SUCCESS', response.json()['status'])
+        d = response.json()
+        self.assertEqual('SUCCESS', d['status'])
+        self.assertIn('tasks', d)
+        self.assertIn('create_time', d)
         self.assertEqual('foo_task3', Task.objects.get(pk=self.foo_task.id).name)
 
 
