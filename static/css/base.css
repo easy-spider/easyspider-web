@@ -32,3 +32,7 @@
 .card-comments {
     background-color: transparent !important;
 }
+
+.loading {
+  display: none !important;
+}

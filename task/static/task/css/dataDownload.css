@@ -26,8 +26,3 @@
 #data-table td {
   vertical-align: middle !important;
 }
-
-.disable {
-  pointer-events: none !important;
-  cursor: default !important;
-}

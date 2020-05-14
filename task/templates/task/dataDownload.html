@@ -49,7 +49,7 @@
                             <th>#</th>
                             <th>详情</th>
                             {% for field in field_list %}
-                                <th>{{ field | safe }}</th>
+                                <th>{{ field }}</th>
                             {% endfor %}
                         </tr>
                     </thead>
@@ -71,7 +71,7 @@
                                     </button>
                                 </td>
                                 {% for td_data in row_data %}
-                                    <td><span class="sr-only">{{ td_data | safe }}</span>{{ td_data | safe | truncatechars_html:"15" }}</td>
+                                    <td><span class="sr-only">{{ td_data }}</span>{{ td_data | truncatechars_html:"15" }}</td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
@@ -87,6 +87,7 @@
                     data-toggle="modal"
                     data-target="#export-modal"
                 >
+                    <span class="spinner-border spinner-border-sm loading" role="status" aria-hidden="true"></span>
                     导出数据
                 </button>
                 <button
@@ -140,6 +141,7 @@
                             type="submit"
                             class="btn btn-primary"
                         >
+                            <span class="spinner-border spinner-border-sm loading" role="status" aria-hidden="true"></span>
                             确定
                         </button>
                     </div>
@@ -216,7 +218,8 @@
                         type="button"
                         class="btn btn-primary"
                     >
-                        确定
+                        <span class="spinner-border spinner-border-sm loading" role="status" aria-hidden="true"></span>
+                        正在获取数据
                     </a>
                 </div>
             </div>
@@ -267,12 +270,14 @@
     <script>
         let clearModal = $('#clear-modal');
         let clearBtn = clearModal.find("button[type=submit]");
+        let clearBtnSpan = clearBtn.find("span");
         clearModal.on('show.bs.modal', function(e) {
             let clearForm = $("#clear-form");
             clearForm.off("submit");
             clearForm.submit(function () {
               let form = this;
               clearBtn.attr("disabled", "disabled");
+              clearBtnSpan.removeClass("loading");
               // 判断一下是否数据已清空
               if(!dataTable.data().any()) {
                   Toast.fire({
@@ -280,6 +285,7 @@
                         title: "&nbsp;数据已清空",
                   });
                   clearBtn.removeAttr("disabled");
+                  clearBtnSpan.addClass("loading");
                   return false;
               }
               $.ajax({
@@ -290,6 +296,7 @@
                 success: function (data) {
                   if(data["status"] === "SUCCESS") {
                     clearBtn.removeAttr("disabled");
+                    clearBtnSpan.addClass("loading");
                     Toast.fire({
                         icon: "success",
                         title: "&nbsp;清空数据成功",
@@ -298,6 +305,7 @@
                     $('#clear-modal').modal('hide');
                   } else {
                       clearBtn.removeAttr("disabled");
+                      clearBtnSpan.addClass("loading");
                       Toast.fire({
                           icon: "error",
                           title: "&nbsp;" + data["message"],
@@ -305,7 +313,8 @@
                   }
                 },
                 error: function (xhr) {
-                  clearBtn.removeAttr("disabled");
+                   clearBtn.removeAttr("disabled");
+                   clearBtnSpan.addClass("loading");
                   console.log(xhr);
                 }
               });
@@ -316,8 +325,10 @@
         let spiderData, json, blob, url;
         let exportModal = $("#export-modal");
         let confirmBtn =$("#confirm-file-type-btn") ;
+        let confirmBtnSpan = confirmBtn.find("span");
         $("#export-data-btn").on("click", function () {
-            confirmBtn.addClass("disable");
+            confirmBtn.addClass("disabled");
+            confirmBtnSpan.removeClass("loading");
             $.ajax({
                 url: "{% url 'get_spider_data' task.pk %}",
                 type: "GET",
@@ -328,15 +339,19 @@
                         json = JSON.stringify(spiderData);
                         blob = new Blob([json], {type: "application/json"});
                         url  = URL.createObjectURL(blob);
-                        confirmBtn.removeClass("disable");
+                        confirmBtn.removeClass("disabled");
+                        confirmBtn.text("下载");
+                        confirmBtnSpan.addClass("loading");
                     } else {
                         console.log(data["message"]);
-                        confirmBtn.removeClass("disable");
+                        confirmBtn.removeClass("disabled");
+                        confirmBtnSpan.addClass("loading");
                     }
                 },
                 error: function (xhr) {
                     console.log(xhr);
-                    confirmBtn.removeClass("disable");
+                    confirmBtn.removeClass("disabled");
+                    confirmBtnSpan.addClass("loading");
                 }
             });
         });
