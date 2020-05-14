@@ -14,22 +14,23 @@
   <!-- Theme style -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.0.4/dist/css/adminlte.min.css"/>
   <link rel="stylesheet" href="{% static 'user/css/login.css' %}">
+  <link rel="stylesheet" href="{% static 'spiderTemplate/css/starter.css' %}" />
   <!-- Website Icon -->
   <link rel="icon" href="{% static 'img/favicon.ico' %}" >
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
   <div class="widget-user-header">
-    <div class="widget-user-image text-center">
-        <img class="img" src="{% static 'img/logo.png' %}" alt="logo"/>
-    </div>
-    <!-- /.widget-user-image -->
-    <h3 class="login-logo">
-        EasySpider · 大数据
-    </h3>
-    <h5 class="widget-user-desc stretch">
-        让数据触手可及
-    </h5>
+      <div class="widget-user-image text-center">
+          <img class="img" src="{% static 'img/logo.png' %}" alt="logo" />
+      </div>
+      <!-- /.widget-user-image -->
+      <h3 class="widget-user-username">
+          EasySpider · 大数据
+      </h3>
+      <h5 class="widget-user-desc stretch">
+          让数据触手可及
+      </h5>
   </div>
   <!-- /.login-logo -->
   {% if error_message %}<p style="color: red">{{ error_message }}</p>{% endif %}
