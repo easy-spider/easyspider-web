@@ -58,7 +58,7 @@ def reset_password(request):
         return redirect(reverse('login'))
     request.user.set_password(request.POST['password'])
     request.user.save()
-    return redirect(reverse('user_profile'))
+    return redirect(reverse('index'))
 
 
 @require_http_methods(['GET', 'POST'])
@@ -71,4 +71,4 @@ def user_profile(request):
     request.user.email = request.POST['email']
     request.user.first_name = request.POST['first_name']
     request.user.save()
-    return redirect(reverse('user_profile'))
+    return redirect(reverse('index'))
