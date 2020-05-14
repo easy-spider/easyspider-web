@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     path('', views.task_list, name='my_task'),
-    path('recentTasks/', views.get_recent_tasks, name="get_recent_tasks"),
+    path('recentTasks/', views.recent_tasks_view, name="get_recent_tasks"),
     path('create/<int:template_pk>/', views.create_task, name='create_task'),
     path('restart/<int:task_pk>/', views.restart_task, name='restart_task'),
 
