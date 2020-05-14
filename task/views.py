@@ -132,13 +132,10 @@ def rename_task(request, task_pk):
         return HttpResponseForbidden('Not your task')
     try:
         task.set_name(request.POST['inputTaskName'])
-        task.create_time = timezone.now()
         task.save()
         return JsonResponse({
             'status': 'SUCCESS',
-            'tasks': get_recent_tasks(request.user),
-            'create_time': task.create_time.astimezone(
-                pytz.timezone(settings.TIME_ZONE)).strftime('%y/%m/%d %H:%M')
+            'tasks': get_recent_tasks(request.user)
         })
     except ValueError as e:
         return JsonResponse(

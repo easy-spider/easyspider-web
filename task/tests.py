@@ -240,7 +240,6 @@ class RenameTaskViewTests(TestCase):
         d = response.json()
         self.assertEqual('SUCCESS', d['status'])
         self.assertIn('tasks', d)
-        self.assertIn('create_time', d)
         self.assertEqual('foo_task3', Task.objects.get(pk=self.foo_task.id).name)
 
 
