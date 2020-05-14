@@ -1,8 +1,6 @@
 let taskTableEle = $("#task-table");
 let taskTableBodyEle = taskTableEle.find("tbody");
 
-taskTableEle.css("min-height","100px");
-
 let taskTable = taskTableEle.DataTable({
   dom: '<"toolbar">frtip',
   fnInitComplete: function(){
@@ -42,6 +40,13 @@ let taskTable = taskTableEle.DataTable({
     sZeroRecords: "没有找到匹配的采集任务",
     emptyTable: "暂无任务",
   },
+});
+
+taskTableEle.on('show.bs.dropdown', function () {
+    $('.dataTables_scrollBody').addClass('dropdown-visible');
+})
+  .on('hide.bs.dropdown', function () {
+    $('.dataTables_scrollBody').removeClass('dropdown-visible');
 });
 
 const Toast = Swal.mixin({

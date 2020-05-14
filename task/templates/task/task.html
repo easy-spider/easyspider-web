@@ -312,7 +312,6 @@
         taskSocket.onmessage = function(e) {
             let data = JSON.parse(e.data);
             let message = data['message'];
-            console.log(message);
             let taskID = message["task_id"];
             let status = "";
             if("status" in message) {
@@ -349,6 +348,7 @@
                     "                          >\n" +
                     "                            <i class=\"far fa-play-circle hidden\"></i>\n" +
                     "</a>");
+                taskTable.columns.adjust().draw();
             } else if(status === "running" && preStatus !== statusDisplayName) {
                 ops.empty();
                 ops.append("<a href=\"\" data-toggle=\"modal\" data-target=\"\" data-id=\"" + taskID + "\">\n" +
@@ -362,6 +362,7 @@
                     "                                  >\n" +
                     "                                    <i class=\"far fa-stop-circle hidden\"></i>\n" +
                     "</a>");
+                taskTable.columns.adjust().draw();
             }
             tdEles.eq(8).find(".progress")
                        .attr("title", progress)
@@ -369,11 +370,12 @@
                        .css("width", progress);
             if(duration !== "") {
                 tdEles.eq(5).html(duration);
+                taskTable.columns.adjust().draw();
             }
             if(finishTime !== "") {
                 tdEles.eq(7).html(finishTime);
+                taskTable.columns.adjust().draw();
             }
-            taskTable.columns.adjust().draw();
         };
 
         taskSocket.onclose = function(e) {
@@ -522,10 +524,7 @@
                             }
                             sessionStorage.setItem('recent-edit-update', JSON.stringify(tasks));
                           }
-                          // 修改编辑时间
-                          let editTime = data["create_time"];
                           let parent = aEle.parent("td");
-                          parent.nextAll().eq(2).html(editTime);
                           // 修改任务名
                           parent.html(aEle[0].outerHTML + escapeHtml(newTaskName));
                           // 隐去modal

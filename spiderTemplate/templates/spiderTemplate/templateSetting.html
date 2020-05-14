@@ -123,7 +123,7 @@
                     return false;
                 } else {
                     if($(this).attr("name") === "inputTaskName") {
-                        if(value < 3 || value.length > 20) {
+                        if(value.length < 3 || value.length > 20) {
                             Toast.fire({
                                 icon: "error",
                                 title: "&nbsp;任务名长度应在3~20个字符之间",
@@ -172,7 +172,7 @@
                             btnSpan.addClass("loading");
                             Toast.fire({
                                 icon: "success",
-                                title: "&nbsp;任务创建成功，请到我的任务页面查看",
+                                title: "&nbsp;任务保存并启动成功，请到我的任务页面查看",
                             });
                             // get top 5 tasks
                             let tasks = data["tasks"];

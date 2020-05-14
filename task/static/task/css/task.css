@@ -52,3 +52,7 @@
   pointer-events: none !important;
   cursor: default !important;
 }
+
+div.dataTables_scrollBody.dropdown-visible {
+  overflow: visible !important;
+}
