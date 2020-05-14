@@ -222,10 +222,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 </ul>
                             </li>
                             {% if  request.user.is_superuser == 1 %}
-                                <li class="nav-item has-treeview">
+                                <li class="nav-item has-treeview {% block nav_tree_open %}{% endblock %}">
                                     <a
                                         href="#"
-                                        class="nav-link "
+                                        class="nav-link {% block nav_admin_active %}{% endblock %}"
                                     >
                                         <i class="nav-icon fas fa-tachometer-alt"></i>
                                         <p>
@@ -235,7 +235,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     </a>
                                     <ul class="nav nav-treeview">
                                         <li class="nav-item edit-item">
-                                            <a class="nav-link" href="{% url 'create_template' %}">
+                                            <a class="nav-link {% block nav_upload_active %}{% endblock %}" href="{% url 'create_template' %}">
                                                 <i
                                                     class="far fa-circle nav-icon"
                                                 ></i>
@@ -245,7 +245,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                             </a>
                                         </li>
                                         <li class="nav-item edit-item">
-                                            <a class="nav-link" href="{% url 'list_template' %}">
+                                            <a class="nav-link {% block nav_modify_active %}{% endblock %}" href="{% url 'list_template' %}">
                                                 <i
                                                     class="far fa-circle nav-icon"
                                                 ></i>
@@ -256,17 +256,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                         </li>
                                     </ul>
                                 </li>
-                            <li class="nav-item">
-                                <a
-                                    href="{% url 'list_node' %}"
-                                    class="nav-link "
-                                >
-                                    <i class="nav-icon fas fa-edit"></i>
-                                    <p>
-                                        节点管理
-                                    </p>
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a
+                                        href="{% url 'list_node' %}"
+                                        class="nav-link {% block nav_node_active %}{% endblock %}"
+                                    >
+                                        <i class="nav-icon fas fa-edit"></i>
+                                        <p>
+                                            节点管理
+                                        </p>
+                                    </a>
+                                </li>
                             {% endif %}
 
                         </ul>
