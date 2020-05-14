@@ -1,10 +1,12 @@
 from enum import IntEnum
 
+import pytz
 from django.forms import model_to_dict
 from django.http import HttpResponseForbidden, JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
+from EasySpiderWeb import settings
 from scheduler.models import Node, Job
 from task import consumers
 from task.models import Task
@@ -115,7 +117,8 @@ def set_job_status(request, job_id, status):
                 'progress': task.progress(),
                 'status': task.status,
                 'status_display_name': task.display_status(),
-                'finish_time': task.finish_time.strftime('%y/%m/%d %H:%M'),
+                'finish_time': task.finish_time.astimezone(
+                    pytz.timezone(settings.TIME_ZONE)).strftime('%y/%m/%d %H:%M'),
                 'duration': task.duration()
             })
         else:

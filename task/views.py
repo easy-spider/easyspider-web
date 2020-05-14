@@ -2,6 +2,7 @@ import json
 import logging
 import uuid
 
+import pytz
 import requests
 from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
@@ -117,7 +118,8 @@ def restart_task(request, task_pk):
     return JsonResponse({
         'status': 'SUCCESS',
         'tasks': get_recent_tasks(request.user),
-        'create_time': task.create_time.strftime('%y/%m/%d %H:%M')
+        'create_time': task.create_time.astimezone(
+            pytz.timezone(settings.TIME_ZONE)).strftime('%y/%m/%d %H:%M')
     })
 
 
@@ -130,11 +132,13 @@ def rename_task(request, task_pk):
         return HttpResponseForbidden('Not your task')
     try:
         task.set_name(request.POST['inputTaskName'])
+        task.create_time = timezone.now()
         task.save()
         return JsonResponse({
             'status': 'SUCCESS',
             'tasks': get_recent_tasks(request.user),
-            'create_time': task.create_time.strftime('%y/%m/%d %H:%M')
+            'create_time': task.create_time.astimezone(
+                pytz.timezone(settings.TIME_ZONE)).strftime('%y/%m/%d %H:%M')
         })
     except ValueError as e:
         return JsonResponse(
