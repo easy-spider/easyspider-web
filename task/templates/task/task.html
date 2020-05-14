@@ -454,9 +454,12 @@
                             }
                             sessionStorage.setItem('recent-edit-update', JSON.stringify(tasks));
                           }
+                          // 修改编辑时间
+                          let editTime = data["creat_time"];
+                          let parent = aEle.parent("td");
+                          parent.nextAll().eq(2).html(editTime);
                           // 修改任务名
-                          let updateNameStr = aEle[0].outerHTML + newTaskName;
-                          aEle.parent("td").text(updateNameStr);
+                          parent.html(aEle[0].outerHTML + escapeHtml(newTaskName));
                           // 隐去modal
                           $('#rename-task-modal').modal('hide');
                           taskTable.columns.adjust().draw();
@@ -543,21 +546,24 @@
                           status.removeClass();
                           status.addClass("ready");
                           status.html("等待运行");
+                          let nextTds = parent.nextAll();
+                          // 更新编辑时间
+                          let editTime = data['create_time'];
+                          console.log(editTime);
+                          nextTds.eq(0).html(editTime);
                           // 清空耗时
-                          parent.nextAll().eq(1).html("");
+                          nextTds.eq(1).html("");
                           // 执行次数+1
-                          let countEle = parent.nextAll().eq(2);
+                          let countEle = nextTds.eq(2);
                           countEle.html(+countEle.html().trim() + 1);
                           // 清空采集完成时间
-                          parent.nextAll().eq(3).html("");
+                          nextTds.eq(3).html("");
                           // 进度条重置为0
-                          tdEle = parent
-                              .nextAll()
-                              .eq(4)
-                              .find(".progress")
-                              .attr("title", "0%")
-                              .find(".progress-bar")
-                              .css("width", "0%");
+                          nextTds.eq(4)
+                                 .find(".progress")
+                                 .attr("title", "0%")
+                                 .find(".progress-bar")
+                                 .css("width", "0%");
                           aEle.remove();
                           // 隐去modal
                           $('#restart-task-modal').modal('hide');
