@@ -49,7 +49,7 @@
                             <th>#</th>
                             <th>详情</th>
                             {% for field in field_list %}
-                                <th>{{ field | safe }}</th>
+                                <th>{{ field }}</th>
                             {% endfor %}
                         </tr>
                     </thead>
@@ -71,7 +71,7 @@
                                     </button>
                                 </td>
                                 {% for td_data in row_data %}
-                                    <td><span class="sr-only">{{ td_data | safe }}</span>{{ td_data | safe | truncatechars_html:"15" }}</td>
+                                    <td><span class="sr-only">{{ td_data }}</span>{{ td_data | truncatechars_html:"15" }}</td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}

@@ -342,14 +342,27 @@
             }
             if (status === "finished") {
                 ops.empty();
-                ops.append("                          <a\n" +
+                ops.append("<a\n" +
                     "                            data-id=\"" + taskID + "\"\n" +
                     "                            href=\"#restart-task-modal\"\n" +
                     "                            data-toggle=\"modal\"\n" +
                     "                            data-target=\"#restart-task-modal\"\n" +
                     "                          >\n" +
                     "                            <i class=\"far fa-play-circle hidden\"></i>\n" +
-                    "                          </a>");
+                    "</a>");
+            } else if(status === "running") {
+                ops.empty();
+                ops.append("<a href=\"\" data-toggle=\"modal\" data-target=\"\" data-id=\"" + taskID + "\">\n" +
+                    "                                    <i class=\"far fa-pause-circle hidden\"></i>\n" +
+                    "                                  </a>\n" +
+                    "                                  <a\n" +
+                    "                                    data-id=\""+ taskID + "\"\n" +
+                    "                                    href=\"#cancel-task-modal\"\n" +
+                    "                                    data-toggle=\"modal\"\n" +
+                    "                                    data-target=\"#cancel-task-modal\"\n" +
+                    "                                  >\n" +
+                    "                                    <i class=\"far fa-stop-circle hidden\"></i>\n" +
+                    "</a>");
             }
             tdEles.eq(8).find(".progress")
                        .attr("title", progress)
@@ -374,9 +387,11 @@
             let taskID = aEle.data('id');
             let renameTaskForm = $("#rename-task-form");
             let renameBtn = renameTaskForm.find("button[type=submit]");
+            let links = taskTableBodyEle.find("a");
             renameTaskForm.off("submit");
             renameTaskForm.submit(function () {
                 renameBtn.attr("disabled", "disabled");
+                links.addClass("disable");
                 // validation
                 let form = this;
                 let inputEle = $(form).find("input#task-name-input");
@@ -388,6 +403,7 @@
                     });
                     inputEle.val("");
                     renameBtn.removeAttr("disabled");
+                    links.removeClass("disable");
                     return false;
                 } else {
                     if(newTaskName.length < 3 || newTaskName.length > 20) {
@@ -397,6 +413,7 @@
                         });
                         inputEle.val("");
                         renameBtn.removeAttr("disabled");
+                        links.removeClass("disable");
                         return false;
                     }
                 }
@@ -408,6 +425,7 @@
                     success: function (data) {
                       if(data["status"] === "SUCCESS") {
                           renameBtn.removeAttr("disabled");
+                          links.removeClass("disable");
                           Toast.fire({
                               icon: "success",
                               title: "&nbsp;任务重命名成功",
@@ -429,7 +447,7 @@
                                 "                                                class=\"far fa-circle nav-icon hidden\"\n" +
                                 "                                            ></i>\n" +
                                 "                                            <p>\n" +
-                                "                                                " + tasks[i]['name'] +"\n" +
+                                "                                                " + escapeHtml(tasks[i]['name']) +"\n" +
                                 "                                            </p>\n" +
                                 "                                        </a>\n" +
                                 "                                    </li>");
@@ -438,11 +456,12 @@
                           }
                           // 修改任务名
                           let updateNameStr = aEle[0].outerHTML + newTaskName;
-                          aEle.parent("td").html(updateNameStr);
+                          aEle.parent("td").text(updateNameStr);
                           // 隐去modal
                           $('#rename-task-modal').modal('hide');
                           taskTable.columns.adjust().draw();
                       } else {
+                          links.removeClass("disable");
                           renameBtn.removeAttr("disabled");
                           Toast.fire({
                               icon: "error",
@@ -451,6 +470,7 @@
                       }
                     },
                     error: function (xhr) {
+                      links.removeClass("disable");
                       renameBtn.removeAttr("disabled");
                       console.log(xhr);
                     }
@@ -465,8 +485,10 @@
             let taskID = aEle.data('id');
             let restartTaskForm = $("#restart-task-form");
             let restartBtn = restartTaskForm.find("button[type=submit]");
+            let links = taskTableBodyEle.find("a");
             restartTaskForm.off("submit");
             restartTaskForm.submit(function () {
+                links.addClass("disable");
                 restartBtn.attr("disabled", "disabled");
                 $.ajax({
                     url: $(this).attr("action").split("/").slice(0,-2).concat(taskID).join("/") + "/",
@@ -475,6 +497,7 @@
                     cache: false,
                     success: function (data) {
                       if(data["status"] === "SUCCESS") {
+                          links.removeClass("disable");
                           restartBtn.removeAttr("disabled");
                           Toast.fire({
                               icon: "success",
@@ -497,14 +520,14 @@
                                 "                                                class=\"far fa-circle nav-icon hidden\"\n" +
                                 "                                            ></i>\n" +
                                 "                                            <p>\n" +
-                                "                                                " + tasks[i]['name'] +"\n" +
+                                "                                                " + escapeHtml(tasks[i]['name']) +"\n" +
                                 "                                            </p>\n" +
                                 "                                        </a>\n" +
                                 "                                    </li>");
                             }
                             sessionStorage.setItem('recent-edit-update', JSON.stringify(tasks));
                           }
-                          // 更新采集状态、操作字符、进度条（为0）、执行次数+1、耗时和采集完成时间清空
+                          // 更新采集状态、操作字符、进度条（为0）、执行次数+1、耗时和采集完成时间清空、更新最近编辑时间
                           let parent = aEle.parent("td");
                                                 parent.append("                          <a\n" +
                               "                            data-id=\"" + taskID + "\"\n" +
@@ -540,6 +563,7 @@
                           $('#restart-task-modal').modal('hide');
                           taskTable.columns.adjust().draw();
                       } else {
+                          links.removeClass("disable");
                           restartBtn.removeAttr("disabled");
                           Toast.fire({
                               icon: "error",
@@ -548,6 +572,7 @@
                       }
                     },
                     error: function (xhr) {
+                      links.removeClass("disable");
                       restartBtn.removeAttr("disabled");
                       console.log(xhr);
                     }
@@ -564,9 +589,11 @@
           } else {
               let taskForm = $("#task-form");
               let delBtn = $(this);
+              let links = taskTableBodyEle.find("a");
               taskForm.off("submit");
               taskForm.submit(function () {
                 delBtn.attr("disabled", "disabled");
+                links.addClass("disable");
                 let isValid = true;
                 let form = this;
                 // Iterate over all selected checkboxes
@@ -580,6 +607,7 @@
                           title: "&nbsp;非已完成或已终止状态的任务不能删除",
                       });
                       isValid = false;
+                      links.removeClass("disable");
                       delBtn.removeAttr("disabled");
                       return false;
                   }
@@ -602,6 +630,7 @@
                       success: function (data) {
                           if(data["status"] === "SUCCESS") {
                               delBtn.removeAttr("disabled");
+                              links.removeClass("disable");
                               Toast.fire({
                                   icon: "success",
                                   title: "&nbsp;任务删除成功",
@@ -626,7 +655,7 @@
                                     "                                                class=\"far fa-circle nav-icon hidden\"\n" +
                                     "                                            ></i>\n" +
                                     "                                            <p>\n" +
-                                    "                                                " + tasks[i]['name'] +"\n" +
+                                    "                                                " + escapeHtml(tasks[i]['name']) +"\n" +
                                     "                                            </p>\n" +
                                     "                                        </a>\n" +
                                     "                                    </li>");
@@ -635,6 +664,7 @@
                               }
                           } else {
                               delBtn.removeAttr("disabled");
+                              links.removeClass("disable");
                               Toast.fire({
                                   icon: "error",
                                   title: "&nbsp;" + data["message"],
@@ -643,6 +673,7 @@
                       },
                       error: function (xhr) {
                           delBtn.removeAttr("disabled");
+                          links.removeClass("disable");
                           console.log(xhr);
                       }
                     });

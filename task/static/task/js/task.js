@@ -63,9 +63,11 @@ $('#cancel-task-modal').on('show.bs.modal', function(e) {
     let taskID = aEle.data('id');
     let cancelTaskForm = $("#cancel-task-form");
     let cancelBtn = cancelTaskForm.find("button[type=submit]");
+    let links = taskTableBodyEle.find("a");
     cancelTaskForm.off("submit");
     cancelTaskForm.submit(function () {
         cancelBtn.attr("disabled", "disabled");
+        links.addClass("disable");
         $.ajax({
             url: $(this).attr("action").split("/").slice(0,-2).concat(taskID).join("/") + "/",
             type: "POST",
@@ -74,6 +76,7 @@ $('#cancel-task-modal').on('show.bs.modal', function(e) {
             success: function (data) {
               if(data["status"] === "SUCCESS") {
                   cancelBtn.removeAttr("disabled");
+                  links.removeClass("disable");
                   Toast.fire({
                       icon: "success",
                       title: "&nbsp;任务已终止",
@@ -99,6 +102,7 @@ $('#cancel-task-modal').on('show.bs.modal', function(e) {
                   taskTable.columns.adjust().draw();
               } else {
                   cancelBtn.removeAttr("disabled");
+                  links.removeClass("disable");
                   Toast.fire({
                       icon: "error",
                       title: "&nbsp;" + data["message"],
@@ -107,6 +111,7 @@ $('#cancel-task-modal').on('show.bs.modal', function(e) {
             },
             error: function (xhr) {
               cancelBtn.removeAttr("disabled");
+              links.removeClass("disable");
               console.log(xhr);
             }
         });
