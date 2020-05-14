@@ -222,8 +222,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 </ul>
                             </li>
                             {% if  request.user.is_superuser == 1 %}
-                                <li class="nav-item has-treeview {% block nav_tree_open %}{% endblock %}">
+                                <li id="template-management-li" class="nav-item has-treeview {% block nav_tree_open %}{% endblock %}">
+                                    <script>
+                                        (function () {
+                                          if (Boolean(sessionStorage.getItem('template-management-open'))) {
+                                            let li = document.getElementById("template-management-li");
+                                            li.className = li.className + ' menu-open';
+                                          }
+                                        })();
+                                    </script>
                                     <a
+                                        id="template-management-link"
                                         href="#"
                                         class="nav-link {% block nav_admin_active %}{% endblock %}"
                                     >
@@ -331,6 +340,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 sessionStorage.setItem('recent-edit-open', '');
               } else {
                 sessionStorage.setItem('recent-edit-open', '1');
+              }
+            });
+            $('#template-management-link').click(function (event) {
+              event.preventDefault();
+              if (Boolean(sessionStorage.getItem('template-management'))) {
+                sessionStorage.setItem('template-management-open', '');
+              } else {
+                sessionStorage.setItem('template-management-open', '1');
               }
             });
         </script>
