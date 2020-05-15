@@ -344,7 +344,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             });
             $('#template-management-link').click(function (event) {
               event.preventDefault();
-              if (Boolean(sessionStorage.getItem('template-management'))) {
+              if (Boolean(sessionStorage.getItem('template-management-open'))) {
                 sessionStorage.setItem('template-management-open', '');
               } else {
                 sessionStorage.setItem('template-management-open', '1');
