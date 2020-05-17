@@ -362,7 +362,7 @@ function validate() {
         return false;
     }
     for(var i=0;i<value1.length;i++){
-        if(value1[i].value===''){
+        if(value1[i].value===''&&value1[i].disabled!==true){
             alert("请将字段填写完整！");
             return false;
         }
