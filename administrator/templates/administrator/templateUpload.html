@@ -38,7 +38,7 @@
                 </ul>
                 </div><!-- /.card-header -->
                 <div class="card-body">
-                <form action="{% url 'create_template' %}" method="post" onsubmit="return validate();">
+                <form action="{% url 'create_template' %}" enctype="multipart/form-data" method="post" onsubmit="return validate();">
                     {% csrf_token %}
                 <div class="tab-content">
                     <div class="active tab-pane" id="activity">
