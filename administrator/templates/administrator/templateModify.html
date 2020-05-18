@@ -141,6 +141,9 @@
                             <th>中文名称</th>
                             <th>输入标签</th>
                             <th>参数类型</th>
+                            <th>最大值</th>
+                            <th>最小值</th>
+                            <th>长度</th>
                           </tr>
                           </thead>
                             <tbody>
@@ -150,6 +153,9 @@
                                     <td>{{param.display_name}}</td>
                                     <td>{{param.input_label}}</td>
                                     <td>{{param.input_type}}</td>
+                                    <td>{{param.number_min}}</td>
+                                    <td>{{param.number_max}}</td>
+                                    <td>{{param.length_limit}}</td>
                                 </tr>
                             {% endfor %}
                             </tbody>
