@@ -175,7 +175,7 @@ def create_template(request):
                 )
                 save_pic(
                     request.FILES['field_pic' + n],
-                    os.path.join(site_name, template_name, 'field', field_name)
+                    os.path.join(site_name, template_name, 'field', field_name + '.jpg')
                 )
 
         # 保存模板参数
@@ -199,7 +199,7 @@ def create_template(request):
                 param.save()
                 save_pic(
                     request.FILES['param_pic' + n],
-                    os.path.join(site_name, template_name, 'param', param_name)
+                    os.path.join(site_name, template_name, 'param', param_name + '.jpg')
                 )
 
         # egg文件
