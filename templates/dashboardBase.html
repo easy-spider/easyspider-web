@@ -14,6 +14,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
         <!-- jQuery -->
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.min.js"></script>
+        <script>
+            function escapeHtml(unsafe) {
+                return unsafe
+                     .replace(/&/g, "&amp;")
+                     .replace(/</g, "&lt;")
+                     .replace(/>/g, "&gt;")
+                     .replace(/"/g, "&quot;")
+                     .replace(/'/g, "&#039;");
+             }
+        </script>
         <!-- Custom css -->
         <link
             rel="stylesheet"
@@ -177,7 +187,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                                         "                                                class=\"far fa-circle nav-icon hidden\"\n" +
                                                         "                                            ></i>\n" +
                                                         "                                            <p>\n" +
-                                                        "                                                " + tasks[i]['name'] +"\n" +
+                                                        "                                                " + escapeHtml(tasks[i]['name']) +"\n" +
                                                         "                                            </p>\n" +
                                                         "                                        </a>\n" +
                                                         "                                    </li>");
@@ -188,7 +198,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                                         "                                                class=\"far fa-circle nav-icon hidden\"\n" +
                                                         "                                            ></i>\n" +
                                                         "                                            <p>\n" +
-                                                        "                                                " + tasks[i]['name'] +"\n" +
+                                                        "                                                " + escapeHtml(tasks[i]['name']) +"\n" +
                                                         "                                            </p>\n" +
                                                         "                                        </a>\n" +
                                                         "                                    </li>");
@@ -200,7 +210,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                                         "                                                class=\"far fa-circle nav-icon hidden\"\n" +
                                                         "                                            ></i>\n" +
                                                         "                                            <p>\n" +
-                                                        "                                                " + tasks[i]['name'] +"\n" +
+                                                        "                                                " + escapeHtml(tasks[i]['name']) +"\n" +
                                                         "                                            </p>\n" +
                                                         "                                        </a>\n" +
                                                         "                                    </li>");
@@ -212,10 +222,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 </ul>
                             </li>
                             {% if  request.user.is_superuser == 1 %}
-                                <li class="nav-item has-treeview">
+                                <li id="template-management-li" class="nav-item has-treeview {% block nav_tree_open %}{% endblock %}">
+                                    <script>
+                                        (function () {
+                                          if (Boolean(sessionStorage.getItem('template-management-open'))) {
+                                            let li = document.getElementById("template-management-li");
+                                            li.className = li.className + ' menu-open';
+                                          }
+                                        })();
+                                    </script>
                                     <a
+                                        id="template-management-link"
                                         href="#"
-                                        class="nav-link "
+                                        class="nav-link {% block nav_admin_active %}{% endblock %}"
                                     >
                                         <i class="nav-icon fas fa-tachometer-alt"></i>
                                         <p>
@@ -225,7 +244,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                     </a>
                                     <ul class="nav nav-treeview">
                                         <li class="nav-item edit-item">
-                                            <a class="nav-link" href="{% url 'create_template' %}">
+                                            <a class="nav-link {% block nav_upload_active %}{% endblock %}" href="{% url 'create_template' %}">
                                                 <i
                                                     class="far fa-circle nav-icon"
                                                 ></i>
@@ -235,7 +254,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                             </a>
                                         </li>
                                         <li class="nav-item edit-item">
-                                            <a class="nav-link" href="{% url 'list_template' %}">
+                                            <a class="nav-link {% block nav_modify_active %}{% endblock %}" href="{% url 'list_template' %}">
                                                 <i
                                                     class="far fa-circle nav-icon"
                                                 ></i>
@@ -246,17 +265,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                         </li>
                                     </ul>
                                 </li>
-                            <li class="nav-item">
-                                <a
-                                    href="{% url 'list_node' %}"
-                                    class="nav-link "
-                                >
-                                    <i class="nav-icon fas fa-edit"></i>
-                                    <p>
-                                        节点管理
-                                    </p>
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a
+                                        href="{% url 'list_node' %}"
+                                        class="nav-link {% block nav_node_active %}{% endblock %}"
+                                    >
+                                        <i class="nav-icon fas fa-edit"></i>
+                                        <p>
+                                            节点管理
+                                        </p>
+                                    </a>
+                                </li>
                             {% endif %}
 
                         </ul>
@@ -323,6 +342,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 sessionStorage.setItem('recent-edit-open', '1');
               }
             });
+            $('#template-management-link').click(function (event) {
+              event.preventDefault();
+              if (Boolean(sessionStorage.getItem('template-management-open'))) {
+                sessionStorage.setItem('template-management-open', '');
+              } else {
+                sessionStorage.setItem('template-management-open', '1');
+              }
+            });
         </script>
         <script src="{% static 'spiderTemplate/js/base.js' %}"></script>
         <script>
@@ -347,7 +374,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 "                                                class=\"far fa-circle nav-icon hidden\"\n" +
                                 "                                            ></i>\n" +
                                 "                                            <p>\n" +
-                                "                                                " + tasks[i]['name'] +"\n" +
+                                "                                                " + escapeHtml(tasks[i]['name']) +"\n" +
                                 "                                            </p>\n" +
                                 "                                        </a>\n" +
                                 "                                    </li>");

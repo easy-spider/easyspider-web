@@ -26,7 +26,15 @@ img {
     font-size: 0.95rem;
     margin-left: 150px;
     text-align: left;
+    letter-spacing: 15.8952px;
 }
 .widget-user-header{
     padding-bottom: 10px;
+    width:90%;
+    padding-left: 5%;
+}
+.widget-user-username {
+    margin-left: 150px!important;
+    font-size: 25px;
+    margin-bottom: .3rem;
 }

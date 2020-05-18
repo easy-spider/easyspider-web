@@ -7,6 +7,26 @@
     width: 100%;
 }
 
+.widget-user-desc{
+    font-size: 0.95rem;
+    margin-left: 150px;
+    text-align: left;
+    letter-spacing: 15.8952px;
+}
+.widget-user-header{
+    margin-top: 10px;
+    padding-bottom: 10px;
+    width:60%;
+    padding-left: 10%;
+    float: left;
+}
+.widget-user-username {
+    margin-top: 5px;
+    margin-left: 150px!important;
+    font-size: 25px;
+    margin-bottom: .3rem;
+}
+
 .top-logo{
     padding-top: 20px;
     padding-left: 150px;

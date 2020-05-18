@@ -293,7 +293,9 @@ function add2() {
     div.append(label);
 
     td1.append(input1);
+    td1.style.width='200px';
     td2.append(input3);
+    td2.style.width='200px';
     td5.append(input_label_div);
     td5.style.width='160px';
     td6.append(input_type_div);
@@ -362,7 +364,7 @@ function validate() {
         return false;
     }
     for(var i=0;i<value1.length;i++){
-        if(value1[i].value===''){
+        if(value1[i].value===''&&value1[i].disabled!==true){
             alert("请将字段填写完整！");
             return false;
         }

@@ -1,23 +1,24 @@
 {% extends 'dashboardBase.html' %}
 {% load static %}
 
-{% block title %}EasySpider | 修改模板{% endblock %}
+{% block title %}EasySpider | 上传模板{% endblock %}
 
 {% block css_extend %}
-    <link rel="stylesheet" href="{% static 'easyspider/css/templateModify.css' %}" />
+    <link rel="stylesheet" href="{% static 'administrator/css/templateUpload.css' %}" />
 {% endblock %}
 
-{% block page_title %}修改模板{% endblock %}
+{% block nav_upload_active %}active{% endblock %}
+{% block nav_admin_active %}active{% endblock %}
+{% block nav_tree_open %}menu-open{% endblock %}
+
+{% block page_title %}上传模板{% endblock %}
 
 {% block page_link %}
     <li class="breadcrumb-item">
         <a href="{% url 'starter' %}">首页</a>
     </li>
-    <li class="breadcrumb-item">
-        <a href="{% url 'list_template' %}">管理现有模板</a>
-    </li>
     <li class="breadcrumb-item active">
-        修改模板
+        上传模板
     </li>
 {% endblock %}
 
@@ -37,47 +38,48 @@
                 </ul>
                 </div><!-- /.card-header -->
                 <div class="card-body">
-                <form onsubmit="return validate();">
+                <form action="{% url 'create_template' %}" enctype="multipart/form-data" method="post" onsubmit="return validate();">
+                    {% csrf_token %}
                 <div class="tab-content">
                     <div class="active tab-pane" id="activity">
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label">所属网站</label>
+                            <label for="inputName" class="col-sm-2 col-form-label">所属网站</label>
                             <div class="col-sm-10">
-                                {{template.site}}
+                                <select class="custom-select" name="site_name">
+                                    {% for site in site_list %}
+                                        <option value="{{site.name}}">{{site.display_name}}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">英文名称</label>
                             <div class="col-sm-10">
-                                {{template.name}}
+                                <input type="text" class="form-control"  placeholder="对应Spider名字" name="name">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">中文名称</label>
                             <div class="col-sm-10">
-                                {{template.display_name}}
+                                <input type="text" class="form-control" placeholder="展示的名字" name="display_name">
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">模板简介</label>
                             <div class="col-sm-10">
-                                <textarea class="form-control" placeholder="HTML格式" disabled>
-                                    {{template.introduction}}
-                                </textarea>
+                                <textarea class="form-control" placeholder="HTML格式" name="introduction"></textarea>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">示例数据</label>
                             <div class="col-sm-10">
-                                <textarea class="form-control" id="inputExperience" placeholder="HTML格式" disabled>
-                                    {{template.sample_data}}
-                                </textarea>
+                                <textarea class="form-control" id="inputExperience" placeholder="HTML格式" name="sample_data"></textarea>
                             </div>
                         </div>
                         <div class="form-group row">
                             <label class="col-sm-2 col-form-label">划分参数</label>
                             <div class="col-sm-10">
-                                {{template.split_param}}
+                                <input type="text" class="form-control" id="inputName" placeholder="用哪个参数划分任务（应为数字类型）" name="split_param">
                             </div>
                         </div>
                         <div class="form-group row">
@@ -85,70 +87,67 @@
                           <div class="col-sm-10">
                             <div class="custom-file">
                                 <div class="input-group-append">
-                                    <div class="input-group-text menu">预览图片<img src="{{ template.logo }}" height="400" id='img-1'/></div>
+                                    <input type="file" class="custom-file-input" id="file-1" onchange="handleFile1()" name="logo">
+                                    <div class="input-group-text menu">预览图片<img src="" height="400" id='img-1'></div>
                                 </div>
+                                <label class="custom-file-label"  id='fileName-1'>jpg文件</label>
                             </div>
                           </div>
                         </div>
                         <div class="form-group row">
-                          <label for="inputExperience" class="col-sm-2 col-form-label">egg文件</label>
+                          <label class="col-sm-2 col-form-label">egg文件</label>
                           <div class="col-sm-10">
                             <div class="custom-file">
-                              <input type="file" class="custom-file-input" id="file-2" onchange="handleFile2()">
+                              <input type="file" class="custom-file-input" id="file-2" onchange="handleFile2()" name="egg">
                               <label class= "custom-file-label" id='fileName-2'>选择文件</label>
                             </div>
                           </div>
                         </div>
                         <div class="form-group row">
                             <div class="offset-sm-2 col-sm-10">
-                                <button type="submit" class="btn btn-danger">修改egg文件</button>
+                                <button type="submit" class="btn btn-danger">上传模板</button>
                             </div>
                         </div>
                     <!-- /.card -->
                     </div>
                     <div class="tab-pane" id="settings"><div class="card-body">
+                        <button class='btn btn-success' type="button" onclick="add1()">新增采集字段</button>
                         <table  class="table">
                           <thead>
                           <tr>
-                            <th>字段英文名称</th>
-                            <th>字段中文名称</th>
+                            <th>英文名称</th>
+                            <th>中文名称</th>
+                            <th>预览截图</th>
+                            <th>操作</th>
                           </tr>
                           </thead>
-                            <tbody>
-                            {% for field in template.field_set.all %}
-                                <tr>
-                                    <td>{{field.name}}</td>
-                                    <td>{{field.display_name}}</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
+                          <tbody id='body1'>
+                          </tbody>
                         </table>
                       </div>
                     </div>
                     <!-- /.tab-pane -->
                     <div class="tab-pane" id="parameter">
                         <div class="card-body">
+                        <button class='btn btn-success' type="button" onclick="add2()">新增模板参数</button>
+
                         <table  class="table">
                           <thead>
                           <tr>
-                            <th>参数英文名称</th>
-                            <th>参数中文名称</th>
-                            <th>input_label</th>
-                            <th>input_type</th>
+                            <th>英文名称</th>
+                            <th>中文名称</th>
+                            <th>输入标签</th>
+                            <th>参数类型</th>
+                            <th>最小值</th>
+                            <th>最大值</th>
+                            <th>长度</th>
+                            <th>预览截图</th>
+                            <th>操作</th>
                           </tr>
                           </thead>
-                            <tbody>
-                            {% for param in template.param_set.all %}
-                                <tr>
-                                    <td>{{param.name}}</td>
-                                    <td>{{param.display_name}}</td>
-                                    <td>{{param.input_label}}</td>
-                                    <td>{{param.input_type}}</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                        </div>
+                          <tbody id='body2'>
+                          </tbody>
+                        </table></div>
                     </div>
                 </div>
                 </form>
@@ -165,6 +164,8 @@
 {% endblock %}
 
 {% block js_extend %}
+    <script src="{% static 'administrator/js/templateUpload.js' %}"></script>
+    <script src="{% static 'administrator/js/bs-custom-file-input.min.js' %}"></script>
     <script>
         var fileInput = document.getElementById('file-1'),
         previewImg = document.getElementById('img-1');
