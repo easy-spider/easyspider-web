@@ -49,6 +49,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <link rel="icon" href="{% static 'img/favicon.ico' %}" />
     </head>
     <body class="hold-transition sidebar-mini layout-navbar-fixed layout-fixed">
+        <script>
+            (function () {
+              if (Boolean(sessionStorage.getItem('collapse'))) {
+                let bodyEle = document.getElementsByTagName("body")[0];
+                bodyEle.className = bodyEle.className + ' sidebar-collapse';
+              }
+            })();
+        </script>
         <div class="wrapper">
             <!-- Navbar -->
             <nav
@@ -58,6 +66,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a
+                            id="collapse-link"
                             class="nav-link"
                             data-widget="pushmenu"
                             href="#"
@@ -348,6 +357,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 sessionStorage.setItem('template-management-open', '');
               } else {
                 sessionStorage.setItem('template-management-open', '1');
+              }
+            });
+            $('#collapse-link').click(function (event) {
+              event.preventDefault();
+              if (Boolean(sessionStorage.getItem('collapse'))) {
+                sessionStorage.setItem('collapse', '');
+              } else {
+                sessionStorage.setItem('collapse', '1');
               }
             });
         </script>

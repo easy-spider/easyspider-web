@@ -36,3 +36,7 @@
 .loading {
   display: none !important;
 }
+
+body {
+    min-width: 1390px;
+}
