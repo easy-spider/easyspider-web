@@ -11,6 +11,7 @@
 {% block nav_admin_active %}active{% endblock %}
 {% block nav_tree_open %}menu-open{% endblock %}
 
+
 {% block page_title %}修改模板{% endblock %}
 
 {% block page_link %}
@@ -41,7 +42,8 @@
                 </ul>
                 </div><!-- /.card-header -->
                 <div class="card-body">
-                <form onsubmit="return validate();">
+                <form action="{% url 'modify_template' template.id %}" onsubmit="return validate();" enctype="multipart/form-data" method="post">
+                    {% csrf_token %}
                 <div class="tab-content">
                     <div class="active tab-pane" id="activity">
                         <div class="form-group row">
@@ -98,7 +100,7 @@
                           <label for="inputExperience" class="col-sm-2 col-form-label">egg文件</label>
                           <div class="col-sm-10">
                             <div class="custom-file">
-                              <input type="file" class="custom-file-input" id="file-2" onchange="handleFile2()">
+                              <input type="file" class="custom-file-input" id="file-2" onchange="handleFile()" name="egg">
                               <label class= "custom-file-label" id='fileName-2'>选择文件</label>
                             </div>
                           </div>
@@ -114,8 +116,8 @@
                         <table  class="table">
                           <thead>
                           <tr>
-                            <th>字段英文名称</th>
-                            <th>字段中文名称</th>
+                            <th>英文名称</th>
+                            <th>中文名称</th>
                           </tr>
                           </thead>
                             <tbody>
@@ -135,10 +137,13 @@
                         <table  class="table">
                           <thead>
                           <tr>
-                            <th>参数英文名称</th>
-                            <th>参数中文名称</th>
-                            <th>input_label</th>
-                            <th>input_type</th>
+                            <th>英文名称</th>
+                            <th>中文名称</th>
+                            <th>输入标签</th>
+                            <th>参数类型</th>
+                            <th>最大值</th>
+                            <th>最小值</th>
+                            <th>长度</th>
                           </tr>
                           </thead>
                             <tbody>
@@ -148,6 +153,9 @@
                                     <td>{{param.display_name}}</td>
                                     <td>{{param.input_label}}</td>
                                     <td>{{param.input_type}}</td>
+                                    <td>{{param.number_min}}</td>
+                                    <td>{{param.number_max}}</td>
+                                    <td>{{param.length_limit}}</td>
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -168,6 +176,7 @@
     </section>
 {% endblock %}
 
+
 {% block js_extend %}
     <script>
         var fileInput = document.getElementById('file-1'),
@@ -183,6 +192,24 @@
             // 调用reader.readAsDataURL()方法，把图片转成base64
             reader.readAsDataURL(file);}, false
         );
+    </script>
+    <script>
+        function validate() {
+            var value=document.getElementById('file-2');
+            if(value.value===''){
+                alert("请上传egg文件！");
+                return false;
+            }
+            alert("修改egg文件成功！");
+            return true;
+        }
+    </script>
+    <script>
+       function handleFile(){
+            var file = document.getElementById("file-2");
+            var fileName = document.getElementById("fileName-2");
+            fileName.innerHTML = file.value;
+        }
     </script>
 {% endblock %}
 
