@@ -26,3 +26,7 @@
 #data-table td {
   vertical-align: middle !important;
 }
+
+.not-show {
+  display: none !important;
+}

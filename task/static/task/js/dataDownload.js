@@ -1,5 +1,8 @@
 let dataTableEle = $("#data-table");
 let dataTable = dataTableEle.DataTable({
+   fnInitComplete: function(){
+     $("#data-table-card").parent().removeClass("not-show");
+   },
   scrollX: true,
   searching: false,
   ordering: false,
