@@ -2,6 +2,7 @@ let dataTableEle = $("#data-table");
 let dataTable = dataTableEle.DataTable({
    fnInitComplete: function(){
      $("#data-table-card").parent().removeClass("not-show");
+     $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
    },
   scrollX: true,
   searching: false,
