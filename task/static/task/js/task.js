@@ -12,6 +12,7 @@ let taskTable = taskTableEle.DataTable({
          '              <span class="spinner-border spinner-border-sm loading" role="status" aria-hidden="true"></span>' +
          '              <i class="fas fa-sync"></i>&nbsp;刷新\n' +
          '            </button>');
+     $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
    },
   paging: false,
   info: false,

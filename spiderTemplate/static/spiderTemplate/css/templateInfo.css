@@ -41,3 +41,9 @@
 #arguments-vert-tabs-tab .nav-link.active {
   border-color: #ddd transparent #ddd #ddd !important;
 }
+
+#logo-div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
