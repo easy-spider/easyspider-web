@@ -326,14 +326,14 @@
             method: "GET",
             success: function (data) {
                 let message = "节点主机名：" + data.node_name +
-                        "\n状态：" + data.status +
+                        "\nScrapyd运行状态：" + data.status +
                         "\n等待运行任务：" + data.pending +
                         "\n正在运行任务：" + data.running +
-                        "\n完成运行任务：" + data.finished;
+                        "\n完成运行任务：" + data.finished + (data.finished === 100? "+" : "");
                 alert(message);
             },
             error: function () {
-                alert("检视失败");
+                alert("检视失败，已将该节点禁用");
                 window.location.reload();
             },
             complete: function () {
