@@ -33,7 +33,7 @@ $('#data-modal').on('show.bs.modal', function(e) {
   $(this).find(".modal-title").html("#" + rowIndex + " 数据详情");
   for(let i = 0; i < dtEles.length; i++) {
     let next = dtEles.eq(i).next();
-    let updateStr = "<dd>" + $(dataTable.cell(rowIndex - 1, i + 2).data().trim()).text().trim() + "</dd>";
+    let updateStr = "<dd class='text-break'>" + $(dataTable.cell(rowIndex - 1, i + 2).data().trim()).text().trim() + "</dd>";
     if(next.is("dd")) {
       next.html(updateStr);
     } else {
