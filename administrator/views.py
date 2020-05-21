@@ -78,10 +78,10 @@ def inspect_node(request, pk):
     node = get_object_or_404(Node, pk=pk)
     try:
         url = f'http://{node.ip}:{node.port}/daemonstatus.json'
-        r = requests.get(url, auth=(node.username, node.password)).json()
+        r = requests.get(url, auth=(node.username, node.password), timeout=1).json()
         return JsonResponse(r)
     except requests.exceptions.RequestException as _e:
-        node.status = NodeStatus.OFFLINE
+        node.status = NodeStatus.DISABLED
         node.save()
     return HttpResponseBadRequest()
 
