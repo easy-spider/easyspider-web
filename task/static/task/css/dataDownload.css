@@ -30,3 +30,7 @@
 .not-show {
   display: none !important;
 }
+
+.text-break {
+  word-wrap: break-word;
+}
