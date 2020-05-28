@@ -1,8 +1,12 @@
+import re
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
+
+EMAIL_REGEX = re.compile(r'[a-zA-Z0-9_\-]+@[a-zA-Z0-9_\-]+(\.[a-zA-Z0-9_\-]+)+')
 
 
 @require_http_methods(['GET', 'POST'])
@@ -38,6 +42,8 @@ def register(request):
     nickname = request.POST['first_name']
     if User.objects.filter(username=username).exists():
         return render(request, 'user/register.html', {'error_message': '用户名已存在'})
+    elif not re.fullmatch(EMAIL_REGEX, email):
+        return render(request, 'user/register.html', {'error_message': '邮箱格式错误'})
     User.objects.create_user(username, email, password, first_name=nickname)
     return redirect(reverse('index'))
 
@@ -68,6 +74,9 @@ def user_profile(request):
         return redirect(reverse('login'))
     if request.method == 'GET':
         return render(request, 'user/information.html')
+
+    if not re.fullmatch(EMAIL_REGEX, request.POST['email']):
+        return render(request, 'user/information.html', {'error_message': '邮箱格式错误'})
     request.user.email = request.POST['email']
     request.user.first_name = request.POST['first_name']
     request.user.save()

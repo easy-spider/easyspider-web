@@ -31,7 +31,15 @@ class RegisterViewTests(TestCase):
             'email': 'zzy@foobar.com', 'first_name': 'ZZy'
         }
         response = self.client.post(reverse('register'), data)
-        self.assertContains(response, '用户名已存在')
+        self.assertEqual('用户名已存在', response.context['error_message'])
+
+    def test_invalid_email(self):
+        """邮箱格式错误"""
+        data = {'username': 'zzy', 'password': 'abcdef', 'first_name': 'ZZy'}
+        for email in ('zzy', 'zzy@', 'zzy@example', '$as%d*&'):
+            data['email'] = email
+            response = self.client.post(reverse('register'), data)
+            self.assertEqual('邮箱格式错误', response.context['error_message'])
 
 
 class LoginViewTests(TestCase):
@@ -97,6 +105,15 @@ class UserProfileViewTests(TestCase):
         self.client.login(username='zzy', password='123456')
         response = self.client.get(reverse('user_profile'))
         self.assertTemplateUsed(response, 'user/information.html')
+
+    def test_invalid_email(self):
+        """邮箱格式错误"""
+        self.client.login(username='zzy', password='123456')
+        data = {'first_name': 'ZZy979'}
+        for email in ('zzy', 'zzy@', 'zzy@example', '$as%d*&'):
+            data['email'] = email
+            response = self.client.post(reverse('user_profile'), data)
+            self.assertEqual('邮箱格式错误', response.context['error_message'])
 
     def test_post(self):
         self.client.login(username='zzy', password='123456')
