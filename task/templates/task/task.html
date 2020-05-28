@@ -350,6 +350,7 @@
                     "</a>");
                 taskTable.columns.adjust().draw();
             } else if(status === "running" && preStatus !== statusDisplayName) {
+                // from ready to running
                 ops.empty();
                 ops.append("<a href=\"\" data-toggle=\"modal\" data-target=\"\" data-id=\"" + taskID + "\">\n" +
                     "                                    <i class=\"far fa-pause-circle hidden\"></i>\n" +
@@ -362,6 +363,7 @@
                     "                                  >\n" +
                     "                                    <i class=\"far fa-stop-circle hidden\"></i>\n" +
                     "</a>");
+                ops.find("a").on("click", pauseAndRunning);
                 taskTable.columns.adjust().draw();
             }
             tdEles.eq(8).find(".progress")
@@ -768,7 +770,7 @@
           }
         });
 
-        taskTableBodyEle.find("tr td:nth-of-type(4) a").on("click", function () {
+        function pauseAndRunning() {
             let ele = $(this).find("i");
             let parent = $(this).parent("td");
             let status = parent.prev("td");
@@ -835,7 +837,8 @@
                     });
                 }
             }
-            taskTable.columns.adjust().draw();
-        });
+        }
+
+        taskTableBodyEle.find("tr td:nth-of-type(4) a").on("click", pauseAndRunning);
     </script>
 {% endblock %}
