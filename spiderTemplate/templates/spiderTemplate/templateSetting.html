@@ -108,6 +108,7 @@
         let btn = $(".btn-primary");
         let btnSpan = btn.find("span");
         $("#setting-form").submit(function () {
+            console.log("HELP");
             let isValid = true;
             btn.attr('disabled','disabled');
             btnSpan.removeClass("loading");
