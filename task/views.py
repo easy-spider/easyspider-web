@@ -85,7 +85,7 @@ def restart_task(request, task_pk):
     if task.user_id != request.user.id:
         return HttpResponseForbidden('Not your task')
     if task.status not in ['finished', 'canceled']:
-        return HttpResponseForbidden('Operation not allowed')
+        return JsonResponse({'status': 'ERROR', 'message': '非已完成或已终止状态的任务不能重新启动'})
 
     template = task.template
     if 'noChange' not in request.POST:
@@ -173,7 +173,9 @@ def change_task_status(request, task_pk, status):
     if task.user_id != request.user.id:
         return HttpResponseForbidden('Not your task')
     if task.status not in ALLOWED_OPERATION or status not in ALLOWED_OPERATION[task.status]:
-        return HttpResponseForbidden('Operation not allowed')
+        return JsonResponse(
+            {'status': 'ERROR', 'message': f'{task.status} -> {status} not allowed'}
+        )
 
     task.status = status
     task.save()
@@ -199,7 +201,7 @@ def clear_data(request, task_pk):
     if task.user_id != request.user.id:
         return HttpResponseForbidden('Not your task')
     if task.status not in ['finished', 'canceled']:
-        return HttpResponseForbidden('Operation not allowed')
+        return JsonResponse({'status': 'ERROR', 'message': '非已完成或已终止状态的任务不能清除数据或删除'})
 
     try:
         client = MongoClient(settings.MONGODB_URI)

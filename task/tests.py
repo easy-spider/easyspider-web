@@ -295,18 +295,19 @@ class ChangeTaskStatusViewTests(TestCase):
         """操作不符合状态转移图"""
         self.client.login(username='zzy', password='123456')
 
-        # {view_name: [allowed_status]}
+        # {view_name: [not_allowed_status]}
         status_map = {
             'pause_task': ['ready', 'paused', 'finished', 'canceled'],
             'resume_task': ['ready', 'running', 'finished', 'canceled'],
             'cancel_task': ['finished', 'canceled']
         }
-        for view_name in status_map:
+        for view_name, to_status in zip(status_map, ('paused', 'running', 'canceled')):
             for s in status_map[view_name]:
                 task = self.user.task_set.get(status=s)
                 response = self.client.post(reverse(view_name, args=(task.id,)))
-                self.assertEqual(403, response.status_code)
-                self.assertEqual(b'Operation not allowed', response.content)
+                d = response.json()
+                self.assertEqual('ERROR', d['status'])
+                self.assertEqual(f'{s} -> {to_status} not allowed', d['message'])
 
     def test_pause(self):
         """running状态的任务可暂停，所有PENDING状态的作业改为CREATED"""
@@ -381,8 +382,9 @@ class DeleteTaskViewTests(TestCase):
         for s in ('ready', 'running', 'paused'):
             task = self.user.task_set.get(status=s)
             response = self.client.post(reverse('delete_task', args=(task.id,)))
-            self.assertEqual(403, response.status_code)
-            self.assertEqual(b'Operation not allowed', response.content)
+            d = response.json()
+            self.assertEqual('ERROR', d['status'])
+            self.assertEqual('非已完成或已终止状态的任务不能清除数据或删除', d['message'])
 
     def test_ok(self):
         self.client.login(username='zzy', password='123456')
@@ -435,5 +437,6 @@ class ClearDataViewTests(TestCase):
         for s in ('ready', 'running', 'paused'):
             task = self.user.task_set.get(status=s)
             response = self.client.post(reverse('clear_data', args=(task.id,)))
-            self.assertEqual(403, response.status_code)
-            self.assertEqual(b'Operation not allowed', response.content)
+            d = response.json()
+            self.assertEqual('ERROR', d['status'])
+            self.assertEqual('非已完成或已终止状态的任务不能清除数据或删除', d['message'])
