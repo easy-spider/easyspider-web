@@ -439,4 +439,4 @@ class ClearDataViewTests(TestCase):
             response = self.client.post(reverse('clear_data', args=(task.id,)))
             d = response.json()
             self.assertEqual('ERROR', d['status'])
-            self.assertEqual('非已完成或已终止状态的任务不能清除数据=', d['message'])
+            self.assertEqual('非已完成或已终止状态的任务不能清除数据', d['message'])
