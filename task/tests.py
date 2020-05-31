@@ -307,7 +307,7 @@ class ChangeTaskStatusViewTests(TestCase):
                 response = self.client.post(reverse(view_name, args=(task.id,)))
                 d = response.json()
                 self.assertEqual('ERROR', d['status'])
-                self.assertEqual(f'{s} -> {to_status} not allowed', d['message'])
+                self.assertEqual(f'禁止{s} -> {to_status}', d['message'])
 
     def test_pause(self):
         """running状态的任务可暂停，所有PENDING状态的作业改为CREATED"""
@@ -384,7 +384,7 @@ class DeleteTaskViewTests(TestCase):
             response = self.client.post(reverse('delete_task', args=(task.id,)))
             d = response.json()
             self.assertEqual('ERROR', d['status'])
-            self.assertEqual('非已完成或已终止状态的任务不能清除数据或删除', d['message'])
+            self.assertEqual('非已完成或已终止状态的任务不能清除数据', d['message'])
 
     def test_ok(self):
         self.client.login(username='zzy', password='123456')
@@ -439,4 +439,4 @@ class ClearDataViewTests(TestCase):
             response = self.client.post(reverse('clear_data', args=(task.id,)))
             d = response.json()
             self.assertEqual('ERROR', d['status'])
-            self.assertEqual('非已完成或已终止状态的任务不能清除数据或删除', d['message'])
+            self.assertEqual('非已完成或已终止状态的任务不能清除数据=', d['message'])

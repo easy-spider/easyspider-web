@@ -108,17 +108,16 @@
         let btn = $(".btn-primary");
         let btnSpan = btn.find("span");
         $("#setting-form").submit(function () {
-            console.log("HELP");
             let isValid = true;
             btn.attr('disabled','disabled');
             btnSpan.removeClass("loading");
             // 数据验证
-            $("input[type=text], textarea").each(function () {
+            $("input[type=text], textarea.form-control").each(function () {
                 let value = $(this).val().trim();
                 if(value.length === 0) {
                     Toast.fire({
                         icon: "error",
-                        title: "&nbsp;" + $(this).attr("placeholder").slice(3) + "不能为空",
+                        title: "&nbsp;" + $(this).prev().text().trim() + "不能为空",
                     });
                     isValid = false;
                     return false;
@@ -148,16 +147,7 @@
                 }
             });
 
-            // 任务状态验证
-            {% if template_setting_task %}
-                {% if template_setting_task.status != 'finished' and template_setting_task.status != 'canceled' %}
-                    Toast.fire({
-                        icon: "error",
-                        title: "&nbsp;非已完成或已终止的任务无法重新启动",
-                    });
-                    isValid = false;
-                {% endif %}
-            {% endif %}
+            // 任务状态验证后端完成
             if(!isValid) {
                 btn.removeAttr("disabled");
                 btnSpan.addClass("loading");
@@ -218,7 +208,7 @@
                             btnSpan.addClass("loading");
                             Toast.fire({
                                 icon: "error",
-                                title: "&nbsp;" + data["message"],
+                                title: "&nbsp;" + data['message'],
                             });
                         }
                     },

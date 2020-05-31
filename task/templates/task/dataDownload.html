@@ -343,7 +343,10 @@
                         confirmBtn.text("下载");
                         confirmBtnSpan.addClass("loading");
                     } else {
-                        console.log(data["message"]);
+                        Toast.fire({
+                            icon: "error",
+                            title: "&nbsp;" + data['message'],
+                        });
                         confirmBtn.removeClass("disabled");
                         confirmBtnSpan.addClass("loading");
                     }
