@@ -278,16 +278,6 @@
               let form = this;
               clearBtn.attr("disabled", "disabled");
               clearBtnSpan.removeClass("loading");
-              // 判断一下是否数据已清空
-              if(!dataTable.data().any()) {
-                  Toast.fire({
-                        icon: "info",
-                        title: "&nbsp;数据已清空",
-                  });
-                  clearBtn.removeAttr("disabled");
-                  clearBtnSpan.addClass("loading");
-                  return false;
-              }
               $.ajax({
                 url: $(form).attr("action"),
                 type: "POST",

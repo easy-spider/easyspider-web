@@ -663,14 +663,16 @@
         });
 
         btnEle.on("click", function () {
-          if($(this).find("i").hasClass("fa-sync")) {
-              location.reload();
-              taskTable.columns.adjust().draw();
+          let delBtn = $(this);
+          let delBtnSpan = delBtn.find("span");
+          if(delBtn.find("i").hasClass("fa-sync")) {
+              delBtn.attr("disabled", "disabled");
+              delBtnSpan.removeClass("loading");
+              window.location.reload(true);
+              taskTableBodyEle.find("a").addClass("disable");
               return false;
           } else {
               let taskForm = $("#task-form");
-              let delBtn = $(this);
-              let delBtnSpan = delBtn.find("span");
               let rows_selected = taskTableBodyEle.find("tr.selected");
               let links = rows_selected.find("a");
               taskForm.off("submit");
@@ -678,93 +680,74 @@
                 delBtn.attr("disabled", "disabled");
                 links.addClass("disable");
                 delBtnSpan.removeClass("loading");
-                let isValid = true;
                 let form = this;
-                // Iterate over all selected checkboxes
+                let post_data = {
+                  'csrfmiddlewaretoken': $(form).find("input[name=csrfmiddlewaretoken]").val()
+                };
+                let taskIDs = [];
                 rows_selected.each(function () {
-                  let taskStatus = $(this).find("td:nth-of-type(3)").text().trim();
-
-                  if(taskStatus !== "已完成" && taskStatus !== "已终止") {
-                      Toast.fire({
-                          icon: "error",
-                          title: "&nbsp;非已完成或已终止状态的任务不能删除",
-                      });
-                      isValid = false;
-                      links.removeClass("disable");
-                      delBtn.removeAttr("disabled");
-                      delBtnSpan.addClass("loading");
-                      return false;
-                  }
+                    let taskID = parseInt($(this).attr("id"));
+                    taskIDs.push(taskID);
                 });
-                if(isValid) {
-                    let post_data = {
-                      'csrfmiddlewaretoken': $(form).find("input[name=csrfmiddlewaretoken]").val()
-                    };
-                    let taskIDs = [];
-                    rows_selected.each(function () {
-                        let taskID = parseInt($(this).attr("id"));
-                        taskIDs.push(taskID);
-                    });
-                    post_data["ids"] = JSON.stringify(taskIDs);
-                    $.ajax({
-                      url: '{% url 'batch_delete_task' %}',
-                      type: "POST",
-                      data: post_data,
-                      cache: false,
-                      success: function (data) {
-                          if(data["status"] === "SUCCESS") {
-                              delBtn.removeAttr("disabled");
-                              links.removeClass("disable");
-                              delBtnSpan.addClass("loading");
-                              Toast.fire({
-                                  icon: "success",
-                                  title: "&nbsp;任务删除成功",
-                              });
-                              taskTable.rows(".selected").remove().draw(false);
-                              // reset button
-                              btnEle.html("<i class='fas fa-sync'></i>&nbsp;刷新");
-                              // update sidebar
-                              let tasks = data["tasks"];
-                              if (tasks) {
-                                let recentEditList = $("#recent-edit-list");
-                                // remove cur tasks
-                                recentEditList.empty();
-                                // 重新填充
-                                for(let i = 0; i < tasks.length; i++) {
-                                    let recentTaskID = tasks[i]['id'];
-                                    let templateID = tasks[i]['template_id'];
-                                    let url = "{% url 'template_setting' 1 %}".split("/").slice(0, -2).concat(templateID).join("/") + "/";
-                                    recentEditList.append("<li class=\"nav-item edit-item\">\n" +
-                                    "<a class=\"nav-link\" href=\""+ url + "?taskID=" + recentTaskID + "\">\n" +
-                                    "                                            <i\n" +
-                                    "                                                class=\"far fa-circle nav-icon hidden\"\n" +
-                                    "                                            ></i>\n" +
-                                    "                                            <p>\n" +
-                                    "                                                " + escapeHtml(tasks[i]['name']) +"\n" +
-                                    "                                            </p>\n" +
-                                    "                                        </a>\n" +
-                                    "                                    </li>");
-                                }
-                                sessionStorage.setItem('recent-edit-update', JSON.stringify(tasks));
-                              }
-                          } else {
-                              delBtn.removeAttr("disabled");
-                              links.removeClass("disable");
-                              delBtnSpan.addClass("loading");
-                              Toast.fire({
-                                  icon: "error",
-                                  title: "&nbsp;" + data["message"],
-                              });
-                          }
-                      },
-                      error: function (xhr) {
+                post_data["ids"] = JSON.stringify(taskIDs);
+                $.ajax({
+                  url: '{% url 'batch_delete_task' %}',
+                  type: "POST",
+                  data: post_data,
+                  cache: false,
+                  success: function (data) {
+                      if(data["status"] === "SUCCESS") {
                           delBtn.removeAttr("disabled");
                           links.removeClass("disable");
                           delBtnSpan.addClass("loading");
-                          console.log(xhr);
+                          Toast.fire({
+                              icon: "success",
+                              title: "&nbsp;任务删除成功",
+                          });
+                          taskTable.rows(".selected").remove().draw(false);
+                          // reset button
+                          btnEle.html("<i class='fas fa-sync'></i>&nbsp;刷新");
+                          // update sidebar
+                          let tasks = data["tasks"];
+                          if (tasks) {
+                            let recentEditList = $("#recent-edit-list");
+                            // remove cur tasks
+                            recentEditList.empty();
+                            // 重新填充
+                            for(let i = 0; i < tasks.length; i++) {
+                                let recentTaskID = tasks[i]['id'];
+                                let templateID = tasks[i]['template_id'];
+                                let url = "{% url 'template_setting' 1 %}".split("/").slice(0, -2).concat(templateID).join("/") + "/";
+                                recentEditList.append("<li class=\"nav-item edit-item\">\n" +
+                                "<a class=\"nav-link\" href=\""+ url + "?taskID=" + recentTaskID + "\">\n" +
+                                "                                            <i\n" +
+                                "                                                class=\"far fa-circle nav-icon hidden\"\n" +
+                                "                                            ></i>\n" +
+                                "                                            <p>\n" +
+                                "                                                " + escapeHtml(tasks[i]['name']) +"\n" +
+                                "                                            </p>\n" +
+                                "                                        </a>\n" +
+                                "                                    </li>");
+                            }
+                            sessionStorage.setItem('recent-edit-update', JSON.stringify(tasks));
+                          }
+                      } else {
+                          delBtn.removeAttr("disabled");
+                          links.removeClass("disable");
+                          delBtnSpan.addClass("loading");
+                          Toast.fire({
+                              icon: "error",
+                              title: "&nbsp;" + data["message"],
+                          });
                       }
-                    });
-                }
+                  },
+                  error: function (xhr) {
+                      delBtn.removeAttr("disabled");
+                      links.removeClass("disable");
+                      delBtnSpan.addClass("loading");
+                      console.log(xhr);
+                  }
+                });
                 return false;
               });
           }
